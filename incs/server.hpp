@@ -1,20 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   server.hpp                                                               */
+/*   main.cpp                                                                 */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/15 23:15:22 by Tiago                  /_____/ U         */
+/*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
+/*   Updated: 2024/05/15 23:34:45 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
-#define SERVER_HPP
+# define SERVER_HPP
 
-#include <iostream>
+# define RESET		"\033[0m"
+# define BLACK		"\033[30m"
+# define RED		"\033[31m"
+# define GREEN		"\033[32m"
+# define YELLOW		"\033[33m"
+# define BLUE		"\033[34m"
+# define MAGENTA	"\033[35m"
+# define CYAN		"\033[36m"
+# define WHITE		"\033[37m"
+
+# include <iostream>
 
 #endif

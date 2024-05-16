@@ -14,31 +14,37 @@
 
 NAME		=	SERVER
 CXX			=	c++
-RM			=	rm -f
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 -pedantic
-#CXXFLAGS	+=  -fsanitize=address -g3
-SRCS_FILES	=	main
-SRCS		= 	$(addprefix $(SRCS_DIR), $(addsuffix .cpp, $(SRCS_FILES)))
-OBJS		= 	$(addprefix $(OBJS_DIR), $(addsuffix .o, $(SRCS_FILES)))
-SRCS_DIR	=	srcs/
-OBJS_DIR	=	objs/
+CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
+CXXFLAGS	=	-fsanitize=address -g3
+INCLUDES	=	-Iincs
+RM			=	rm -rf
+MKDIR		=	mkdir -p
 
-all:
-				mkdir -p $(OBJS_DIR)
-				make $(NAME)
+SRC_PATH	=	srcs
+OBJ_PATH	=	objs
+ANNOYING	=	*.dSYM .vscode
+MAIN		=	srcs/main.cpp
+SRC			=	
+OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
-$(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp
-				$(CXX) $(CXXFLAGS) -c $< -o $@
+all: ${NAME}
 
-$(NAME):		$(OBJS)
-				$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+${NAME}: ${OBJ} $(MAIN)
+	${CXX} ${CXXFLAGS} ${INCLUDES} -o ${NAME} ${MAIN} ${OBJ}
+
+${OBJ_PATH}/%.o: ${SRC_PATH}/%.cpp
+	${MKDIR} ${@D}
+	${CXX} ${CXXFLAGS} ${INCLUDES} -c $< -o $@
+
+test: fclean all
+	./${NAME}
 
 clean:
-				rm -rf $(OBJS_DIR)
+	${RM} ${ANNOYING} ${OBJ_PATH}
 
-fclean:			clean
-				rm -rf $(NAME)
+fclean: clean
+	${RM} ${NAME}
 
-re:				fclean all
+re: fclean all
 
-.PHONY:			all clean fclean re
+.PHONY = all clean fclean re
