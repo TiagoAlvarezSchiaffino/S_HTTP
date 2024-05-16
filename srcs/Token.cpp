@@ -8,19 +8,19 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 02:01:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 02:02:57 by Tiago                  /_____/ U         */
+/*   Updated: 2024/05/16 04:11:04 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Token.hpp"
 
-Token::Token(const std::string &context, Type type, int lineNum) : _context(context), _lineNum(lineNum), _type(type) {}
+Token::Token(std::string token, Type type, int lineNum) : _token(token), _lineNum(lineNum), _type(type) {}
 
 Token::~Token() {}
 
-std::string	Token::getContext()
+std::string	Token::getToken()
 {
-	return (this->_context);
+	return (this->_token);
 }
 
 int	Token::getLineNum()
@@ -28,7 +28,7 @@ int	Token::getLineNum()
 	return (this->_lineNum);
 }
 
-Token::Type	Token::getType()
+Type	Token::getType()
 {
 	return (this->_type);
 }

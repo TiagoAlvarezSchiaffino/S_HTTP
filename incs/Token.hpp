@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:55:33 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 01:56:54 by Tiago                  /_____/ U         */
+/*   Updated: 2024/05/16 03:59:29 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,24 +17,26 @@
 
 # include <string>
 
+enum Type
+{
+    CONTEXT,
+    KEY,
+    VALUE,
+    SEMICOLON,
+    OPEN_BRACE,
+    CLOSE_BRACE
+};
+
 class Token
 {
 	public:
-		enum Type
-		{
-			OPEN_BRACE,
-			CLOSE_BRACE,
-			SEMICOLON,
-			TEXT,
-			INVALID
-		};
-		Token(const std::string &context, Type type, int lineNum);
+		Token(std::string context, Type type, int lineNum);
 		~Token();
-		std::string	getContext();
+		std::string	getToken();
 		int			getLineNum();
 		Type		getType();
 	private:
-		std::string	_context;
+		std::string	_token;
 		int			_lineNum;
 		Type		_type;
 };
