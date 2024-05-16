@@ -1,33 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   main.cpp                                                                 */
+/*   Token.hpp                                                                */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 23:58:01 by Tiago                  /_____/ U         */
+/*   Created: 2024/05/16 01:55:33 by Tiago                    /   (_____/     */
+/*   Updated: 2024/05/16 01:56:54 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERV_HPP
-# define SERV_HPP
+#ifndef TOKEN_HPP
+# define TOKEN_HPP
 
 # include <string>
-# include "ConfigManager.hpp"
 
-class Serv
+class Token
 {
 	public:
-		Serv(std::string configFilePath);
-		~Serv();
-		void	runServer();
-
+		enum Type
+		{
+			OPEN_BRACE,
+			CLOSE_BRACE,
+			SEMICOLON,
+			TEXT,
+			INVALID
+		};
+		Token(const std::string &context, Type type, int lineNum);
+		~Token();
+		std::string	getContext();
+		int			getLineNum();
+		Type		getType();
 	private:
-		std::string		_configFilePath;
-		ConfigManager	_configManager;
+		std::string	_context;
+		int			_lineNum;
+		Type		_type;
 };
 
 #endif

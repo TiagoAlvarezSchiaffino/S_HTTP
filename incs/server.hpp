@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/15 23:52:56 by Tiago                  /_____/ U         */
+/*   Updated: 2024/05/16 01:58:20 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,8 @@
 # include <iostream>
 # include <string>
 
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netdb.h>
-# include <arpa/inet.h>
-# include <netinet/in.h>
-
 # include "Serv.hpp"
+# include "ConfigManager.hpp"
 
 # define RESET		"\033[0m"
 # define BLACK		"\033[30m"
@@ -36,6 +31,6 @@
 # define CYAN		"\033[36m"
 # define WHITE		"\033[37m"
 
-# define DEFAULT_CONFIG_PATH "conf/default.conf"
+# define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 #endif

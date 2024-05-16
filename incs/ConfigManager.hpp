@@ -1,33 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   main.cpp                                                                 */
+/*   ConfigManager.hpp                                                        */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 23:58:01 by Tiago                  /_____/ U         */
+/*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
+/*   Updated: 2024/05/16 01:54:46 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERV_HPP
-# define SERV_HPP
+#ifndef CONFIGMANAGER_HPP
+# define CONFIGMANAGER_HPP
 
 # include <string>
-# include "ConfigManager.hpp"
+# include <fstream>
 
-class Serv
+# define ValidTokens "{};"
+# define ValidSpaces " \f\n\r\t\v"
+
+class ConfigManager
 {
 	public:
-		Serv(std::string configFilePath);
-		~Serv();
-		void	runServer();
+		ConfigManager();
+		ConfigManager(std::string configFilePath);
+		ConfigManager	&operator=(const ConfigManager &srcs);
+		~ConfigManager();
+		int	parseConfigFile();
 
 	private:
+		std::ifstream	_file;
 		std::string		_configFilePath;
-		ConfigManager	_configManager;
+		std::string		_fileBuffer;
 };
 
 #endif
