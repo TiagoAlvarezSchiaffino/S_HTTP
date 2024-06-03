@@ -8,7 +8,7 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/03 14:08:22 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/03 14:30:41 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
@@ -29,6 +29,8 @@ MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \
 				Token.cpp \
+				HttpPostResponse.cpp \
+				HttpDefaultResponse.cpp
 				EuleePocket.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
