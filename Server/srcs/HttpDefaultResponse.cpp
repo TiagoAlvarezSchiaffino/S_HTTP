@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:39:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 15:47:33 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 17:22:13 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,6 @@ void	HttpDefaultResponse::handleDefault()
 	else if (ret == 0)
 		std::cout << RED << "Poll timeout" << RESET << std::endl;
 	else if (this->_fds[0].revents & POLLOUT)
-	{
 		write(this->_socket, output.c_str(), output.length());
-		std::cout << "Default page sent" << std::endl;
-	}
 	close(this->_socket);
 }

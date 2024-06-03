@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 16:28:09 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 17:03:14 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include "../incs/ConfigManager.hpp"
 # include "../incs/HttpPostResponse.hpp"
 # include "../incs/HttpDefaultResponse.hpp"
+# include "../incs/HttpCgiResponse.hpp"
 # include "server.hpp"
 
 # define WS_DOMAIN		AF_INET
@@ -37,7 +38,7 @@
 # define WS_BACKLOG		10
 # define WS_PORT		8082
 # define WS_BUFFER_SIZE	30000
-# define WS_TIMEOUT		10000
+# define WS_TIMEOUT		3000
 
 class Serv
 {
@@ -49,13 +50,12 @@ class Serv
 	private:
 		void				_perrorExit(std::string msg);
 		void				_setupServer();
-		void				_handleCgi(std::string method, int contentLength);
 		int					_handleGet();
 		void				_serverLoop();
 
 		std::string					_configFilePath, _path;
 		std::vector<int>			_serverFd;
-		int							_newSocket;
+		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
 		pollfd						_fds[1];
 		ConfigManager				_configManager;
