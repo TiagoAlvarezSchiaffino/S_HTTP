@@ -1,43 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   EuleeHand.hpp                                                            */
+/*   EuleePocket.hpp                                                          */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 16:53:43 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/03 16:56:31 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EULEEHAND_HPP
-# define EULEEHAND_HPP
+#ifndef EULEEPOCKET_HPP
+# define EULEEPOCKET_HPP
 
-# include "EuleePocket.hpp"
-# include "ConfigManager.hpp"
+# include <string>
+# include <vector>
+# include <iostream>
 
-class EuleeHand
+struct EuleePocket
 {
-	public:
-		EuleeHand(void);
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
-		EuleeHand(const EuleeHand &ref);
-		~EuleeHand(void);
+	EuleePocket(void) {};
+	~EuleePocket(void) {};
 
-		EuleeHand	&operator=(const EuleeHand &ref);
+	// server block
+	std::string					root;
+	std::vector<std::string>	index;
 
-		void	printTokens(void);
-		void	parseConfigFile(void);
-		void	errorHandleShit(void);
-		void	configLibrary(void);
-
-		std::vector<EuleePocket>	block;
-
-	private:
-		std::string					_configFilePath;
-		ConfigManager				_configManager;
+	std::vector<std::string>	server_name;
+	std::vector<std::string>	location_path;
 };
 
 #endif
