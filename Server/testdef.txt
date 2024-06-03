@@ -1,0 +1,97 @@
+Token: |server| Type: |1| Line: |6| // key
+Token: |{| Type: |4| Line: |6| // open braces
+Token: |listen| Type: |1| Line: |7| // key
+Token: |80| Type: |2| Line: |8| // val
+Token: |;| Type: |3| Line: |8| // semicolon
+
+Token: |server_name| Type: |1| Line: |9| // key
+Token: || Type: |2| Line: |9| // val
+Token: || Type: |2| Line: |9| // val
+Token: |;| Type: |3| Line: |9| // semicolon
+
+Token: |access_log| Type: |1| Line: |10| // key
+Token: || Type: |2| Line: |10| // val
+Token: |main| Type: |2| Line: |10| // val
+Token: |;| Type: |3| Line: |10| // semicolon
+
+Token: |root| Type: |1| Line: |11| // key
+Token: |html| Type: |2| Line: |11| // val
+Token: |;| Type: |3| Line: |11| // semicolon
+
+Token: |location| Type: |1| Line: |13| // key
+Token: |~| Type: |2| Line: |13| // val
+Token: |\.php$| Type: |2| Line: |13| // val
+Token: |{| Type: |4| Line: |13| // open braces
+
+Token: |fastcgi_pass| Type: |1| Line: |14| // key
+Token: || Type: |2| Line: |14| // val
+Token: |;| Type: |3| Line: |14| // semicolon
+
+Token: |}| Type: |5| Line: |15| // close
+Token: |}| Type: |5| Line: |16| // close
+
+Token: |server| Type: |1| Line: |19| // key
+Token: |{| Type: |4| Line: |19| // open braces
+Token: |listen| Type: |1| Line: |20| // key
+Token: |80| Type: |2| Line: |20| // val
+Token: |;| Type: |3| Line: |20| // semicolon
+
+Token: |server_name| Type: |1| Line: |21| // key
+Token: || Type: |2| Line: |21| // val
+Token: || Type: |2| Line: |21| // val
+Token: |;| Type: |3| Line: |21| // semicolon
+
+Token: |access_log| Type: |1| Line: |22| // key
+Token: || Type: |2| Line: |22| // value
+Token: |main| Type: |2| Line: |22| // value
+Token: |;| Type: |3| Line: |22| // semicolon
+
+Token: |location| Type: |1| Line: |25| // key
+Token: |~| Type: |2| Line: |25| // val
+Token: |^/(images|javascript|js|css|flash|media|static)/| Type: |2| Line: |25| // val
+Token: |{| Type: |4| Line: |25| // open braces
+Token: |root| Type: |1| Line: |26| // value
+Token: || Type: |2| Line: |26| // val
+Token: |;| Type: |3| Line: |26| semicolon
+
+Token: |expires| Type: |1| Line: |27| // key
+Token: |30d| Type: |2| Line: |27| // val
+Token: |;| Type: |3| Line: |27| // semicolon
+
+Token: |}| Type: |5| Line: |28| // close
+
+Token: |location| Type: |1| Line: |31| // key
+Token: |/| Type: |2| Line: |31| // val
+Token: |{| Type: |4| Line: |31| // open braces
+Token: |proxy_pass| Type: |1| Line: |32| // key
+Token: || Type: |2| Line: |32| // val
+Token: |;| Type: |3| Line: |32| // semicolon
+
+Token: |}| Type: |5| Line: |33| // close
+Token: |}| Type: |5| Line: |34| // close
+
+Token: |server| Type: |1| Line: |37| // key
+Token: |{| Type: |4| Line: |37| // open braces
+Token: |listen| Type: |1| Line: |38| // key
+Token: |80| Type: |2| Line: |38| // val
+Token: |;| Type: |3| Line: |38| // semicolon
+
+Token: |server_name| Type: |1| Line: |39| // key
+Token: || Type: |2| Line: |39| // val
+Token: |;| Type: |3| Line: |39| // semicolon
+
+Token: |access_log| Type: |1| Line: |40| // key
+Token: || Type: |2| Line: |40| // val
+Token: |main| Type: |2| Line: |40| // val
+Token: |;| Type: |3| Line: |40| // semicolon
+
+Token: |location| Type: |1| Line: |42| // key
+Token: |/| Type: |2| Line: |42| // val
+Token: |{| Type: |4| Line: |42| // open braces
+
+Token: |proxy_pass| Type: |1| Line: |43| // key
+Token: || Type: |2| Line: |43| // val
+Token: |;| Type: |3| Line: |43| // semicolon
+
+Token: |}| Type: |5| Line: |44| // close
+Token: |}| Type: |5| Line: |45| // close

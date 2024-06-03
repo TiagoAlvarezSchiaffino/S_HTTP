@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 14:14:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 15:58:39 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ class EuleeHand
 
 		void	printTokens(void);
 		void	parseConfigFile(void);
+		void	errorHandleShit(void);
+		void	configLibrary(void);
 
 	private:
 		std::string		_configFilePath;
