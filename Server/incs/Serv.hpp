@@ -1,33 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   main.cpp                                                                 */
+/*   Serv.hpp                                                                 */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 23:58:01 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 14:28:18 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERV_HPP
 # define SERV_HPP
 
-# include <string>
-# include "ConfigManager.hpp"
+# include "EuleeHand.hpp"
 
 class Serv
 {
 	public:
 		Serv(std::string configFilePath);
-		~Serv();
-		void	runServer();
+		~Serv(void);
+
+		void	runServer(void);
 
 	private:
-		std::string		_configFilePath;
-		ConfigManager	_configManager;
+		EuleeHand	_database;
 };
 
 #endif

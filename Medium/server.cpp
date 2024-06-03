@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 06:19:02 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 06:44:13 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 14:26:30 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,7 +203,7 @@ int	server(int port)
 			file.close();
 
 			// Send file
-			std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: video/mp4\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
+			std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
 			printf("Sending file...\n");
 			// printf("Response: %s\n", http_response.c_str());
 			printf("File content: %s\n", file_contents.c_str());

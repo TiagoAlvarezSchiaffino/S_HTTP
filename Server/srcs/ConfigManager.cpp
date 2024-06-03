@@ -8,22 +8,22 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 06:58:01 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 14:20:39 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigManager.hpp"
 #include <unistd.h>
 
-ConfigManager::ConfigManager(): _configFilePath() {}
+ConfigManager::ConfigManager(void): _configFilePath() {}
 
 ConfigManager::ConfigManager(std::string configFilePath): _configFilePath(configFilePath) {}
 
 ConfigManager::~ConfigManager() {}
 
-ConfigManager	&ConfigManager::operator=(const ConfigManager &srcs)
+ConfigManager	&ConfigManager::operator=(const ConfigManager &ref)
 {
-	this->_configFilePath = srcs._configFilePath;
+	this->_configFilePath = ref._configFilePath;
 	return (*this);
 }
 
@@ -82,18 +82,16 @@ void	ConfigManager::parseConfigFile()
 	std::ifstream	file(this->_configFilePath.c_str(), std::ios::binary);
 	if (file.is_open() == false)
 		throw std::runtime_error("Failed to open config file");
+
 	std::string	line;
 	int			lineNum = 0;
-	// this->_fileBuffer = "{" + this->_fileBuffer + "}";
 	while (std::getline(file, line))
-	{
-		lineNum++;
-		this->_lexLine(line, lineNum);
-	}
+		this->_lexLine(line, ++lineNum);
 	file.close();
-	std::cout << "Here\n" << std::endl;
-	// for (size_t i = 0; i < this->_tokens.size(); i++)
-	// {
-	// 	std::cout << "Token: " << this->_tokens[i].getToken() << ", Type: " << this->_tokens[i].getType() << ", Line: " << this->_tokens[i].getLineNum() <<std::endl;
-	// }
+}
+
+void	ConfigManager::printTokens(void)
+{
+	for (size_t i = 0; i < this->_tokens.size(); i++)
+	std::cout << "Token: " << this->_tokens[i].getToken() << ", Type: " << this->_tokens[i].getType() << ", Line: " << this->_tokens[i].getLineNum() <<std::endl;
 }

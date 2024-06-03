@@ -1,46 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   Token.hpp                                                                */
+/*   EuleeHand.hpp                                                            */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/05/16 01:55:33 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 14:16:10 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/03 14:14:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef TOKEN_HPP
-# define TOKEN_HPP
+#ifndef EULEEHAND_HPP
+# define EULEEHAND_HPP
 
-# include <string>
+# include "ConfigManager.hpp"
 
-enum Type
-{
-    CONTEXT,
-    KEY,
-    VALUE,
-    SEMICOLON,
-    OPEN_BRACE,
-    CLOSE_BRACE
-};
-
-class Token
+class EuleeHand
 {
 	public:
-		Token(std::string context, Type type, int lineNum);
-		~Token(void);
+		EuleeHand(void);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
+		EuleeHand(const EuleeHand &ref);
+		~EuleeHand(void);
 
-		Type		getType(void);
-		std::string	getToken(void);
-		int			getLineNum(void);
+		EuleeHand	&operator=(const EuleeHand &ref);
+
+		void	printTokens(void);
+		void	parseConfigFile(void);
 
 	private:
-		Type		_type;
-		std::string	_token;
-		int			_lineNum;
+		std::string		_configFilePath;
+		ConfigManager	_configManager;
 };
 
 #endif

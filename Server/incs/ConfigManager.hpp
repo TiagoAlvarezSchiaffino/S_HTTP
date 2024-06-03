@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 06:51:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 14:11:46 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,21 @@
 class ConfigManager
 {
 	public:
-		ConfigManager();
+		ConfigManager(void);
 		ConfigManager(std::string configFilePath);
-		ConfigManager	&operator=(const ConfigManager &srcs);
-		~ConfigManager();
-		void			parseConfigFile();
+		~ConfigManager(void);
+
+		ConfigManager	&operator=(const ConfigManager &ref);
+
+		void			parseConfigFile(void);
+		void			printTokens(void);
 
 	private:
-		void						_lexLine(std::string line, int lineNum);
-		void						_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
-		std::string					_configFilePath;
-		std::vector<Token>			_tokens;
+		std::vector<Token>	_tokens;
+		std::string			_configFilePath;
+
+		void				_lexLine(std::string line, int lineNum);
+		void				_createToken(std::string *token, Type *currentType, Type type, std::string c, int lineNum);
 };
 
 #endif

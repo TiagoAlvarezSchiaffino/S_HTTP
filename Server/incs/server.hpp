@@ -1,14 +1,14 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   main.cpp                                                                 */
+/*   server.cpp                                                                 */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 01:58:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 14:17:24 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 # include "Serv.hpp"
 # include "ConfigManager.hpp"
+# include "EuleeHand.hpp"
 
 # define RESET		"\033[0m"
 # define BLACK		"\033[30m"
