@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 12:48:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:02:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,9 @@
 # include "server.hpp"
 # include "HttpPutResponse.hpp"
 
+# define WS_SERVER_NAME			"localhost"
 # define WS_BACKLOG				10
-# define WS_PORT				8080
+# define WS_PORT				8081
 # define WS_BUFFER_SIZE			30000
 # define WS_TIMEOUT				3
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
@@ -65,11 +66,8 @@ class Serv
 		int							_unchunkResponse();
 		void						_serverLoop();
 
-		std::string					_configFilePath, _path, _buffer;
-		std::vector<int>			_serverFd;
-		int							_socket;
-		std::vector<sockaddr_in>	_serverAddr;
 		ConfigManager				_configManager;
+		EuleeHand					_database;
 };
 
 #endif

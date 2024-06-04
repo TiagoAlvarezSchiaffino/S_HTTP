@@ -8,13 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:27:05 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:10:01 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpCgiResponse.hpp"
 
-HttpCgiResponse::HttpCgiResponse(std::string path, std::string method, int socket) : _path(path), _method(method), _socket(socket) {}
+HttpCgiResponse::HttpCgiResponse(EuleeHand database) : _database(database) {}
 
 HttpCgiResponse::~HttpCgiResponse() {}
 
@@ -43,7 +43,7 @@ void	HttpCgiResponse::handleCgi()
         // setenv("CONTENT_LENGTH", std::to_string(contentLength.c_str(), 1);
 		setenv("CONTENT_LENGTH", "69", 1);
 
-		char	*cmds[2] = {(char *)(this->_path.c_str() + 1), NULL};
+		char	*cmds[2] = {(char *)(this->_database.methodPath.c_str() + 1), NULL};
 		execve(cmds[0], cmds, NULL);
 		std::cerr << RED << "Failed to execve CGI: " << strerror(errno) << RESET << std::endl;
         std::cout << "HTTP/1.1 404 Not Found\r\n\r\nCGI requested is not found...\r\n" << std::endl;
@@ -58,13 +58,13 @@ void	HttpCgiResponse::handleCgi()
         int n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
         while (n > 0)
 		{
-			ft_select(this->_socket, &buffer[0], n, WRITE);
+			this->_database.ft_select(this->_database.socket, &buffer[0], n, WRITE);
 			n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);
         }
 
         close(cgiInput[1]);
         close(cgiOutput[0]);
         waitpid(pid, &status, 0);
-		close(this->_socket);
+		close(this->_database.socket);
     }
 }

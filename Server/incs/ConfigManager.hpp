@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 10:40:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:14:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class ConfigManager
 		int				checkOpenBrace(int i, int previous, int *braces, int main_block);
 		int				checkCloseBrace(int i, int previous, int *braces, int *main_block);
 
-		int				locationBlock(size_t *i);
+		int				locationBlock(size_t i);
 		void			errorHandleShit(void);
 
 		// Utils

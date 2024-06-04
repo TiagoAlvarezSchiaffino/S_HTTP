@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 09:12:00 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:14:51 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:50:07 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,12 @@
 class HttpHeadResponse
 {
 	public:
-		HttpHeadResponse(int socket, std::string path);
+		HttpHeadResponse(EuleeHand database);
 		~HttpHeadResponse();
 		void	handleHead();
 
 	private:
-		int		_socket;
-		std::string	_path;
+		EuleeHand	_database;
 };
 
 #endif

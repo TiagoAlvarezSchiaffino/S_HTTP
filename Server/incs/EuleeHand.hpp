@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:09:30 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:34:08 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,12 @@ class EuleeHand
 		long	ft_select(int fd, void *buff, size_t size, Mode mode);
 		int		sendHttp(std::string statusCode, std::string path);
 
+		int							socket;
 		std::map<std::string, std::string>	envp, cgi , statusCode;
 		std::vector<EuleePocket>	server;
 		std::vector<int>			serverFd;
 		std::vector<sockaddr_in>	serverAddr;
 		std::string					methodPath, buffer;
-		int							socket, contentLength;
 
 	private:
 		std::string		_configFilePath;

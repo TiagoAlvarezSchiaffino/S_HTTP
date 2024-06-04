@@ -8,15 +8,15 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 11:34:10 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:06:59 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand(void) : server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), contentLength(), _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand(void) : socket(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(), _configManager() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) : server(), serverFd(), serverAddr(), methodPath(), buffer(), socket(), contentLength(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) :  socket(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(configFilePath), _configManager(configManager) {}
 
 EuleeHand::~EuleeHand(void) {}
 

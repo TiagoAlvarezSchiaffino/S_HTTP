@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 08:40:21 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:11:44 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:45:16 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,12 @@
 class HttpDeleteResponse
 {
 	public:
-		HttpDeleteResponse(int socket, std::string path);
+		HttpDeleteResponse(EuleeHand database);
 		~HttpDeleteResponse();
 		void	handleDelete();
 
 	private:
-		int		_socket;
-		std::string	_path;
+		EuleeHand	_database;
 };
 
 #endif

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:51:50 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:12:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:47:54 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,12 @@
 class HttpGetResponse
 {
 	public:
-		HttpGetResponse(std::string path, int socket);
+		HttpGetResponse(EuleeHand database);
 		~HttpGetResponse();
 		void		handleGet();
 
 	private:
-		int			_socket;
-		std::string	_path;
+		EuleeHand	_database;
 };
 
 #endif

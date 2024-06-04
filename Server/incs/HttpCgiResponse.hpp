@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:58:46 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:10:17 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:40:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,12 @@
 class HttpCgiResponse
 {
 	public:
-		HttpCgiResponse(std::string path, std::string method, int socket);
+		HttpCgiResponse(EuleeHand database);
 		~HttpCgiResponse();
 		void		handleCgi();
 
 	private:
-		void		_perrorExit(std::string msg);
-		std::string	_path, _method;
-		int			_socket;
+		EuleeHand	_database;
 };
 
 #endif
