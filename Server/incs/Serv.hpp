@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 11:54:48 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 12:48:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@
 # include "server.hpp"
 # include "HttpPutResponse.hpp"
 
-# define WS_SERVER_NAME			"localhost"
 # define WS_BACKLOG				10
 # define WS_PORT				8080
 # define WS_BUFFER_SIZE			30000
