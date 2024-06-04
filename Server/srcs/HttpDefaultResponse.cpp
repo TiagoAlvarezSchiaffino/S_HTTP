@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:39:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 06:47:40 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 08:17:30 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,10 @@ int	ft_select(int fd, void *buffer, size_t size, Mode mode)
         return (0);
     }
 
-	for (int i = 0; i < FD_SETSIZE; i++)
-	{
-		if (FD_ISSET(fd, &readFds) && mode == READ && i == fd)
-			return (read(fd, buffer, size));
-		else if (FD_ISSET(fd, &writeFds) && mode == WRITE && i == fd)
-			return (write(fd, buffer, size));
-	}
+    if (FD_ISSET(fd, &readFds) && mode == READ)
+        return (read(fd, buffer, size));
+    else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
+        return (write(fd, buffer, size));
     return (0);
 }
 

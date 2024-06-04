@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:45:16 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 08:27:55 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ long	Serv::ft_select2(int fd, void *buffer, size_t size, Mode mode)
 	fd_set read_fds, write_fds;
     FD_ZERO(&read_fds);
     FD_ZERO(&write_fds);
-
 	FD_SET(fd, (mode == READ) ? &read_fds : &write_fds);
 
     timeval	timeout;
@@ -129,7 +128,7 @@ void	Serv::_setupServer()
 		this->_perrorExit("Listen Error");
 }
 
-int	WebServer::_unchunkResponse()
+int	Serv::_unchunkResponse()
 {
 	std::string	header = this->_buffer.substr(0, this->_buffer.find("\r\n\r\n"));
 	std::string	output;
@@ -142,7 +141,7 @@ int	WebServer::_unchunkResponse()
 	while (remaining.find("\r\n") != std::string::npos)
 	{
 		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
-		int			size = std::stoi(chunkSize, 0, 16);
+		size_t		size = std::stoul(chunkSize, 0, 16);
 		std::cout << size << std::endl;
 		if (size == 0)
 			return (0);
@@ -160,8 +159,6 @@ int	WebServer::_unchunkResponse()
 
 void	Serv::_serverLoop()
 {
-	long	valread;
-
 	while(1)
 	{
 		std::cout << CYAN << "Port: " << WS_PORT << "\nWaiting for new connection..." << RESET << std::endl;
@@ -183,7 +180,8 @@ void	Serv::_serverLoop()
 
 		size_t		total = 0;
 		char		readBuffer[WS_BUFFER_SIZE];
-		valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+		this->_buffer.clear();
+		long		valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
 		while (valread > 0)
 		{
 			total += valread;
@@ -213,25 +211,30 @@ void	Serv::_serverLoop()
 			close(this->_socket);
 			continue;
 		}
-		std::cout << BLUE << this->_buffer.substr(0, this->_buffer.find("\r\n\r\n")) << RESET << std::endl;
+		// std::cout << BLUE << this->_buffer.substr(0, this->_buffer.find("\r\n\r\n")) << RESET << std::endl;
+		std::cout << BLUE << this->_buffer << RESET << std::endl;
 
 		if (method == "POST")
 		{
+			std::cout << "Post method called" << std::endl;
 			HttpPostResponse	postResponse(this->_socket, this->_buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
 		{
+			std::cout << "Get method called" << std::endl;
 			HttpGetResponse	getResponse(this->_path, this->_socket);
 			getResponse.handleGet();
 		}
 		else if (this->_path.find('.') != std::string::npos)
 		{
+			std::cout << "CGI method called" << std::endl;
 			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket);
 			cgiResponse.handleCgi();
 		}
 		else
 		{
+			std::cout << "Default method called" << std::endl;
 			HttpDefaultResponse	defaultResponse(this->_socket);
 			defaultResponse.handleDefault();
 		}
