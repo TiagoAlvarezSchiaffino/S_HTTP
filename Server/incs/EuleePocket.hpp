@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:15:39 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 17:14:04 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ class EuleePocket
 		iterator	end(void);
 
 		// member variable
-        std::map<std::string, std::string>	envp;
 		std::vector<EuleeWallet>			vectorLocation;
 		std::map<std::string, EuleeWallet>	location;
 		int									portIndex;

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:38:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 17:30:06 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,6 @@ void	ConfigManager::printTokens(void)
 
 void	ConfigManager::printError(std::string str, int i)
 {
-
 	std::cout << str << "Line: " << this->_tokens[i].lineNum << std::endl;
 	std::cout << this->_tokens[i].token << std::endl;
 	exit(1);
@@ -105,8 +104,8 @@ void	ConfigManager::printError(std::string str, int i)
 
 void	ConfigManager::configLibrary(void)
 {
-	const char	*serverlib[11] = {"server", "location", "listen", "root", "index", "server_name", "error_page", "client_max_body_size", "auto_index", "return", "cgi"};
-	const char	*locationlib[12] = {"root", "index", "include", "cgi", "upload", "error_page", "client_max_body_size", "auto_index", "return", "limit_except", "allow", "deny"};
+	const char	*serverlib[11] = {"server", "location", "listen", "root", "index", "server_name", "error_page", "client_max_body_size", "auto_index", "return", "cgi_script"};
+	const char	*locationlib[12] = {"root", "index", "include", "cgi_script", "upload", "error_page", "client_max_body_size", "auto_index", "return", "limit_except", "allow", "deny"};
 
 	this->_serverVar = std::vector<std::string>(serverlib, serverlib + 11);
 	this->_locationVar = std::vector<std::string>(locationlib, locationlib + 12);

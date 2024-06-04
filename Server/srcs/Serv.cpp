@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 16:42:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 17:27:20 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ Serv::Serv(std::string configFilePath)
 
 Serv::~Serv(void) {}
 
-void	Serv::_setupServer()
+void	Serv::_setupServer(void)
 {
 	addrinfo	hints, *res;
 
@@ -68,160 +68,7 @@ void	Serv::_setupServer()
 	}
 }
 
-int	Serv::_unchunkResponse() // Util
-{
-	std::string	header = this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n"));
-	std::string	output;
-
-	if (header.find("Transfer-Encoding: chunked") == std::string::npos)
-		return (0);
-	std::string	remaining = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + 4);
-	std::string	newBody = "";
-
-	while (remaining.find("\r\n") != std::string::npos)
-	{
-		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
-		size_t		size = std::stoul(chunkSize, 0, 16);
-		if (size == 0)
-			return (0);
-		if (size > remaining.size() - std::strlen("\r\n"))
-		{
-			std::cout << RED << "Error: Chunk size is bigger than remaining size" << RESET << std::endl;
-			return (-1);
-		}
-		newBody += remaining.substr(remaining.find("\r\n") + std::strlen("\r\n"), size);
-		remaining = remaining.substr(remaining.find("\r\n") + size + std::strlen("\r\n\r\n"));
-	}
-	this->_database.buffer = header + "\r\n\r\n" + newBody;
-	return (1);
-}
-
-int	Serv::_checkExcept() // Util
-{
-	if (this->_database.server[this->_database.serverIndex].location.find(this->_database.methodPath) == this->_database.server[this->_database.serverIndex].location.end())
-		return (0);
-	int	found = 0;
-	if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT].size() == 0)
-		return (0);
-	for (size_t j = 0; j < this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT].size(); j++)
-	{
-		if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT][j] == this->_database.method)
-			found++;
-	}
-	if (found == 0)
-	{
-		std::string response = "HTTP/1.1 405 Method Not Allowed\r\n\r\n";
-		this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
-		close(this->_database.socket);
-		return (1);
-	}
-	return (0);
-}
-
-int		Serv::_isCGI() // Util
-{
-	size_t extensionPos = this->_database.methodPath.find_last_of('.');
-	if (extensionPos == std::string::npos)
-		return (0);
-	std::string extension = this->_database.methodPath.substr(extensionPos);
-	for (size_t i = 0; i < this->_database.server[this->_database.serverIndex][CGI].size(); i++)
-		if (this->_database.server[this->_database.serverIndex][CGI][i] == extension)
-			return (1);
-	return (0);
-}
-
-void	Serv::_convertLocation() // Util
-{
-	/**
-	 * XExtract methodPath 
-	 * Xstrcmp each location path to method path to see whether it is a location or not
-	 * X-> If yes, check whether it has file trailing behind or not ....
-	 * X	-> If yes, then we check whether it is file or directory
-	 * X		-> If file, then we serve the file + 200 OK
-	 * 			-> If directory, then do step below
-	 * X	-> If no, then 404 Not Found
-	 * X-> If no, then we find whether it has index specified in the location block or not XXX
-	 * 		-> If yes, then we append it back to methodPath and find
-	 * 			-> If found, then we serve the file + 200 OK
-	 * 			-> If not found, 404 Not found
-	 * 		-> If no, then we go back to server block to find index
-	 * 			-> If yes, then we append it back to methodPath and find
-	 * 				-> If found, then we serve the file + 200 OK
-	 * 				-> If not found, then 404 Not found
-	 * 			-> If no, then 404 Not found
-	 */
-
-	this->_database.useDefaultIndex = 0;
-	EuleePocket	myServer = this->_database.server[this->_database.serverIndex];
-	std::string	methodPathCopy = this->_database.methodPath.c_str();
-	size_t		longestPathSize = 0;
-	std::string	locationPath, pathToFind, locationRoot, newPath, indexFile;
-	for (std::map<std::string, EuleeWallet>::iterator it = myServer.location.begin(); it != myServer.location.end(); it++)
-	{
-		if (strncmp(it->first.c_str(), methodPathCopy.c_str(), it->first.length()) == 0 && it->first.length() > longestPathSize)
-		{
-			longestPathSize = it->first.length();
-			locationPath = it->first;
-		}
-	}
-	newPath = this->_database.methodPath;
-	if (methodPathCopy.length() - locationPath.length() > 1)
-	{
-		std::cout << "Trailing File" << std::endl;
-		if (myServer.location[locationPath][ROOT].size() != 0)
-		{
-			locationRoot = myServer.location[locationPath][ROOT][0];
-			newPath = locationRoot + methodPathCopy.substr(locationPath.length());
-		}
-		if (this->_database.checkPath(newPath, 1, 1)) // Either file or directory
-		{
-			std::cout << "Found" << std::endl;
-			if (this->_database.checkPath(newPath, 1, 0)) // File
-			{
-				std::cout << "File" << std::endl;
-				this->_database.methodPath = "/" + newPath;
-				std::cout << "Location Path: " << locationPath << std::endl;
-				std::cout << GREEN << "New Path: " << this->_database.methodPath << RESET << std::endl;
-				return ;
-			}
-			else // Directory
-				std::cout << "Directory" << std::endl;
-		}
-		else // Not Found
-		{
-			std::cout << "Not Found" << std::endl;
-			return ;
-		}
-	}
-	// 	* 		-> If yes, then we append it back to methodPath and find
-	//  * 			-> If found, then we serve the file + 200 OK
-	//  * 			-> If not found, 404 Not found
-	//  * 		-> If no, then we go back to server block to find index
-	//  * 			-> If yes, then we append it back to methodPath and find
-	//  * 				-> If found, then we serve the file + 200 OK
-	//  * 				-> If not found, then 404 Not found
-	//  * 			-> If no, then 404 Not found
-	std::cout << "No Trailing File" << std::endl;
-	if (myServer.location[locationPath][INDEX].size() == 0)
-	{
-		std::cout << "Append back and find" << std::endl;
-		indexFile = myServer[INDEX][0];
-		this->_database.methodPath = myServer[ROOT][0] + locationRoot + "/" + indexFile; 
-		this->_database.useDefaultIndex = 1;
-	}
-	else
-	{
-		std::cout << "Using index: " << newPath << std::endl;
-		locationRoot = myServer.location[locationPath][ROOT][0];
-		std::string	remainingPath = methodPathCopy.erase(0, locationPath.length());
-		indexFile = myServer.location[locationPath][INDEX][0];
-		this->_database.methodPath = "/" + myServer.location[locationPath][ROOT][0] + remainingPath + "/" + indexFile;
-	}
-	std::cout << "Location Path: " << locationPath << std::endl;
-	std::cout << GREEN << "New Path: " << this->_database.methodPath << RESET << std::endl;
-}
-
-void	Serv::_serverLoop()
+void	Serv::_serverLoop(void)
 {
 	while(1)
 	{
@@ -264,7 +111,7 @@ void	Serv::_serverLoop()
 			valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
 		}
 
-		if (this->_unchunkResponse() == -1)
+		if (this->_database.unchunkResponse() == -1)
 		{
 			close(this->_database.socket);
 			continue ;
@@ -286,9 +133,18 @@ void	Serv::_serverLoop()
 		// std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
 		std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
-		if (this->_checkExcept())
+		// std::cout << this->_database.methodPath << std::endl;
+		// if (this->_database.methodPath == "/directory/htdocs.bad_extension")
+		// {
+		// 	std::string response = "HTTP/1.1 404 Not Found\r\n\r\n";
+		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
+		// 	close(this->_database.socket);
+		// 	continue ;
+		// }
+
+		if (this->_database.checkExcept())
 			continue ;
-		this->_convertLocation();
+		this->_database.convertLocation();
 
 		if (this->_database.method == "HEAD")
 		{
@@ -314,7 +170,7 @@ void	Serv::_serverLoop()
 			HttpDeleteResponse	deleteResponse(this->_database);
 			deleteResponse.handleDelete();
 		}
-		else if (this->_database.method == "GET" && this->_database.methodPath != "/" && this->_isCGI() == 0) // Will be determined by the config
+		else if (this->_database.method == "GET" && this->_database.methodPath != "/" && this->_database.isCGI() == 0) // Will be determined by the config
 		{
 			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
 			HttpGetResponse	getResponse(this->_database);
@@ -335,7 +191,7 @@ void	Serv::_serverLoop()
 	}
 }
 
-void	Serv::runServer()
+void	Serv::runServer(void)
 {
 	this->_database.parseConfigFile();
 	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;

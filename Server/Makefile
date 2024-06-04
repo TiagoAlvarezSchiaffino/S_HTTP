@@ -8,7 +8,7 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/04 15:00:18 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/04 17:07:25 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
@@ -23,7 +23,7 @@ RM			=	rm -rf
 MKDIR		=	mkdir -p
 SRC_PATH	=	srcs
 OBJ_PATH	=	objs
-ANNOYING	=	*.dSYM .vscode
+ANNOYING	=	*.dSYM ../.vscode
 MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \
