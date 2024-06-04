@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:22:59 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 11:01:54 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,6 @@
 
 # include "Serv.hpp"
 # include "ConfigManager.hpp"
+# include "EuleeHand.hpp"
 
 #endif

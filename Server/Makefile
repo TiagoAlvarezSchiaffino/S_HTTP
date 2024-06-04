@@ -8,13 +8,13 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/04 09:09:05 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/04 10:56:29 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
 NAME		=	SERVER
 CXX			=	g++
-# CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
+CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
 ifeq ($(DB), 1)
     CXXFLAGS += -fsanitize=thread -g3
 endif
@@ -28,15 +28,15 @@ MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \
 				Token.cpp \
+				EuleeHand.cpp \
+				EuleePocket.cpp \
+				EuleeWallet.cpp \
 				HttpPostResponse.cpp \
 				HttpDefaultResponse.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
 				HttpDeleteResponse.cpp \
-				HttpHeadResponse.cpp \
-				EuleeHand.cpp \
-				EuleePocket.cpp \
-				EuleeWallet.cpp
+				HttpHeadResponse.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: 

@@ -8,72 +8,24 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 10:26:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 11:22:36 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/Serv.hpp"
 
-/* TO BE REMOVED */
-void	perrorExit(std::string msg, int exitTrue)
+/* Class constructor that takes in configFilePath string */
+Serv::Serv(std::string configFilePath)
 {
-	std::cerr << RED << msg << ": ";
-	perror("");
-	std::cerr << RESET;
-	if (exitTrue)
-		exit(EXIT_FAILURE);
-}
-
-/* TO BE REMOVED */
-long	ft_select(int fd, void *buffer, size_t size, Mode mode)
-{
-	fd_set read_fds, write_fds;
-    FD_ZERO(&read_fds);
-    FD_ZERO(&write_fds);
-	FD_SET(fd, (mode == READ) ? &read_fds : &write_fds);
-
-    timeval	timeout;
-    timeout.tv_sec = WS_TIMEOUT;
-    timeout.tv_usec = 0;
-
-    int num_ready = select(fd + 1, &read_fds, &write_fds, NULL, &timeout);
-    if (num_ready == -1)
-	{
-		perrorExit("Select Error", 0);
-        return (-1);
-    }
-    else if (num_ready == 0)
-	{
-        std::cout << RED << "Select timeout!" << RESET << std::endl;
-        return (0);
-    }
-
-	long	val = 0;
-    if (FD_ISSET(fd, &read_fds) && mode == READ)
-	{
-		val = recv(fd, buffer, size, 0);
-		if (val == -1)
-			perrorExit("Read Error", 0);
-	}
-    else if (FD_ISSET(fd, &write_fds) && mode == WRITE)
-	{
-		val = send(fd, buffer, size, 0);
-		if (val == -1)
-			perrorExit("Write Error", 0);
-	}
-	return (val);
-}
-
-Serv::Serv(std::string configFilePath): _configFilePath(configFilePath)
-{
+	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath));
 	this->_configManager = ConfigManager(configFilePath);
-
+	
 	//Temporary to host 2 ports
 	this->_serverAddr.resize(2);
 	this->_serverFd.resize(2); 
 }
 
-Serv::~Serv() {}
+Serv::~Serv(void) {}
 
 void	Serv::_setupServer()
 {
@@ -86,44 +38,44 @@ void	Serv::_setupServer()
 
 	// Default port
 	if ((this->_serverFd[0] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
-		perrorExit("Socket Error");
+		this->_database.perrorExit("Socket Error");
 
 	int	optval = 1;
 	if (setsockopt(this->_serverFd[0], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
-		perrorExit("Setsockopt Error");
+		this->_database.perrorExit("Setsockopt Error");
 
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(WS_PORT).c_str(), &hints, &res) != 0)
-		perrorExit("Getaddrinfo Error");
+		this->_database.perrorExit("Getaddrinfo Error");
 	
 	memcpy(&this->_serverAddr[0], res->ai_addr, res->ai_addrlen);
 	freeaddrinfo(res);
 	this->_serverAddr[0].sin_port = htons(WS_PORT);
 
 	if (bind(this->_serverFd[0], (sockaddr *)&this->_serverAddr[0], sizeof(this->_serverAddr[0])) < 0)
-		perrorExit("Bind Error");
+		this->_database.perrorExit("Bind Error");
 	if (listen(this->_serverFd[0], WS_BACKLOG) < 0)
-		perrorExit("Listen Error");
+		this->_database.perrorExit("Listen Error");
 
 	// Trying port 9090
 	int	port = 9090;
 	if ((this->_serverFd[1] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
-		perrorExit("Socket Error");
+		this->_database.perrorExit("Socket Error");
 
 	int	optval2 = 1;
 	if (setsockopt(this->_serverFd[1], SOL_SOCKET, SO_NOSIGPIPE, &optval2, sizeof(optval)) == -1)
-		perrorExit("Setsockopt Error");
+		this->_database.perrorExit("Setsockopt Error");
 
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(port).c_str(), &hints, &res) != 0)
-		perrorExit("Getaddrinfo Error");
+		this->_database.perrorExit("Getaddrinfo Error");
 	
 	memcpy(&this->_serverAddr[1], res->ai_addr, res->ai_addrlen);
 	freeaddrinfo(res);
 	this->_serverAddr[1].sin_port = htons(port);
 
 	if (bind(this->_serverFd[1], (sockaddr *)&this->_serverAddr[1], sizeof(this->_serverAddr[1])) < 0)
-		perrorExit("Bind Error");
+		this->_database.perrorExit("Bind Error");
 	if (listen(this->_serverFd[1], WS_BACKLOG) < 0)
-		perrorExit("Listen Error");
+		this->_database.perrorExit("Listen Error");
 }
 
 int	Serv::_unchunkResponse()
@@ -174,12 +126,12 @@ void	Serv::_serverLoop()
 			}
 		}
 		if (this->_socket < 0)
-			perrorExit("Accept Error");
+			this->_database.perrorExit("Accept Error");
 
 		size_t		total = 0;
 		char		readBuffer[WS_BUFFER_SIZE];
 		this->_buffer.clear();
-		long		valread = ft_select(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+		long		valread = this->_database.ft_select(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
 		while (valread > 0)
 		{
 			total += valread;
@@ -190,7 +142,7 @@ void	Serv::_serverLoop()
 				return ;
 			}
 			this->_buffer.append(readBuffer, valread);
-			valread = ft_select(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+			valread = this->_database.ft_select(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
 		}
 
 		if (this->_unchunkResponse() == -1)
@@ -209,7 +161,8 @@ void	Serv::_serverLoop()
 			std::cout << RED << message << RESET << std::endl;
 			std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
 
-			ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);			close(this->_socket);
+			this->_database.ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);
+			close(this->_socket);
 			continue;
 		}
 		std::cout << BLUE << this->_buffer.substr(0, this->_buffer.find("\r\n\r\n")) << RESET << std::endl;
@@ -217,45 +170,53 @@ void	Serv::_serverLoop()
 		if (method == "HEAD")
 		{
 			std::cout << "Head method called" << std::endl;
-			HttpHeadResponse	headResponse(this->_socket, this->_path);
+			HttpHeadResponse	headResponse(this->_socket, this->_path, this->_database);
 			headResponse.handleHead();
 		}
 		else if (method == "POST")
 		{
 			std::cout << "Post method called" << std::endl;
-			HttpPostResponse	postResponse(this->_socket, this->_buffer);
+			HttpPostResponse	postResponse(this->_socket, this->_buffer, this->_database);
 			postResponse.handlePost();
 		}
 		else if (method == "DELETE")
 		{
 			std::cout << "Delete method called" << std::endl;
-			HttpDeleteResponse	deleteResponse(this->_socket, this->_path);
+			HttpDeleteResponse	deleteResponse(this->_socket, this->_path, this->_database);
 			deleteResponse.handleDelete();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
 		{
 			std::cout << "Get method called" << std::endl;
-			HttpGetResponse	getResponse(this->_path, this->_socket);
+			HttpGetResponse	getResponse(this->_path, this->_socket, this->_database);
 			getResponse.handleGet();
 		}
 		else if (this->_path.find('.') != std::string::npos)
 		{
 			std::cout << "CGI method called" << std::endl;
-			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket);
+			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket, this->_database);
 			cgiResponse.handleCgi();
 		}
 		else
 		{
 			std::cout << "Default method called" << std::endl;
-			HttpDefaultResponse	defaultResponse(this->_socket);
+			HttpDefaultResponse	defaultResponse(this->_socket, this->_database);
 			defaultResponse.handleDefault();
 		}
 	}
 }
 
-void	Serv::runServer()
+void	Serv::runServer(void)
 {
-	this->_configManager.parseConfigFile();
+	this->_database.parseConfigFile();
+	// this->_database.printTokens();
+	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
+	// this->_database.configLibrary();
+	// this->_database.errorHandleShit();
+	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
+	this->_database.parseConfigServer();
+	this->_database.printServers();
+	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
 	this->_setupServer();
 	this->_serverLoop();
 }

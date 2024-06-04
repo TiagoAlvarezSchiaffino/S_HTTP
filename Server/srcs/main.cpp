@@ -8,11 +8,11 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 06:57:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 11:25:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "../incs/server.hpp"
 
 int	main(int ac, char **av)
 {
@@ -20,15 +20,15 @@ int	main(int ac, char **av)
 
 	if (ac > 2)
 	{
-		std::cout << "Usage: ./serv <configFile>" << std::endl;
+		std::cout << YELLOW "Usage: ./webserv <config_file>" RESET << std::endl;
 		return (EXIT_FAILURE);
 	}
 	else if (ac == 2)
 		configFile = av[1];
-	std::cout << "Using config file: " << configFile << std::endl;
+	std::cout << GREEN "Reading config file : " CYAN << configFile << RESET << std::endl;
 	try {
-		Serv	Serv(configFile);
-		serv.runServer();
+		WebServer	webserver(configFile);
+		webserver.runServer();
 	}
 	catch (std::exception &e) {
 		std::cout << e.what() << std::endl;

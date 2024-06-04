@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 10:53:23 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 11:00:12 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ class EuleeHand
 		void	errorHandleShit(void);
 		void	printServers(void);
 		void	parseConfigServer(void);
+		void	perrorExit(std::string msg, int exitTrue = 1);
+		long	ft_select(int fd, void *buff, size_t size, Mode mode);
 
 		std::vector<EuleePocket>	server;
 

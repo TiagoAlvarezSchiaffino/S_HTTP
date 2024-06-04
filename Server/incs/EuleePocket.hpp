@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 10:11:04 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 11:00:49 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,6 @@ class EuleePocket
 		mapped_type	&operator[](key_type key);
 
 		// member function
-		void		perrorExit(std::string msg, int exitTrue = 1);
-		long		ft_select(int fd, void *buff, size_t size, Mode mode);
 		iterator	begin(void);
 		iterator	end(void);
 
