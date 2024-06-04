@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:02:40 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:50:04 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class Serv
 	public:
 		Serv(std::string configFilePath);
 		~Serv();
-		void						runServer();
+		void						runServer(void);
 
 	private:
 		void						_setupServer();
