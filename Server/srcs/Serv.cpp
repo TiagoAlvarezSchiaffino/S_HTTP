@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:59:52 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 16:42:11 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,7 @@ void	Serv::_setupServer()
 
 	this->_database.serverAddr.resize(this->_database.server.size());
 	this->_database.serverFd.resize(this->_database.server.size()); 
-
 	
-	// Default port
 	for (size_t i = 0; i < this->_database.server.size(); i++)
 	{
 		if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -46,65 +44,31 @@ void	Serv::_setupServer()
 		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
 			this->_database.perrorExit("Setsockopt Error");
 
-		if (getaddrinfo(this->_database.server[i][SERVER_NAME][0].c_str(), this->_database.server[i][LISTEN][0].c_str(), &hints, &res) != 0)
-			this->_database.perrorExit("Getaddrinfo Error");
-		
-		memcpy(&this->_database.serverAddr[i], res->ai_addr, res->ai_addrlen);
-		freeaddrinfo(res);
-		this->_database.serverAddr[i].sin_port = htons(std::stoi(this->_database.server[i][LISTEN][0]));
+		this->_database.server[i][SERVER_NAME].push_back("localhost");
+		this->_database.server[i][LISTEN].push_back("80");
+		for (size_t j = 0; j < this->_database.server[i][LISTEN].size() && this->_database.server[i].portIndex == -1; j++)
+		{
+			if (getaddrinfo(this->_database.server[i][SERVER_NAME][0].c_str(), this->_database.server[i][LISTEN][j].c_str(), &hints, &res) != 0)
+				this->_database.perrorExit("Getaddrinfo Error");
 
-		if (bind(this->_database.serverFd[i], (sockaddr *)&this->_database.serverAddr[i], sizeof(this->_database.serverAddr[i])) < 0)
+			memcpy(&this->_database.serverAddr[i], res->ai_addr, res->ai_addrlen);
+			freeaddrinfo(res);
+			this->_database.serverAddr[i].sin_port = htons(std::stoi(this->_database.server[i][LISTEN][j]));
+
+			if (bind(this->_database.serverFd[i], (sockaddr *)&this->_database.serverAddr[i], sizeof(this->_database.serverAddr[i])) < 0)
+				continue ;
+			else
+				this->_database.server[i].portIndex = j;
+		}
+		if (this->_database.server[i].portIndex == -1)
 			this->_database.perrorExit("Bind Error");
+		
 		if (listen(this->_database.serverFd[i], WS_BACKLOG) < 0)
 			this->_database.perrorExit("Listen Error");
 	}
-
-
-	// for (size_t i = 0; i < this->_database.server.size(); i++)
-	// {
-	// 	if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-	// 		this->_database.perrorExit("Socket Error");
-
-	// 	int	optval = 1;
-	// 	if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
-	// 		this->_database.perrorExit("Setsockopt Error");
-
-	// 	if (getaddrinfo(this->_database.server[i][SERVER_NAME][0].c_str(), this->_database.server[i][LISTEN][0].c_str(), &hints, &res) != 0)
-	// 		this->_database.perrorExit("Getaddrinfo Error");
-		
-	// 	memcpy(&this->_database.serverAddr[i], res->ai_addr, res->ai_addrlen);
-	// 	freeaddrinfo(res);
-	// 	this->_database.serverAddr[i].sin_port = htons(std::stoi(this->_database.server[i][LISTEN][0]));
-
-	// 	if (bind(this->_database.serverFd[i], (sockaddr *)&this->_database.serverAddr[i], sizeof(this->_database.serverAddr[i])) < 0)
-	// 		this->_database.perrorExit("Bind Error");
-	// 	if (listen(this->_database.serverFd[i], WS_BACKLOG) < 0)
-	// 		this->_database.perrorExit("Listen Error");
-	// }
-
-	// Trying port 9090
-	// int	port = 9090;
-	// if ((this->_serverFd[1] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-	// 	this->_database.perrorExit("Socket Error");
-
-	// int	optval2 = 1;
-	// if (setsockopt(this->_serverFd[1], SOL_SOCKET, SO_NOSIGPIPE, &optval2, sizeof(optval)) == -1)
-	// 	this->_database.perrorExit("Setsockopt Error");
-
-	// if (getaddrinfo(WS_SERVER_NAME, std::to_string(port).c_str(), &hints, &res) != 0)
-	// 	this->_database.perrorExit("Getaddrinfo Error");
-	
-	// memcpy(&this->_serverAddr[1], res->ai_addr, res->ai_addrlen);
-	// freeaddrinfo(res);
-	// this->_serverAddr[1].sin_port = htons(port);
-
-	// if (bind(this->_serverFd[1], (sockaddr *)&this->_serverAddr[1], sizeof(this->_serverAddr[1])) < 0)
-	// 	this->_database.perrorExit("Bind Error");
-	// if (listen(this->_serverFd[1], WS_BACKLOG) < 0)
-	// 	this->_database.perrorExit("Listen Error");
 }
 
-int	Serv::_unchunkResponse()
+int	Serv::_unchunkResponse() // Util
 {
 	std::string	header = this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n"));
 	std::string	output;
@@ -132,13 +96,138 @@ int	Serv::_unchunkResponse()
 	return (1);
 }
 
+int	Serv::_checkExcept() // Util
+{
+	if (this->_database.server[this->_database.serverIndex].location.find(this->_database.methodPath) == this->_database.server[this->_database.serverIndex].location.end())
+		return (0);
+	int	found = 0;
+	if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT].size() == 0)
+		return (0);
+	for (size_t j = 0; j < this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT].size(); j++)
+	{
+		if (this->_database.server[this->_database.serverIndex].location[this->_database.methodPath][LIMIT_EXCEPT][j] == this->_database.method)
+			found++;
+	}
+	if (found == 0)
+	{
+		std::string response = "HTTP/1.1 405 Method Not Allowed\r\n\r\n";
+		this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
+		close(this->_database.socket);
+		return (1);
+	}
+	return (0);
+}
+
+int		Serv::_isCGI() // Util
+{
+	size_t extensionPos = this->_database.methodPath.find_last_of('.');
+	if (extensionPos == std::string::npos)
+		return (0);
+	std::string extension = this->_database.methodPath.substr(extensionPos);
+	for (size_t i = 0; i < this->_database.server[this->_database.serverIndex][CGI].size(); i++)
+		if (this->_database.server[this->_database.serverIndex][CGI][i] == extension)
+			return (1);
+	return (0);
+}
+
+void	Serv::_convertLocation() // Util
+{
+	/**
+	 * XExtract methodPath 
+	 * Xstrcmp each location path to method path to see whether it is a location or not
+	 * X-> If yes, check whether it has file trailing behind or not ....
+	 * X	-> If yes, then we check whether it is file or directory
+	 * X		-> If file, then we serve the file + 200 OK
+	 * 			-> If directory, then do step below
+	 * X	-> If no, then 404 Not Found
+	 * X-> If no, then we find whether it has index specified in the location block or not XXX
+	 * 		-> If yes, then we append it back to methodPath and find
+	 * 			-> If found, then we serve the file + 200 OK
+	 * 			-> If not found, 404 Not found
+	 * 		-> If no, then we go back to server block to find index
+	 * 			-> If yes, then we append it back to methodPath and find
+	 * 				-> If found, then we serve the file + 200 OK
+	 * 				-> If not found, then 404 Not found
+	 * 			-> If no, then 404 Not found
+	 */
+
+	this->_database.useDefaultIndex = 0;
+	EuleePocket	myServer = this->_database.server[this->_database.serverIndex];
+	std::string	methodPathCopy = this->_database.methodPath.c_str();
+	size_t		longestPathSize = 0;
+	std::string	locationPath, pathToFind, locationRoot, newPath, indexFile;
+	for (std::map<std::string, EuleeWallet>::iterator it = myServer.location.begin(); it != myServer.location.end(); it++)
+	{
+		if (strncmp(it->first.c_str(), methodPathCopy.c_str(), it->first.length()) == 0 && it->first.length() > longestPathSize)
+		{
+			longestPathSize = it->first.length();
+			locationPath = it->first;
+		}
+	}
+	newPath = this->_database.methodPath;
+	if (methodPathCopy.length() - locationPath.length() > 1)
+	{
+		std::cout << "Trailing File" << std::endl;
+		if (myServer.location[locationPath][ROOT].size() != 0)
+		{
+			locationRoot = myServer.location[locationPath][ROOT][0];
+			newPath = locationRoot + methodPathCopy.substr(locationPath.length());
+		}
+		if (this->_database.checkPath(newPath, 1, 1)) // Either file or directory
+		{
+			std::cout << "Found" << std::endl;
+			if (this->_database.checkPath(newPath, 1, 0)) // File
+			{
+				std::cout << "File" << std::endl;
+				this->_database.methodPath = "/" + newPath;
+				std::cout << "Location Path: " << locationPath << std::endl;
+				std::cout << GREEN << "New Path: " << this->_database.methodPath << RESET << std::endl;
+				return ;
+			}
+			else // Directory
+				std::cout << "Directory" << std::endl;
+		}
+		else // Not Found
+		{
+			std::cout << "Not Found" << std::endl;
+			return ;
+		}
+	}
+	// 	* 		-> If yes, then we append it back to methodPath and find
+	//  * 			-> If found, then we serve the file + 200 OK
+	//  * 			-> If not found, 404 Not found
+	//  * 		-> If no, then we go back to server block to find index
+	//  * 			-> If yes, then we append it back to methodPath and find
+	//  * 				-> If found, then we serve the file + 200 OK
+	//  * 				-> If not found, then 404 Not found
+	//  * 			-> If no, then 404 Not found
+	std::cout << "No Trailing File" << std::endl;
+	if (myServer.location[locationPath][INDEX].size() == 0)
+	{
+		std::cout << "Append back and find" << std::endl;
+		indexFile = myServer[INDEX][0];
+		this->_database.methodPath = myServer[ROOT][0] + locationRoot + "/" + indexFile; 
+		this->_database.useDefaultIndex = 1;
+	}
+	else
+	{
+		std::cout << "Using index: " << newPath << std::endl;
+		locationRoot = myServer.location[locationPath][ROOT][0];
+		std::string	remainingPath = methodPathCopy.erase(0, locationPath.length());
+		indexFile = myServer.location[locationPath][INDEX][0];
+		this->_database.methodPath = "/" + myServer.location[locationPath][ROOT][0] + remainingPath + "/" + indexFile;
+	}
+	std::cout << "Location Path: " << locationPath << std::endl;
+	std::cout << GREEN << "New Path: " << this->_database.methodPath << RESET << std::endl;
+}
+
 void	Serv::_serverLoop()
 {
 	while(1)
 	{
 		std::cout << CYAN << "Port Accepted: ";
 		for (size_t i = 0; i < this->_database.server.size(); i++)
-			std::cout << this->_database.server[i][LISTEN][0] << " ";
+			std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
 		std::cout << "\nWaiting for new connection..." << RESET << std::endl;
 		this->_database.socket = 0;
 		for (size_t i = 0; i < this->_database.server.size(); i++)
@@ -149,7 +238,10 @@ void	Serv::_serverLoop()
 			{
 				this->_database.socket = accept(this->_database.serverFd[i], NULL, NULL);
 				if (this->_database.socket != -1)
+				{
+					this->_database.serverIndex = i;
 					break ;
+				}
 			}
 		}
 		if (this->_database.socket < 0)
@@ -162,7 +254,7 @@ void	Serv::_serverLoop()
 		while (valread > 0)
 		{
 			total += valread;
-			// std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
+			std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
 			if (valread < 0)
 			{
 				close(this->_database.socket);
@@ -178,10 +270,9 @@ void	Serv::_serverLoop()
 			continue ;
 		}
 
-		std::string			method;
 		std::istringstream	request(this->_database.buffer);
 		
-		request >> method >> this->_database.methodPath;
+		request >> this->_database.method >> this->_database.methodPath;
 		if (this->_database.methodPath == "/favicon.ico") // Ignore favicon
 		{
 			std::string	message = "Go away favicon";
@@ -192,36 +283,38 @@ void	Serv::_serverLoop()
 			close(this->_database.socket);
 			continue;
 		}
-		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
-		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
+		// std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
+		std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
+		if (this->_checkExcept())
+			continue ;
+		this->_convertLocation();
 
-
-		if (method == "HEAD")
+		if (this->_database.method == "HEAD")
 		{
 			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
 			HttpHeadResponse	headResponse(this->_database);
 			headResponse.handleHead();
 		}
-		else if (method == "POST")
+		else if (this->_database.method == "POST")
 		{
 			std::cout << MAGENTA << "Post method called" << RESET << std::endl;
 			HttpPostResponse	postResponse(this->_database);
 			postResponse.handlePost();
 		}
-		else if (method == "PUT")
+		else if (this->_database.method == "PUT")
 		{
 			std::cout << MAGENTA << "Put method called" << RESET << std::endl;
 			HttpPutResponse	putResponse(this->_database);
 			putResponse.handlePut();
 		}
-		else if (method == "DELETE")
+		else if (this->_database.method == "DELETE")
 		{
 			std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
 			HttpDeleteResponse	deleteResponse(this->_database);
 			deleteResponse.handleDelete();
 		}
-		else if (method == "GET" && this->_database.methodPath != "/" && this->_database.methodPath.find(".php") == std::string::npos && this->_database.methodPath.find(".py") == std::string::npos && this->_database.methodPath.find(".cgi") == std::string::npos) // Will be determined by the config
+		else if (this->_database.method == "GET" && this->_database.methodPath != "/" && this->_isCGI() == 0) // Will be determined by the config
 		{
 			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
 			HttpGetResponse	getResponse(this->_database);
@@ -242,13 +335,12 @@ void	Serv::_serverLoop()
 	}
 }
 
-void	Serv::runServer(void)
+void	Serv::runServer()
 {
 	this->_database.parseConfigFile();
-	// this->_database.printTokens();
 	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
-	// this->_database.configLibrary();
-	// this->_database.errorHandleShit();
+	this->_database.configLibrary();
+	this->_database.errorHandleShit();
 	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
 	this->_database.parseConfigServer();
 	this->_database.printServers();

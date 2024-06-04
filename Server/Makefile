@@ -8,7 +8,7 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/04 11:37:16 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/04 15:00:18 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
@@ -43,6 +43,7 @@ OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 all: 
 	${MKDIR} ${OBJ_PATH}
 	make ${NAME}
+	./${NAME}
 
 ${NAME}: ${OBJ} $(MAIN)
 	${CXX} ${CXXFLAGS} ${INCLUDES} ${MAIN} ${OBJ} -o ${NAME}

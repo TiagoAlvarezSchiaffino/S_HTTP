@@ -4,11 +4,11 @@ import requests
 import sys
 
 if len(sys.argv) != 2:
-    print("Usage: py_put.py <url>")
+    print("Usage: py_get.py <url>")
     sys.exit(1)
 
 try:
-	response = requests.put(sys.argv[1], data = "A put request sent by py_put.py!")
+	response = requests.get(sys.argv[1])
 except:
 	print("Error: Could not connect to server")
 	sys.exit(1)

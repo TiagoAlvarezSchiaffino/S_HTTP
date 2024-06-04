@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:34:08 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:18:22 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,15 @@ class EuleeHand
 		void	parseConfigServer(void);
 		void	perrorExit(std::string msg, int exitTrue = 1);
 		long	ft_select(int fd, void *buff, size_t size, Mode mode);
+		int		checkPath(std::string path, int	isFile, int isDirectory);
 		int		sendHttp(std::string statusCode, std::string path);
 
-		int							socket;
+		int							socket, serverIndex, useDefaultIndex;
 		std::map<std::string, std::string>	envp, cgi , statusCode;
 		std::vector<EuleePocket>	server;
 		std::vector<int>			serverFd;
 		std::vector<sockaddr_in>	serverAddr;
-		std::string					methodPath, buffer;
+		std::string					method, methodPath, buffer;
 
 	private:
 		std::string		_configFilePath;

@@ -8,15 +8,15 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:06:59 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:52:30 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand(void) : socket(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(), _configManager() {}
+EuleeHand::EuleeHand(void) : socket(), serverIndex(), useDefaultIndex(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(), _configManager() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) :  socket(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, ConfigManager const &configManager) :  socket(), serverIndex(), useDefaultIndex(), server(), serverFd(), serverAddr(), methodPath(), buffer(), _configFilePath(configFilePath), _configManager(configManager) {}
 
 EuleeHand::~EuleeHand(void) {}
 
@@ -58,10 +58,10 @@ void	EuleeHand::printServers(void)
 			std::cout << std::endl;
 		}
 		std::cout << RESET << std::endl;
-		for (size_t j = 0; j < this->server[i].location.size(); ++j)
+		for (size_t j = 0; j < this->server[i].vectorLocation.size(); ++j)
 		{
 			std::cout << BLUE "location " << j + 1 << RESET << std::endl;
-			for (EuleePocket::iterator it2 = this->server[i].location[j].begin(); it2 != this->server[i].location[j].end(); ++it2)
+			for (EuleePocket::iterator it2 = this->server[i].vectorLocation[j].begin(); it2 != this->server[i].vectorLocation[j].end(); ++it2)
 			{
 				std::cout << BLUENORM << it2->first << " : ";
 				for (size_t d = 0; d < it2->second.size(); ++d)
@@ -72,7 +72,7 @@ void	EuleeHand::printServers(void)
 				}
 				std::cout << std::endl;
 			}
-			if (j + 1 < this->server[i].location.size())
+			if (j + 1 < this->server[i].vectorLocation.size())
 				std::cout << std::endl;
 		}
 		std::cout << RESET;
@@ -145,10 +145,27 @@ void	EuleeHand::parseConfigServer(void)
 {
 	std::vector<Token>	tokens = this->_configManager.getToken();
 
-	// i = 1; because tokens[0].token is always equals to "server"
 	size_t	i = 1;
 	while (i < tokens.size())
 		i = this->_parseServer(tokens, i);
+	std::map<std::string, std::string>	unique;
+	for (size_t n = 0; n < this->server.size(); ++n)
+	{
+		for (size_t m = 0; m < this->server[n][LISTEN].size(); ++m)
+		{
+			if (unique.find(this->server[n][LISTEN][m]) == unique.end())
+				unique[this->server[n][LISTEN][m]] = this->server[n][LISTEN][m];
+			else if (n != 0)
+			{
+				this->server.erase(this->server.begin() + n);
+				n--;
+				break ;
+			}
+		}
+	}
+	for (size_t j = 0; j < this->server.size(); j++)
+		for (size_t k = 0; k < this->server[j].vectorLocation.size(); k++)
+			this->server[j].location[this->server[j].vectorLocation[k][LOCATION_READ_PATH][0]] = this->server[j].vectorLocation[k];
 }
 
 void	EuleeHand::perrorExit(std::string msg, int exitTrue)
@@ -197,4 +214,28 @@ long	EuleeHand::ft_select(int fd, void *buff, size_t size, Mode mode)
 			this->perrorExit("Write Error", 0);
 	}
 	return (val);
+}
+
+int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
+{
+    std::ifstream   temp(path + "/");
+    if (temp.good() && isFile == 1 && isDirectory == 0)
+        return (0);
+	std::ifstream	file(path);
+	if (file.good()) // is a directory and a file
+	{
+		if (path[path.length() - 1] == '/')
+        {
+            if (isDirectory)
+                return (1);
+            if (isFile)
+                return (0);
+        }
+		std::ifstream	directory(path + "/");
+        if (directory.good() && isDirectory) // directory
+                return (1);
+        if (isFile)
+            return (1);
+	}
+	return (0);
 }

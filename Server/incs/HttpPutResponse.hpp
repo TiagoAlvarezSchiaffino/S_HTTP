@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 11:46:04 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:57:21 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:19:06 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@ class HttpPutResponse
 		void		handlePut();
 
 	private:
-		int			_socket;
-		std::string	_buffer, _path;
 		EuleeHand	_database;
 };
 

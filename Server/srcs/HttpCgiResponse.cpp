@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:10:01 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 16:53:38 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ void	HttpCgiResponse::handleCgi()
 	pid_t	pid;
 
     if (pipe(cgiInput) < 0 || pipe(cgiOutput) < 0)
-		perrorExit("Pipe Error");
+        this->_database.perrorExit("Pipe Error");
     if ((pid = fork()) < 0)
-		perrorExit("Fork Error");
+        this->_database.perrorExit("Fork Error");
 
     if (pid == 0)	// child process
 	{
@@ -41,12 +41,12 @@ void	HttpCgiResponse::handleCgi()
         // setenv("QUERY_STRING", query_string, 1);
         // setenv("CONTENT_TYPE", content_type, 1);
         // setenv("CONTENT_LENGTH", std::to_string(contentLength.c_str(), 1);
-		setenv("CONTENT_LENGTH", "69", 1);
+		// setenv("CONTENT_LENGTH", "69", 1);
 
 		char	*cmds[2] = {(char *)(this->_database.methodPath.c_str() + 1), NULL};
 		execve(cmds[0], cmds, NULL);
 		std::cerr << RED << "Failed to execve CGI: " << strerror(errno) << RESET << std::endl;
-        std::cout << "HTTP/1.1 404 Not Found\r\n\r\nCGI requested is not found...\r\n" << std::endl;
+        std::cout << "HTTP/1.1 200 OK\r\n\r\n" << std::endl;
         exit(EXIT_FAILURE);
     }
 	else	// parent process
