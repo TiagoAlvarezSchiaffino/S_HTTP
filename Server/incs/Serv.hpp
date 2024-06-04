@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:30:56 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 05:55:12 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include "../incs/HttpPostResponse.hpp"
 # include "../incs/HttpDefaultResponse.hpp"
 # include "../incs/HttpCgiResponse.hpp"
+# include "../incs/HttpGetResponse.hpp"
 # include "server.hpp"
 
 # define WS_DOMAIN		AF_INET
@@ -55,7 +56,6 @@ class Serv
 	private:
 		void				_perrorExit(std::string msg, int exitTrue = 1);
 		void				_setupServer();
-		void				_handleGet();
 		void				_serverLoop();
 		long				ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
@@ -64,7 +64,6 @@ class Serv
 		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
 		ConfigManager				_configManager;
-		// fd_set 						read_fds, write_fds;
 };
 
 #endif

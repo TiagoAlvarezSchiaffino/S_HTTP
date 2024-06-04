@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:53:47 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 06:19:20 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,52 +129,6 @@ void	Serv::_setupServer()
 		this->_perrorExit("Listen Error");
 }
 
-void	Serv::_handleGet()
-{
-	std::ifstream	file(this->_path.c_str() + 1);
-	if (file.fail())
-	{
-		std::cerr << RED << "Error opening " << this->_path << "!\n" << RESET << std::endl;
-		std::string response_body = "404 Not Found";
-		std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
-		send(this->_socket, response.c_str(), response.length(), 0);
-		close(this->_socket);
-		return ;
-	}
-
-	file.seekg(0, std::ios::end);
-	long	file_size = file.tellg();
-	file.seekg(0, std::ios::beg);
-
-	std::string	file_contents;
-	file_contents.resize(file_size + 1);
-	if (file.read(&file_contents[0], file_size).fail())
-	{
-		std::cerr << RED << "Error reading " << this->_path << "!\n" << RESET << std::endl;
-		file.close();
-		close(this->_socket);
-		return ;
-	}
-	file.close();
-
-	std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
-	int	sent = 0;
-	while (sent < (int)http_response.size())
-	{
-		int actually_sent = ft_select2(this->_socket, &http_response[sent], http_response.size() - sent, WRITE);
-		if (actually_sent <= 0)
-		{
-			close(this->_socket);
-			return ;
-		}
-		sent += actually_sent;
-		std::cout << "Actually sent: " << actually_sent << "\tSent: " << sent << " / " << http_response.size() << std::endl;
-	}
-	
-	close(this->_socket);
-	return ;
-}
-
 void	Serv::_serverLoop()
 {
 	long	valread;
@@ -223,7 +177,8 @@ void	Serv::_serverLoop()
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
 		{
-			this->_handleGet();
+			HttpGetResponse	getResponse(this->_path, this->_socket);
+			getResponse.handleGet();
 		}
 		else if (this->_path.find('.') != std::string::npos)
 		{
