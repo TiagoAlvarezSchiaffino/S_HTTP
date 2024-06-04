@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:48:59 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 08:46:28 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # include "../incs/HttpDefaultResponse.hpp"
 # include "../incs/HttpCgiResponse.hpp"
 # include "../incs/HttpGetResponse.hpp"
+# include "../incs/HttpDeleteResponse.hpp"
 # include "server.hpp"
 
 # define WS_DOMAIN		AF_INET

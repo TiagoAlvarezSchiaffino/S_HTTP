@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:55:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:06:40 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 08:57:20 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,10 @@ int	ft_select2(int fd, void *buffer, size_t size, Mode mode)
 
 void	HttpGetResponse::handleGet()
 {
+    size_t	queryPos = this->_path.find('?');
+	if (queryPos != std::string::npos)
+		this->_path = this->_path.substr(0, queryPos);
+
 	std::ifstream	file(this->_path.c_str() + 1);
 	if (file.fail())
 	{
