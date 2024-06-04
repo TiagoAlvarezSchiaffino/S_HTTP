@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:33:13 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 14:34:59 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 17:29:34 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,10 @@
 # include <unistd.h>
 # include <sys/socket.h>
 
+# define RED			"\033[1;31m"
+# define RESET			"\033[0m"
+# define WS_BUFFER_SIZE	30000
+# define WS_TIMEOUT		3
 class HttpPostResponse
 {
 	public:

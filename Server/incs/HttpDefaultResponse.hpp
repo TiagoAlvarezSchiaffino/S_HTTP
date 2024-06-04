@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:30:58 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 15:39:17 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 17:28:14 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,18 @@
 # include <string>
 # include <iostream>
 # include <unistd.h>
-# include <poll.h>
+# include <sys/select.h>
 
 # include "serv.hpp"
 
 class HttpDefaultResponse
 {
 	public:
-		HttpDefaultResponse(pollfd (&fds)[1], int socket);
+		HttpDefaultResponse(int socket);
 		~HttpDefaultResponse();
 		void	handleDefault();
 
 	private:
-		pollfd	(&_fds)[1];
 		int		_socket;
 };
 

@@ -1,37 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   server.cpp                                                                 */
+/*   EuleeWallet.hpp                                                          */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 18:04:52 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/03 17:59:56 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/03 18:02:39 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef EULEEWALLET_HPP
+# define EULEEWALLET_HPP
 
-# include <iostream>
 # include <string>
+# include <iostream>
 
-# include "Serv.hpp"
-# include "ConfigManager.hpp"
-# include "EuleeHand.hpp"
+enum	RegularExpression
+{
+	NOT_SPECIFIED,		// everything else
+	CASE_SENSITIVE,		// ~
+	CASE_INSENSITIVE,	// ~*
+	IGNORE_OTHERS,		// ^~
+	EXACT_MATCH			// =
+};
 
-# define RESET		"\033[0m"
-# define BLACK		"\033[1;30m"
-# define RED		"\033[1;31m"
-# define GREEN		"\033[1;32m"
-# define YELLOW		"\033[1;33m"
-# define BLUE		"\033[1;34m"
-# define MAGENTA	"\033[1;35m"
-# define CYAN		"\033[1;36m"
-# define WHITE		"\033[1;37m"
+// location block
+struct EuleeWallet
+{
+	EuleeWallet(void);
+	~EuleeWallet(void);
 
-# define DEFAULT_CONFIG_PATH	"conf/default.conf"
+	RegularExpression	priority;
+	std::string			valuePath, root, index, include;
+	std::string			cgiPass, cgiIndex, cgiParam;
+};
 
 #endif

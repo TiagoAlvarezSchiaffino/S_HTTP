@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:03:14 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 17:30:56 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 # include <vector>
 # include <unistd.h>
 # include <netdb.h>
-# include <poll.h>
 # include <fcntl.h>
 
 # include "../incs/ConfigManager.hpp"
@@ -36,10 +35,16 @@
 # define WS_FLAGS		AI_PASSIVE
 # define WS_SERVER_NAME	"localhost"
 # define WS_BACKLOG		10
-# define WS_PORT		8082
+# define WS_PORT		8081
 # define WS_BUFFER_SIZE	30000
-# define WS_TIMEOUT		3000
+# define WS_TIMEOUT		3
 
+/* TO BE REMOVED */
+enum	Mode
+{
+	READ,
+	WRITE
+};
 class Serv
 {
 	public:
@@ -48,17 +53,18 @@ class Serv
 		void	runServer();
 
 	private:
-		void				_perrorExit(std::string msg);
+		void				_perrorExit(std::string msg, int exitTrue = 1);
 		void				_setupServer();
-		int					_handleGet();
+		void				_handleGet();
 		void				_serverLoop();
+		long				ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
 		std::string					_configFilePath, _path;
 		std::vector<int>			_serverFd;
 		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
-		pollfd						_fds[1];
 		ConfigManager				_configManager;
+		// fd_set 						read_fds, write_fds;
 };
 
 #endif

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 16:11:30 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 18:08:02 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,16 @@ void	EuleeHand::parseConfigFile(void)
 	this->_configManager.parseConfigFile();
 }
 
+void	EuleeHand::configLibrary(void)
+{
+	this->_configManager.configLibrary();
+}
+
 void	EuleeHand::errorHandleShit(void)
 {
 	this->_configManager.errorHandleShit();
 }
 
-void	EuleeHand::configLibrary(void)
+void	EuleeHand::parseConfigServer(void)
 {
-	this->_configManager.configLibrary();
 }

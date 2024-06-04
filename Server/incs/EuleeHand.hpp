@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 16:53:43 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 17:57:56 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,15 @@ class EuleeHand
 
 		void	printTokens(void);
 		void	parseConfigFile(void);
-		void	errorHandleShit(void);
 		void	configLibrary(void);
+		void	errorHandleShit(void);
+		void	parseConfigServer(void);
 
-		std::vector<EuleePocket>	block;
+		std::vector<EuleePocket>	server;
 
 	private:
-		std::string					_configFilePath;
-		ConfigManager				_configManager;
+		std::string		_configFilePath;
+		ConfigManager	_configManager;
 };
 
 #endif

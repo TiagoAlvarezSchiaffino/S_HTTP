@@ -1,24 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   HttpDefaultResponse.cpp                                                  */
+/*   HttpPostResponse.cpp                                                     */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/06/03 14:39:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:38:42 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/03 17:38:42 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/03 18:30:05 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/HttpDefaultResponse.hpp"
+#include "../incs/HttpPostResponse.hpp"
 
-HttpDefaultResponse::HttpDefaultResponse(int socket) : _socket(socket) {}
+HttpPostResponse::HttpPostResponse(int socket, int content_length, int valread, std::string buffer) : _socket(socket), _content_length(content_length), _valread(valread), _buffer(buffer) {}
+HttpPostResponse::~HttpPostResponse() {}
 
-HttpDefaultResponse::~HttpDefaultResponse() {}
+/* TO BE REMOVED */
+enum	Mode
+{
+	READ,
+	WRITE
+};
 
-int	ft_select(int fd, void *buffer, size_t size, Mode mode)
+/* TO BE REMOVED */
+int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
 {
 	fd_set read_fds, write_fds;
     FD_ZERO(&read_fds);
@@ -54,13 +61,21 @@ int	ft_select(int fd, void *buffer, size_t size, Mode mode)
     return (0);
 }
 
-void	HttpDefaultResponse::handleDefault()
+void	HttpPostResponse::handlePost()
 {
-	std::string http = "HTTP/1.1 200 OK\n";
-	std::string message = "This should display the default page";
-	std::string content_length_str = "Content-Length: " + std::to_string(message.length()) + "\n\n";
-	std::string output = http + content_length_str + message;
+	size_t	content_length_pos = this->_buffer.find("Content-Length: ");
+	if (content_length_pos != std::string::npos)
+	{
+		content_length_pos += std::strlen("Content-Length: ");
+		this->_content_length = std::stoi(this->_buffer.substr(content_length_pos));
+	}
 
-	ft_select(this->_socket, (void *)output.c_str(), output.length(), WRITE);
-	close(this->_socket);
+	std::string	message_body;
+	message_body.resize(this->_content_length);
+	this->_valread = ft_select1(this->_socket, &message_body[0], this->_content_length, READ);
+
+
+	std::string response_body = "Server has received your POST request!";
+	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
+	send(this->_socket, response.c_str(), response.length(), 0);
 }

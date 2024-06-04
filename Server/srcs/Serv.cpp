@@ -8,11 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:27:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/03 17:53:47 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/Serv.hpp"
+
+#include <signal.h>
 
 Serv::Serv(std::string configFilePath): _configFilePath(configFilePath)
 {
@@ -26,42 +28,54 @@ Serv::Serv(std::string configFilePath): _configFilePath(configFilePath)
 Serv::~Serv() {}
 
 /* TO BE REMOVED */
-void	Serv::_perrorExit(std::string msg)
+void	Serv::_perrorExit(std::string msg, int exitTrue)
 {
 	std::cerr << RED << msg << ": ";
 	perror("");
 	std::cerr << RESET;
-	exit(EXIT_FAILURE);
+	if (exitTrue)
+		exit(EXIT_FAILURE);
 }
 
 /* TO BE REMOVED */
-enum	Mode
+long	Serv::ft_select2(int fd, void *buffer, size_t size, Mode mode)
 {
-	READ,
-	WRITE
-};
+	fd_set read_fds, write_fds;
+    FD_ZERO(&read_fds);
+    FD_ZERO(&write_fds);
 
-/* TO BE REMOVED */
-int	ft_poll2(pollfd (&fds)[1], int fd, void *buffer, size_t size, Mode mode)
-{
-	int	ret;
+	FD_SET(fd, (mode == READ) ? &read_fds : &write_fds);
 
-	ret = poll(fds, 1, WS_TIMEOUT);
-	if (ret == -1)
+    timeval	timeout;
+    timeout.tv_sec = WS_TIMEOUT;
+    timeout.tv_usec = 0;
+
+    int num_ready = select(fd + 1, &read_fds, &write_fds, NULL, &timeout);
+    if (num_ready == -1)
 	{
-		std::cout << RED << "Poll error" << RESET << std::endl;
-		return (-1);
-	}
-	else if (ret == 0)
+		this->_perrorExit("Select Error", 0);
+        return (-1);
+    }
+    else if (num_ready == 0)
 	{
-		std::cout << RED << "Poll timeout" << RESET << std::endl;
-		return (-1);
+        std::cout << RED << "Select timeout!" << RESET << std::endl;
+        return (0);
+    }
+
+	long	val = 0;
+    if (FD_ISSET(fd, &read_fds) && mode == READ)
+	{
+		val = read(fd, buffer, size);
+		if (val == -1)
+			this->_perrorExit("Read Error", 0);
 	}
-	else if (fds[0].revents & POLLIN && mode == READ)
-		return (read(fd, buffer, size));
-	else if (fds[0].revents & POLLOUT && mode == WRITE)
-		return (write(fd, buffer, size));
-	return (0);
+    else if (FD_ISSET(fd, &write_fds) && mode == WRITE)
+	{
+		val = write(fd, buffer, size);
+		if (val == -1)
+			this->_perrorExit("Write Error", 0);
+	}
+	return (val);
 }
 
 void	Serv::_setupServer()
@@ -77,6 +91,10 @@ void	Serv::_setupServer()
 	if ((this->_serverFd[0] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
 		this->_perrorExit("Socket Error");
 
+	int	optval = 1;
+	if (setsockopt(this->_serverFd[0], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
+		this->_perrorExit("Setsockopt Error");
+
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(WS_PORT).c_str(), &hints, &res) != 0)
 		this->_perrorExit("Getaddrinfo Error");
 	
@@ -85,7 +103,7 @@ void	Serv::_setupServer()
 	this->_serverAddr[0].sin_port = htons(WS_PORT);
 
 	if (bind(this->_serverFd[0], (sockaddr *)&this->_serverAddr[0], sizeof(this->_serverAddr[0])) < 0)
-		this->_perrorExit("Bind Error 1");
+		this->_perrorExit("Bind Error");
 	if (listen(this->_serverFd[0], WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
 
@@ -93,6 +111,10 @@ void	Serv::_setupServer()
 	int	port = 9090;
 	if ((this->_serverFd[1] = socket(WS_DOMAIN, WS_TYPE, WS_PROTOCOL)) < 0)
 		this->_perrorExit("Socket Error");
+
+	int	optval2 = 1;
+	if (setsockopt(this->_serverFd[1], SOL_SOCKET, SO_NOSIGPIPE, &optval2, sizeof(optval)) == -1)
+		this->_perrorExit("Setsockopt Error");
 
 	if (getaddrinfo(WS_SERVER_NAME, std::to_string(port).c_str(), &hints, &res) != 0)
 		this->_perrorExit("Getaddrinfo Error");
@@ -102,31 +124,12 @@ void	Serv::_setupServer()
 	this->_serverAddr[1].sin_port = htons(port);
 
 	if (bind(this->_serverFd[1], (sockaddr *)&this->_serverAddr[1], sizeof(this->_serverAddr[1])) < 0)
-		this->_perrorExit("Bind Error 2");
+		this->_perrorExit("Bind Error");
 	if (listen(this->_serverFd[1], WS_BACKLOG) < 0)
 		this->_perrorExit("Listen Error");
 }
 
-static std::string	get_content_type(std::string file)
-{
-	std::string	extension = file.substr(file.find_last_of(".") + 1);
-
-	if (extension == "jpg")
-		return ("Content-Type: image/jpeg\r\n");
-	if (extension == "jpg" || extension == "jpeg" || extension == "png")
-		return ("Content-Type: image/" + extension + "\r\n");
-	if (extension == "html" || extension == "css" || extension == "js")
-		return ("Content-Type: text/" + ((extension == "js") ? "javascript" : extension) + "\r\n");
-	if (extension == "mp3")
-		return ("Content-Type: audio/mpeg\r\n");
-	if (extension == "mp4")
-		return ("Content-Type: video/mp4\r\n");
-	if (extension == "json" || extension == "pdf" || extension == "xml" || extension == "zip")
-		return ("Content-Type: application/" + extension + "\r\n");
-	return ("Content-Type: text/plain\r\n");
-}
-
-int	Serv::_handleGet()
+void	Serv::_handleGet()
 {
 	std::ifstream	file(this->_path.c_str() + 1);
 	if (file.fail())
@@ -136,7 +139,7 @@ int	Serv::_handleGet()
 		std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + std::to_string(response_body.length()) + "\r\n\r\n" + response_body;
 		send(this->_socket, response.c_str(), response.length(), 0);
 		close(this->_socket);
-		return (1);
+		return ;
 	}
 
 	file.seekg(0, std::ios::end);
@@ -150,17 +153,26 @@ int	Serv::_handleGet()
 		std::cerr << RED << "Error reading " << this->_path << "!\n" << RESET << std::endl;
 		file.close();
 		close(this->_socket);
-		return (1);
+		return ;
 	}
 	file.close();
 
-	std::string	content_type = get_content_type(this->_path);
-	std::string	http_response = "HTTP/1.1 200 OK\r\n" + get_content_type(this->_path) + "Content-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
-	std::cout << GREEN << get_content_type(this->_path) << RESET << std::endl;
-	ft_poll2(this->_fds, this->_socket, &http_response[0], http_response.size(), WRITE);
-	// write(this->_socket, &http_response[0], http_response.size());
+	std::string	http_response = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + file_contents;
+	int	sent = 0;
+	while (sent < (int)http_response.size())
+	{
+		int actually_sent = ft_select2(this->_socket, &http_response[sent], http_response.size() - sent, WRITE);
+		if (actually_sent <= 0)
+		{
+			close(this->_socket);
+			return ;
+		}
+		sent += actually_sent;
+		std::cout << "Actually sent: " << actually_sent << "\tSent: " << sent << " / " << http_response.size() << std::endl;
+	}
+	
 	close(this->_socket);
-	return (0);
+	return ;
 }
 
 void	Serv::_serverLoop()
@@ -186,12 +198,9 @@ void	Serv::_serverLoop()
 		if (this->_socket < 0)
 			this->_perrorExit("Accept Error");
 
-		this->_fds[0].fd = this->_socket;
-		this->_fds[0].events = POLLIN | POLLOUT;
-
 		std::string	buffer;
 		buffer.resize(WS_BUFFER_SIZE, '\0');
-		valread = ft_poll2(this->_fds, this->_socket, &buffer[0], WS_BUFFER_SIZE, READ);
+		valread = ft_select2(this->_socket, &buffer[0], WS_BUFFER_SIZE, READ);
 		buffer.resize(valread);
 
 		std::string	method, query, contentType;
@@ -214,17 +223,16 @@ void	Serv::_serverLoop()
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
 		{
-			if (this->_handleGet())
-				continue ;
+			this->_handleGet();
 		}
 		else if (this->_path.find('.') != std::string::npos)
 		{
-			HttpCgiResponse	cgiResponse(this->_fds, this->_path, method, this->_socket, contentLength);
+			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket, contentLength);
 			cgiResponse.handleCgi();
 		}
 		else
 		{
-			HttpDefaultResponse	defaultResponse(this->_fds, this->_socket);
+			HttpDefaultResponse	defaultResponse(this->_socket);
 			defaultResponse.handleDefault();
 		}
 	}

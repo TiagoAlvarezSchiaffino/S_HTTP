@@ -1,21 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   server.hpp                                                               */
+/*   EuleeWallet.hpp                                                          */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/05/16 06:45:29 by Tiago                    /   (_____/     */
-/*   Updated: 2024/05/16 06:46:36 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/03 18:19:48 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/03 18:20:31 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#include "EuleeWallet.hpp"
 
-# define PORT			8080
-# define BUFFER_SIZE	30000
+EuleeWallet::EuleeWallet(void) {}
 
-#endif
+EuleeWallet::~EuleeWallet(void) {}
