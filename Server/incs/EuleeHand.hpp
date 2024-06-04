@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 11:00:12 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 11:27:16 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,7 @@ class EuleeHand
 	public:
 		EuleeHand(void);
 		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
-		EuleeHand(const EuleeHand &ref);
 		~EuleeHand(void);
-
-		EuleeHand	&operator=(const EuleeHand &ref);
 
 		void	printTokens(void);
 		void	parseConfigFile(void);
@@ -38,6 +35,10 @@ class EuleeHand
 		long	ft_select(int fd, void *buff, size_t size, Mode mode);
 
 		std::vector<EuleePocket>	server;
+		std::vector<int>			serverFd;
+		std::vector<sockaddr_in>	serverAddr;
+		std::string					methodPath, buffer;
+		int							socket, contentLength;
 
 	private:
 		std::string		_configFilePath;
