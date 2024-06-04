@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:58:26 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 10:11:04 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,14 +56,14 @@ class EuleePocket
 		iterator	end(void);
 
 		// member variable
-		std::map<std::string, std::string>	envp;
-		std::vector<EuleeWallet>			location;
-		std::vector<int>					serverFd;
-		std::vector<sockaddr_in>			serverAddr;
-		std::string							path, method, buffer;
-		int									socket, contentLength, valread;
+		std::vector<EuleeWallet>	location;
+		std::vector<int>			serverFd;
+		std::vector<sockaddr_in>	serverAddr;
+		std::string					path, method, buffer;
+		int							socket, contentLength, valread;
 
 	private:
+		std::map<std::string, std::string>	_envp;
 		EuleeWallet							_server;
 
 };

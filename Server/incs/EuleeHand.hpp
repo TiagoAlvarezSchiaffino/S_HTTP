@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:53:34 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 10:53:23 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,7 @@ class EuleeHand
 		ConfigManager	_configManager;
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
-		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, std::string &val, std::string needle);
-		size_t			_LocationPriorityCheck(std::vector<Token> &tokens, size_t i, RegularExpression &priority, std::string &readPath);
+		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);
 };
 
 #endif

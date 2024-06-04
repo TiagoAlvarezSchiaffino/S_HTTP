@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 08:09:30 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 10:29:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,29 +54,33 @@ void	EuleeHand::printServers(void)
 	for (size_t i = 0; i < this->server.size(); ++i)
 	{
 		std::cout << "=======================" << std::endl;
-		std::cout << CYAN;
-		std::cout << "server " << i + 1 << std::endl;
-		std::cout << RESET << CYANNORM;
-		std::cout << "port       : " << this->server[i].port << std::endl;
-		std::cout << "root       : " << this->server[i].root << std::endl;
-		std::cout << "index      : " << this->server[i].index << std::endl;
-		std::cout << "domain     : " << this->server[i].domain << std::endl;
-		std::cout << "autoIndex  : " << this->server[i].autoIndex << std::endl;
-		std::cout << "uploadSize : " << this->server[i].uploadSize << std::endl;
-		std::cout << "errorPath  : " << this->server[i].errorPath << std::endl;
-		std::cout << std::endl;
+		std::cout << CYAN "server " << i + 1 << RESET << std::endl;
+		for (EuleePocket::iterator it = this->server[i].begin(); it != this->server[i].end(); ++it)
+		{
+			std::cout << CYANNORM << it->first << " : ";
+			for (size_t k = 0; k < it->second.size(); ++k)
+			{
+				std::cout << it->second[k];
+				if (k + 1 < it->second.size())
+					std::cout << " ";
+			}
+			std::cout << std::endl;
+		}
+		std::cout << RESET << std::endl;
 		for (size_t j = 0; j < this->server[i].location.size(); ++j)
 		{
-			std::cout << RESET << BLUE;
-			std::cout << "location " << j + 1 << std::endl;
-			std::cout << RESET << BLUENORM;
-			std::cout << "readType   : " << this->server[i].location[j].priority << std::endl;
-			std::cout << "readPath   : " << this->server[i].location[j].readPath << std::endl;
-			std::cout << "root       : " << this->server[i].location[j].root << std::endl;
-			std::cout << "index      : " << this->server[i].location[j].index << std::endl;
-			std::cout << "cgi_pass   : " << this->server[i].location[j].cgiPass << std::endl;
-			std::cout << "cgi_index  : " << this->server[i].location[j].cgiIndex << std::endl;
-			std::cout << "cgi_param  : " << this->server[i].location[j].cgiParam << std::endl;
+			std::cout << BLUE "location " << j + 1 << RESET << std::endl;
+			for (EuleePocket::iterator it2 = this->server[i].location[j].begin(); it2 != this->server[i].location[j].end(); ++it2)
+			{
+				std::cout << BLUENORM << it2->first << " : ";
+				for (size_t d = 0; d < it2->second.size(); ++d)
+				{
+					std::cout << it2->second[d];
+					if (d + 1 < it2->second.size())
+						std::cout << " ";
+				}
+				std::cout << std::endl;
+			}
 			if (j + 1 < this->server[i].location.size())
 				std::cout << std::endl;
 		}
@@ -85,69 +89,64 @@ void	EuleeHand::printServers(void)
 	}
 }
 
-size_t	EuleeHand::_parsingHelper(std::vector<Token> &tokens, size_t i, std::string &val, std::string needle)
+size_t	EuleeHand::_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key)
 {
 	if (tokens[i].token == needle)
-		val = tokens[++i].token;
-	return (i);
-}
-
-size_t	EuleeHand::_LocationPriorityCheck(std::vector<Token> &tokens, size_t i, RegularExpression &priority, std::string &readPath)
-{
-	if (tokens[i].token == "~")
-		priority = CASE_SENSITIVE;
-	else if (tokens[i].token == "~*")
-		priority = CASE_INSENSITIVE;
-	else if (tokens[i].token == "^~")
-		priority = IGNORE_OTHERS;
-	else if (tokens[i].token == "=")
-		priority = EXACT_MATCH;
-	else
-		priority = NOT_SPECIFIED;
-	if (tokens[++i].token != "{")
-		readPath = tokens[i].token;
+	{
+		while (tokens[++i].token != ";")
+			location[key].push_back(tokens[i].token);
+	}
 	return (i);
 }
 
 size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i)
 {
-	std::string			readPath, root, index, include, cgiPass, cgiIndex, cgiParam;
-	RegularExpression	priority;
+	EuleeWallet	loc;
 
-	i = this->_LocationPriorityCheck(tokens, i, priority, readPath);
+	if (tokens[i].token != "{")
+		loc[LOCATION_READ_PATH].push_back(tokens[i++].token);
 	while (tokens[i].token != "}")
 	{
-		i = this->_parsingHelper(tokens, i, root, "root");
-		i = this->_parsingHelper(tokens, i, index, "index");
-		i = this->_parsingHelper(tokens, i, include, "include");
-		i = this->_parsingHelper(tokens, i, cgiPass, "cgi_pass");
-		i = this->_parsingHelper(tokens, i, cgiIndex, "cgi_index");
-		i = this->_parsingHelper(tokens, i, cgiParam, "cgi_param");
+		i = this->_parsingHelper(tokens, i, loc, "cgi", CGI);
+		i = this->_parsingHelper(tokens, i, loc, "root", ROOT);
+		i = this->_parsingHelper(tokens, i, loc, "index", INDEX);
+		i = this->_parsingHelper(tokens, i, loc, "return", RETURN);
+		i = this->_parsingHelper(tokens, i, loc, "upload", UPLOAD);
+		i = this->_parsingHelper(tokens, i, loc, "include", INCLUDE);
+		i = this->_parsingHelper(tokens, i, loc, "error_page", ERROR_PAGE);
+		i = this->_parsingHelper(tokens, i, loc, "auto_index", AUTO_INDEX);
+		i = this->_parsingHelper(tokens, i, loc, "limit_except", LIMIT_EXCEPT);
+		i = this->_parsingHelper(tokens, i, loc, "client_max_body_size", CLIENT_MAX_BODY_SIZE);
 		++i;
 	}
-	location.push_back(EuleeWallet(priority, readPath, root, index, include, cgiPass, cgiIndex, cgiParam));
+	location.push_back(EuleeWallet(loc));
 	return (i);
 }
 
 size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 {
-	std::string	port, root, index, domain, autoIndex, uploadSize, errorPath;
+	EuleeWallet					serv;
 	std::vector<EuleeWallet>	location;
 
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
-		i = this->_parsingHelper(tokens, i, port, "listen");
-		i = this->_parsingHelper(tokens, i, root, "root");
-		i = this->_parsingHelper(tokens, i, index, "index");
-		i = this->_parsingHelper(tokens, i, domain, "server_name");
-		i = this->_parsingHelper(tokens, i, errorPath, "error_page");
-		i = this->_parsingHelper(tokens, i, uploadSize, "client_max_body_size");
-		i = this->_parsingHelper(tokens, i, autoIndex, "auto_index");
+		i = this->_parsingHelper(tokens, i, serv, "cgi", CGI);
+		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
+		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
+		i = this->_parsingHelper(tokens, i, serv, "listen", LISTEN);
+		i = this->_parsingHelper(tokens, i, serv, "return", RETURN);
+		i = this->_parsingHelper(tokens, i, serv, "upload", UPLOAD);
+		i = this->_parsingHelper(tokens, i, serv, "include", INCLUDE);
+		i = this->_parsingHelper(tokens, i, serv, "auto_index", AUTO_INDEX);
+		i = this->_parsingHelper(tokens, i, serv, "error_page", ERROR_PAGE);
+		i = this->_parsingHelper(tokens, i, serv, "server_name", SERVER_NAME);
+		i = this->_parsingHelper(tokens, i, serv, "limit_except", LIMIT_EXCEPT);
+		i = this->_parsingHelper(tokens, i, serv, "client_max_body_size", CLIENT_MAX_BODY_SIZE);
 		if (tokens[i].token == "location")
 			i = this->_parseLocation(tokens, location, ++i);
 		++i;
 	}
-	this->server.push_back(EuleePocket(port, root, index, domain, autoIndex, uploadSize, errorPath, location));
+	this->server.push_back(EuleePocket(serv, location));
 	return (++i);
 }
 

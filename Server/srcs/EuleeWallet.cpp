@@ -8,24 +8,30 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 18:19:48 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 08:12:44 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 10:35:51 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeWallet.hpp"
 
-EuleeWallet::EuleeWallet(void) : priority(), readPath(), root(), index(), include(), cgiPass(), cgiIndex(), cgiParam() {}
+EuleeWallet::EuleeWallet(void) : _location() {}
 
-EuleeWallet::EuleeWallet(RegularExpression priority, std::string readPath, std::string root, std::string index, std::string include, std::string cgiPass, std::string cgiIndex, std::string cgiParam) : priority(), readPath(), root(), index(), include(), cgiPass(), cgiIndex(), cgiParam()
+EuleeWallet::EuleeWallet(value_type location) : _location(location) {}
+
+EuleeWallet::mapped_type	&EuleeWallet::operator[](const key_type &key)
 {
-    this->readPath = readPath;
-	this->priority = priority;
-	this->root = root;
-	this->index = index;
-	this->include = include;
-	this->cgiPass = cgiPass;
-	this->cgiIndex = cgiIndex;
-	this->cgiParam = cgiParam;
+	return (this->_location[key]);
 }
 
 EuleeWallet::~EuleeWallet(void) {}
+
+
+EuleeWallet::iterator	EuleeWallet::begin(void)
+{
+	return (this->_location.begin());
+}
+
+EuleeWallet::iterator	EuleeWallet::end(void)
+{
+	return (this->_location.end());
+}
