@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:29:35 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:45:16 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,35 @@ void	Serv::_setupServer()
 		this->_perrorExit("Listen Error");
 }
 
+int	WebServer::_unchunkResponse()
+{
+	std::string	header = this->_buffer.substr(0, this->_buffer.find("\r\n\r\n"));
+	std::string	output;
+
+	if (header.find("Transfer-Encoding: chunked") == std::string::npos)
+		return (0);
+	std::string	remaining = this->_buffer.substr(this->_buffer.find("\r\n\r\n") + 4);
+	std::string	newBody = "";
+
+	while (remaining.find("\r\n") != std::string::npos)
+	{
+		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
+		int			size = std::stoi(chunkSize, 0, 16);
+		std::cout << size << std::endl;
+		if (size == 0)
+			return (0);
+		if (size > remaining.size() - std::strlen("\r\n"))
+		{
+			std::cout << RED << "Error: Chunk size is bigger than remaining size" << RESET << std::endl;
+			return (-1);
+		}
+		newBody += remaining.substr(remaining.find("\r\n") + std::strlen("\r\n"), size);
+		remaining = remaining.substr(remaining.find("\r\n") + size + std::strlen("\r\n\r\n"));
+	}
+	this->_buffer = header + "\r\n\r\n" + newBody;
+	return (1);
+}
+
 void	Serv::_serverLoop()
 {
 	long	valread;
@@ -154,7 +183,6 @@ void	Serv::_serverLoop()
 
 		size_t		total = 0;
 		char		readBuffer[WS_BUFFER_SIZE];
-		std::string	buffer;
 		valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
 		while (valread > 0)
 		{
@@ -165,12 +193,18 @@ void	Serv::_serverLoop()
 				close(this->_socket);
 				return ;
 			}
-			buffer.append(readBuffer, valread);
+			this->_buffer.append(readBuffer, valread);
 			valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
 		}
 
+		if (this->_unchunkResponse() == -1)
+		{
+			close(this->_socket);
+			continue ;
+		}
+
 		std::string	method, query, contentType;
-		std::istringstream	request(buffer);
+		std::istringstream	request(this->_buffer);
 		
 		request >> method >> this->_path;
 		if (this->_path == "/favicon.ico") // Ignore favicon
@@ -179,11 +213,11 @@ void	Serv::_serverLoop()
 			close(this->_socket);
 			continue;
 		}
-		std::cout << BLUE << buffer.substr(0, buffer.find("\r\n\r\n")) << RESET << std::endl;
+		std::cout << BLUE << this->_buffer.substr(0, this->_buffer.find("\r\n\r\n")) << RESET << std::endl;
 
 		if (method == "POST")
 		{
-			HttpPostResponse	postResponse(this->_socket, buffer);
+			HttpPostResponse	postResponse(this->_socket, this->_buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config

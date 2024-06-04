@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:33:13 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:24:04 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:48:16 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class HttpPostResponse
 	public:
 		HttpPostResponse(int socket, std::string buffer);
 		~HttpPostResponse();
-		void	handlePost();
+		void		handlePost();
 
 	private:
 		void		_saveFile(size_t contentLength, int contentLengthSpecified);

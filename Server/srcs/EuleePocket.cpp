@@ -8,26 +8,32 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:56:40 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 18:19:24 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 08:09:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleePocket.hpp"
 
-EuleePocket::EuleePocket(void) : envp(), location(), port(), root(), index(), domain(), autoIndex(), uploadSize(), errorPath(), serverFd(), serverAddr(), path(), method(), buffer(), socket(), contentLength(), valread() {}
+EuleePocket::EuleePocket(void) : envp(), location(), serverFd(), serverAddr(), path(), method(), buffer(), socket(), contentLength(), valread(), _server() {}
 
-EuleePocket::EuleePocket(std::string port, std::string root, std::string index, std::string domain, std::string autoIndex, std::string uploadSize, std::string errorPath) : envp(), location(), port(), root(), index(), domain(), autoIndex(), uploadSize(), errorPath(), serverFd(), serverAddr(), path(), method(), buffer(), socket(), contentLength(), valread()
-{
-	this->port = port;
-	this->root = root;
-	this->index = index;
-	this->domain = domain;
-	this->autoIndex = autoIndex;
-	this->uploadSize = uploadSize;
-	this->errorPath = errorPath;
-}
+EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> location) : envp(), location(location), serverFd(), serverAddr(), path(), method(), buffer(), socket(), contentLength(), valread(), _server(server) {}
 
 EuleePocket::~EuleePocket(void) {}
+
+EuleePocket::mapped_type	&EuleePocket::operator[](key_type key)
+{
+	return (this->_server[key]);
+}
+
+EuleePocket::iterator	EuleePocket::begin(void)
+{
+	return (this->_server.begin());
+}
+
+EuleePocket::iterator	EuleePocket::end(void)
+{
+	return (this->_server.end());
+}
 
 void	EuleePocket::perrorExit(std::string msg, int exitTrue)
 {
@@ -40,37 +46,37 @@ void	EuleePocket::perrorExit(std::string msg, int exitTrue)
 
 long	EuleePocket::ft_select(int fd, void *buff, size_t size, Mode mode)
 {
-	fd_set	read_fds, write_fds;
-	FD_ZERO(&read_fds);
-	FD_ZERO(&write_fds);
-	FD_SET(fd, (mode == READ) ? &read_fds : &write_fds);
+	fd_set	readFds, writeFds;
+	FD_ZERO(&readFds);
+	FD_ZERO(&writeFds);
+	FD_SET(fd, (mode == READ) ? &readFds : &writeFds);
 
 	timeval	timeout;
 	timeout.tv_sec = WS_TIMEOUT;
 	timeout.tv_usec = 0;
 
-	int	num_ready = select(fd + 1, &read_fds, &write_fds, NULL, &timeout);
-	if (num_ready == -1)
+	int	ret = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);
+	if (ret == -1)
 	{
 		this->perrorExit("Select Error", 0);
 		return (-1);
 	}
-	else if (num_ready == 0)
+	else if (ret == 0)
 	{
 		std::cout << RED << "Select timeout!" << RESET << std::endl;
 		return (0);
 	}
 
 	long	val = 0;
-	if (FD_ISSET(fd, &read_fds) && mode == READ)
+	if (FD_ISSET(fd, &readFds) && mode == READ)
 	{
-		val = read(fd, buff, size);
+		val = recv(fd, buff, size, 0);
 		if (val == -1)
 			this->perrorExit("Read Error", 0);
 	}
-	else if (FD_ISSET(fd, &write_fds) && mode == WRITE)
+	else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
 	{
-		val = write(fd, buff, size);
+		val = send(fd, buff, size, 0);
 		if (val == -1)
 			this->perrorExit("Write Error", 0);
 	}

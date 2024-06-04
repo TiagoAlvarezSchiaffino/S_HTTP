@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:51:50 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:00:57 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:48:10 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class HttpGetResponse
 	public:
 		HttpGetResponse(std::string path, int socket);
 		~HttpGetResponse();
-		void	handleGet();
+		void		handleGet();
 
 	private:
 		int			_socket;

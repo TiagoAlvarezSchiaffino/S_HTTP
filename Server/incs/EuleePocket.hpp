@@ -8,15 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:59:41 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:58:26 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef EULEEPOCKET_HPP
 # define EULEEPOCKET_HPP
 
-# include <map>
-# include <vector>
 # include <unistd.h>
 # include <sys/select.h>
 # include <netinet/in.h>
@@ -24,6 +22,10 @@
 
 # define RESET		"\033[0m"
 # define RED		"\033[1;31m"
+# define BLUE		"\033[1;34m"
+# define CYAN		"\033[1;36m"
+# define BLUENORM	"\033[34m"
+# define CYANNORM	"\033[36m"
 # define WS_TIMEOUT	3
 
 enum	Mode
@@ -33,26 +35,37 @@ enum	Mode
 };
 
 // server block
-struct EuleePocket
+class EuleePocket
 {
-	EuleePocket(void);
-	EuleePocket(std::string port, std::string root, std::string index, std::string domain, std::string autoIndex, std::string uploadSize, std::string errorPath);
-	~EuleePocket(void);
+	public:
+		typedef Key								key_type;
+		typedef std::vector<std::string>		mapped_type;
+		typedef std::map<key_type, mapped_type>	value_type;
+		typedef	value_type::iterator			iterator;
 
-	// member variables
-	std::map<std::string, std::string>	envp;
-	std::vector<EuleeWallet>			location;
-	std::string							port, root, index, domain;
-	std::string							autoIndex, uploadSize, errorPath;
+		EuleePocket(void);
+		EuleePocket(EuleeWallet server, std::vector<EuleeWallet> location);
+		~EuleePocket(void);
 
-	std::vector<int>					serverFd;
-	std::vector<sockaddr_in>			serverAddr;
-	std::string							path, method, buffer;
-	int									socket, contentLength, valread;
+		mapped_type	&operator[](key_type key);
 
-	// member functions
-	void	perrorExit(std::string msg, int exitTrue = 1);
-	long	ft_select(int fd, void *buff, size_t size, Mode mode);
+		// member function
+		void		perrorExit(std::string msg, int exitTrue = 1);
+		long		ft_select(int fd, void *buff, size_t size, Mode mode);
+		iterator	begin(void);
+		iterator	end(void);
+
+		// member variable
+		std::map<std::string, std::string>	envp;
+		std::vector<EuleeWallet>			location;
+		std::vector<int>					serverFd;
+		std::vector<sockaddr_in>			serverAddr;
+		std::string							path, method, buffer;
+		int									socket, contentLength, valread;
+
+	private:
+		EuleeWallet							_server;
+
 };
 
 #endif

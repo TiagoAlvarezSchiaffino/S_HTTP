@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:03:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:48:59 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 # define WS_FLAGS		AI_PASSIVE
 # define WS_SERVER_NAME	"localhost"
 # define WS_BACKLOG		10
-# define WS_PORT		8080
+# define WS_PORT		8081
 # define WS_BUFFER_SIZE	30000
 # define WS_TIMEOUT		3
 
@@ -51,15 +51,16 @@ class Serv
 	public:
 		Serv(std::string configFilePath);
 		~Serv();
-		void	runServer();
+		void						runServer();
 
 	private:
-		void				_perrorExit(std::string msg, int exitTrue = 1);
-		void				_setupServer();
-		void				_serverLoop();
-		long				ft_select2(int fd, void *buffer, size_t size, Mode mode);
+		void						_perrorExit(std::string msg, int exitTrue = 1);
+		void						_setupServer();
+		int							_unchunkResponse();
+		void						_serverLoop();
+		long						ft_select2(int fd, void *buffer, size_t size, Mode mode);
 
-		std::string					_configFilePath, _path;
+		std::string					_configFilePath, _path, _buffer;
 		std::vector<int>			_serverFd;
 		int							_socket;
 		std::vector<sockaddr_in>	_serverAddr;
