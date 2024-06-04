@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:59:56 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 18:02:39 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 05:32:44 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ enum	RegularExpression
 struct EuleeWallet
 {
 	EuleeWallet(void);
+    EuleeWallet(RegularExpression priority, std::string valuePath, std::string root, std::string index, std::string include, std::string cgiPass, std::string cgiIndex, std::string cgiParam);
 	~EuleeWallet(void);
 
 	RegularExpression	priority;
