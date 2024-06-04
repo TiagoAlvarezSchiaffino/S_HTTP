@@ -8,11 +8,11 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:55:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 06:54:46 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:06:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "HttpGetResponse.hpp"
+#include "../incs/HttpGetResponse.hpp"
 
 HttpGetResponse::HttpGetResponse(std::string path, int socket) : _socket(socket), _path(path) {}
 
@@ -98,7 +98,7 @@ void	HttpGetResponse::handleGet()
 			return ;
 		}
 		total += sent;
-		std::cout << "Sent: " << sent << "\tTotal: " << total << " / " << httpResponse.size() << std::endl;
+		std::cout << GREEN << "Sent: " << sent << "\tTotal: " << total << " / " << httpResponse.size() << RESET << std::endl;
 	}
 	close(this->_socket);
 }

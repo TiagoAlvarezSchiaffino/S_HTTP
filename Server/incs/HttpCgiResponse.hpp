@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:58:46 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:28:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 06:59:45 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@
 class HttpCgiResponse
 {
 	public:
-		HttpCgiResponse(std::string path, std::string method, int socket, int contentLength);
+		HttpCgiResponse(std::string path, std::string method, int socket);
 		~HttpCgiResponse();
 		void	handleCgi();
 
 	private:
 		void		_perrorExit(std::string msg);
 		std::string	_path, _method;
-		int			_socket, _contentLength;
+		int			_socket;
 };
 
 #endif

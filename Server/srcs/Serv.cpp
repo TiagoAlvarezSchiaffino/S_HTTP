@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 06:19:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:22:56 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,13 +152,24 @@ void	Serv::_serverLoop()
 		if (this->_socket < 0)
 			this->_perrorExit("Accept Error");
 
+		size_t		total = 0;
+		char		readBuffer[WS_BUFFER_SIZE];
 		std::string	buffer;
-		buffer.resize(WS_BUFFER_SIZE, '\0');
-		valread = ft_select2(this->_socket, &buffer[0], WS_BUFFER_SIZE, READ);
-		buffer.resize(valread);
+		valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+		while (valread > 0)
+		{
+			total += valread;
+			std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
+			if (valread < 0)
+			{
+				close(this->_socket);
+				return ;
+			}
+			buffer.append(readBuffer, valread);
+			valread = ft_select2(this->_socket, readBuffer, WS_BUFFER_SIZE, READ);
+		}
 
 		std::string	method, query, contentType;
-		int		contentLength = 0;
 		std::istringstream	request(buffer);
 		
 		request >> method >> this->_path;
@@ -168,11 +179,11 @@ void	Serv::_serverLoop()
 			close(this->_socket);
 			continue;
 		}
-		std::cout << buffer;
+		std::cout << BLUE << buffer.substr(0, buffer.find("\r\n\r\n")) << RESET << std::endl;
 
 		if (method == "POST")
 		{
-			HttpPostResponse	postResponse(this->_socket, contentLength, valread, buffer);
+			HttpPostResponse	postResponse(this->_socket, valread, buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
@@ -182,7 +193,7 @@ void	Serv::_serverLoop()
 		}
 		else if (this->_path.find('.') != std::string::npos)
 		{
-			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket, contentLength);
+			HttpCgiResponse	cgiResponse(this->_path, method, this->_socket);
 			cgiResponse.handleCgi();
 		}
 		else

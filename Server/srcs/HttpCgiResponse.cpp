@@ -8,13 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 06:43:15 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:06:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpCgiResponse.hpp"
 
-HttpCgiResponse::HttpCgiResponse(std::string path, std::string method, int socket, int contentLength) : _path(path), _method(method), _socket(socket), _contentLength(contentLength) {}
+HttpCgiResponse::HttpCgiResponse(std::string path, std::string method, int socket) : _path(path), _method(method), _socket(socket) {}
 
 HttpCgiResponse::~HttpCgiResponse() {}
 
@@ -72,7 +72,6 @@ void	HttpCgiResponse::handleCgi()
 {
 	int		cgiInput[2], cgiOutput[2], status;
 	pid_t	pid;
-	char	c;
 
     if (pipe(cgiInput) < 0 || pipe(cgiOutput) < 0)
 		this->_perrorExit("Pipe Error");
@@ -91,7 +90,7 @@ void	HttpCgiResponse::handleCgi()
         // setenv("SCRIPT_NAME", path, 1);
         // setenv("QUERY_STRING", query_string, 1);
         // setenv("CONTENT_TYPE", content_type, 1);
-        // setenv("CONTENT_LENGTH", std::to_string(this->_contentLength).c_str(), 1);
+        // setenv("CONTENT_LENGTH", std::to_string(contentLength.c_str(), 1);
 		setenv("CONTENT_LENGTH", "69", 1);
 
 		char	*cmds[2] = {(char *)(this->_path.c_str() + 1), NULL};
@@ -103,17 +102,6 @@ void	HttpCgiResponse::handleCgi()
 	{
         close(cgiInput[0]);
         close(cgiOutput[1]);
-
-        if (this->_method == "POST")
-		{
-			int	n = read(this->_socket, &c, 1);
-            int i = 0;
-            while (n > 0 && i < this->_contentLength) {
-                write(cgiInput[1], &c, 1);
-				n = ft_select3(this->_socket, &c, 1, READ);
-                i++;
-            }
-        }
 
 		std::string	buffer(WS_BUFFER_SIZE, '\0');
         int n = read(cgiOutput[0], &buffer[0], WS_BUFFER_SIZE);

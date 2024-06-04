@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 05:55:12 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:03:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 # define WS_FLAGS		AI_PASSIVE
 # define WS_SERVER_NAME	"localhost"
 # define WS_BACKLOG		10
-# define WS_PORT		8081
+# define WS_PORT		8080
 # define WS_BUFFER_SIZE	30000
 # define WS_TIMEOUT		3
 
