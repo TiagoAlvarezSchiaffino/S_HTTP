@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:33:13 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:29:34 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 06:35:11 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # define HTTPPOSTRESPONSE_HPP
 
 # include <iostream>
+# include <fstream>
 # include <string>
 # include <unistd.h>
 # include <sys/socket.h>
@@ -32,8 +33,9 @@ class HttpPostResponse
 		void	handlePost();
 
 	private:
-		int			_socket, _content_length, _valread;
-		std::string	_buffer;
+		void		_saveFile();
+		int			_socket, _contentLength, _valread;
+		std::string	_buffer, _messageBody;
 };
 
 #endif
