@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 11:45:31 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:10:01 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@
 
 # define RESET		"\033[0m"
 # define RED		"\033[1;31m"
+# define GREEN		"\033[1;32m"
 # define BLUE		"\033[1;34m"
+# define MAGENTA	"\033[1;35m"
 # define CYAN		"\033[1;36m"
 # define BLUENORM	"\033[34m"
 # define CYANNORM	"\033[36m"
