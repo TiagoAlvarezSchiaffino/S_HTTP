@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:38:42 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:50:29 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 12:02:45 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	HttpPostResponse::handlePost()
 	if (contentLengthPos != std::string::npos)
 	{
 		contentLengthPos += std::strlen("Content-Length: ");
-		contentLength = std::stoi(this->_buffer.substr(contentLengthPos));
+		contentLength = std::stoul(this->_buffer.substr(contentLengthPos));
 		contentLengthSpecified = 1;
 	}
 
@@ -80,4 +80,5 @@ void	HttpPostResponse::handlePost()
 	std::string responseBody = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
 	ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);
+    close(this->_socket);
 }

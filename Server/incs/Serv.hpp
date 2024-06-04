@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:20:47 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 11:54:48 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,18 @@
 # define Serv_HPP
 
 # include <iostream>
-# include <string>
 # include <sstream>
 # include <fstream>
 # include <vector>
+# include <map>
+# include <sys/socket.h>
 # include <unistd.h>
 # include <netdb.h>
 # include <fcntl.h>
-# include <sys/socket.h>
 
 # include "ConfigManager.hpp"
+# include "EuleeHand.hpp"
+# include "EuleeWallet.hpp"
 # include "HttpPostResponse.hpp"
 # include "HttpDefaultResponse.hpp"
 # include "HttpCgiResponse.hpp"
@@ -33,11 +35,8 @@
 # include "HttpDeleteResponse.hpp"
 # include "HttpHeadResponse.hpp"
 # include "server.hpp"
+# include "HttpPutResponse.hpp"
 
-# define WS_DOMAIN				AF_INET
-# define WS_TYPE				SOCK_STREAM
-# define WS_PROTOCOL			0
-# define WS_FLAGS				AI_PASSIVE
 # define WS_SERVER_NAME			"localhost"
 # define WS_BACKLOG				10
 # define WS_PORT				8080

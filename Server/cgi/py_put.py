@@ -4,12 +4,11 @@ import requests
 import sys
 
 if len(sys.argv) != 2:
-    print("Usage: py_delete.py <port>")
+    print("Usage: py_delete.py <url>")
     sys.exit(1)
 
 try:
-	url = "http://localhost:" + str(sys.argv[1]) + "/cgi/files/deleteMe"
-	response = requests.delete(url)
+	response = requests.put(sys.argv[1], data = "Hello World")
 except:
 	print("Error: Could not connect to server")
 	sys.exit(1)

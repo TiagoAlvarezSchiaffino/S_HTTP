@@ -1,36 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   EuleePocket.cpp                                                          */
+/*   HttpPutResponse.hpp                                                      */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/06/03 16:56:40 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 12:00:03 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/04 11:46:04 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/04 11:49:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "EuleePocket.hpp"
+#ifndef HTTPPUTRESPONSE_HPP
+# define HTTPPUTRESPONSE_HPP
 
-EuleePocket::EuleePocket(void) : envp(), location(), _server() {}
+# include "Serv.hpp"
 
-EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> location) : envp(), location(location), _server(server) {}
-
-EuleePocket::~EuleePocket(void) {}
-
-EuleePocket::mapped_type	&EuleePocket::operator[](key_type key)
+class HttpPutResponse
 {
-	return (this->_server[key]);
-}
+	public:
+		HttpPutResponse(int socket, std::string buffer, std::string path, EuleeHand database);
+		~HttpPutResponse();
+		void		handlePut();
 
-EuleePocket::iterator	EuleePocket::begin(void)
-{
-	return (this->_server.begin());
-}
+	private:
+		void		_saveFile(size_t contentLength, int contentLengthSpecified);
 
-EuleePocket::iterator	EuleePocket::end(void)
-{
-	return (this->_server.end());
-}
+		int			_socket;
+		std::string	_buffer, _path;
+		EuleeHand	_database;
+};
+
+#endif

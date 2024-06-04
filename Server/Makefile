@@ -8,7 +8,7 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/04 10:56:29 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/04 11:37:16 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
@@ -36,7 +36,8 @@ SRC			=	WebServer.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
 				HttpDeleteResponse.cpp \
-				HttpHeadResponse.cpp
+				HttpHeadResponse.cpp \
+				HttpPutResponse.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: 
