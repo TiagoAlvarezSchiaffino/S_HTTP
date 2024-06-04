@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:22:56 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 07:29:35 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,7 @@ void	Serv::_serverLoop()
 
 		if (method == "POST")
 		{
-			HttpPostResponse	postResponse(this->_socket, valread, buffer);
+			HttpPostResponse	postResponse(this->_socket, buffer);
 			postResponse.handlePost();
 		}
 		else if (method == "GET" && this->_path != "/" && this->_path.find(".php") == std::string::npos && this->_path.find(".py") == std::string::npos && this->_path.find(".cgi") == std::string::npos) // Will be determined by the config
