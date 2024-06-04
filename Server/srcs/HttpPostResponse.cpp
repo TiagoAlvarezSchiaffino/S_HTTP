@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:38:42 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 08:22:49 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 09:50:29 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,44 +17,6 @@
 HttpPostResponse::HttpPostResponse(int socket, std::string buffer) : _socket(socket), _buffer(buffer) {}
 
 HttpPostResponse::~HttpPostResponse() {}
-
-/* TO BE REMOVED */
-enum	Mode
-{
-	READ,
-	WRITE
-};
-
-/* TO BE REMOVED */
-int	ft_select1(int fd, void *buffer, size_t size, Mode mode)
-{
-	fd_set readFds, writeFds;
-    FD_ZERO(&readFds);
-    FD_ZERO(&writeFds);
-	FD_SET(fd, (mode == READ) ? &readFds : &writeFds);
-
-    timeval	timeout;
-    timeout.tv_sec = WS_TIMEOUT;
-    timeout.tv_usec = 0;
-
-    int ret = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);
-    if (ret == -1)
-	{
-        std::cerr << "Error: select() failed.\n";
-        return (-1);
-    }
-    else if (ret == 0)
-	{
-        std::cout << "Select timeout.\n";
-        return (0);
-    }
-
-	if (FD_ISSET(fd, &readFds) && mode == READ)
-		return (read(fd, buffer, size));
-	else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
-		return (write(fd, buffer, size));
-    return (0);
-}
 
 void	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecified)
 {
@@ -117,5 +79,5 @@ void	HttpPostResponse::handlePost()
 	this->_saveFile(contentLength, contentLengthSpecified);
 	std::string responseBody = "Server has received your POST request!";
 	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
-	send(this->_socket, response.c_str(), response.length(), 0);
+	ft_select(this->_socket, (void *)response.c_str(), response.length(), WRITE);
 }

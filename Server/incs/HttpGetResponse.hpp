@@ -8,23 +8,14 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:51:50 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 07:48:10 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 09:12:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPGETRESPONSE_HPP
 # define HTTPGETRESPONSE_HPP
 
-# include <fstream>
-# include <iostream>
-# include <string>
-# include <unistd.h>
-# include <sys/socket.h>
-
-# define RED		"\033[1;31m"
-# define GREEN		"\033[1;32m"
-# define RESET		"\033[0m"
-# define WS_TIMEOUT	3
+# include "Serv.hpp"
 
 class HttpGetResponse
 {

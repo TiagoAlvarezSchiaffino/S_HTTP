@@ -1,26 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   server.cpp                                                                 */
+/*   server.hpp                                                               */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 18:04:52 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 09:22:59 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
-
-# include <iostream>
-# include <string>
-
-# include "Serv.hpp"
-# include "ConfigManager.hpp"
-# include "EuleeHand.hpp"
 
 # define RESET		"\033[0m"
 # define BLACK		"\033[1;30m"
@@ -32,6 +25,7 @@
 # define CYAN		"\033[1;36m"
 # define WHITE		"\033[1;37m"
 
-# define DEFAULT_CONFIG_PATH	"conf/default.conf"
+# include "Serv.hpp"
+# include "ConfigManager.hpp"
 
 #endif

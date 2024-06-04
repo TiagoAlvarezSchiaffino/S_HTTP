@@ -1,32 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   HttpPostResponse.hpp                                                     */
+/*   HttpHeadResponse.hpp                                                     */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/06/03 14:33:13 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:15:34 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/04 09:12:00 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/04 09:14:51 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPPOSTRESPONSE_HPP
-# define HTTPPOSTRESPONSE_HPP
+#ifndef HTTPHEADRESPONE_HPP
+# define HTTPHEADRESPONE_HPP
 
 # include "Serv.hpp"
-class HttpPostResponse
+
+class HttpHeadResponse
 {
 	public:
-		HttpPostResponse(int socket, std::string buffer);
-		~HttpPostResponse();
-		void		handlePost();
+		HttpHeadResponse(int socket, std::string path);
+		~HttpHeadResponse();
+		void	handleHead();
 
 	private:
-		void		_saveFile(size_t contentLength, int contentLengthSpecified);
-		int			_socket;
-		std::string	_buffer;
+		int		_socket;
+		std::string	_path;
 };
 
 #endif

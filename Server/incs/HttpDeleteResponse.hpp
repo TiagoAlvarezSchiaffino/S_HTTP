@@ -1,32 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   HttpPostResponse.hpp                                                     */
+/*   HttpDeleteResponse.hpp                                                   */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/06/03 14:33:13 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 09:15:34 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/04 08:40:21 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/04 09:11:44 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPPOSTRESPONSE_HPP
-# define HTTPPOSTRESPONSE_HPP
+#ifndef HTTPDELETERESPONSE_HPP
+# define HTTPDELETERESPONSE_HPP
 
 # include "Serv.hpp"
-class HttpPostResponse
+
+class HttpDeleteResponse
 {
 	public:
-		HttpPostResponse(int socket, std::string buffer);
-		~HttpPostResponse();
-		void		handlePost();
+		HttpDeleteResponse(int socket, std::string path);
+		~HttpDeleteResponse();
+		void	handleDelete();
 
 	private:
-		void		_saveFile(size_t contentLength, int contentLengthSpecified);
-		int			_socket;
-		std::string	_buffer;
+		int		_socket;
+		std::string	_path;
 };
 
 #endif

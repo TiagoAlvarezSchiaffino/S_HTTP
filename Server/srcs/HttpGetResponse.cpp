@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:55:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 08:57:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 09:35:19 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,49 +18,9 @@ HttpGetResponse::HttpGetResponse(std::string path, int socket) : _socket(socket)
 
 HttpGetResponse::~HttpGetResponse() {}
 
-/* TO BE REMOVED */
-enum	Mode
-{
-	READ,
-	WRITE
-};
-
-/* TO BE REMOVED */
-int	ft_select2(int fd, void *buffer, size_t size, Mode mode)
-{
-	fd_set readFds, writeFds;
-    FD_ZERO(&readFds);
-    FD_ZERO(&writeFds);
-    if (mode == READ)
-        FD_SET(fd, &readFds);
-    else if (mode == WRITE)
-        FD_SET(fd, &writeFds);
-
-    timeval	timeout;
-    timeout.tv_sec = WS_TIMEOUT;
-    timeout.tv_usec = 0;
-
-    int ret = select(fd + 1, &readFds, &writeFds, nullptr, &timeout);
-    if (ret == -1)
-	{
-        std::cerr << "Error: select() failed.\n";
-        return (-1);
-    }
-    else if (ret == 0)
-	{
-        std::cout << "Select timeout.\n";
-        return (0);
-    }
-
-    if (FD_ISSET(fd, &readFds) && mode == READ)
-        return (read(fd, buffer, size));
-    else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
-        return (write(fd, buffer, size));
-    return (0);
-}
-
 void	HttpGetResponse::handleGet()
 {
+    std::string	failedResponse = "HTTP/1.1 404 Not Found\r\n\r\nFile to get is not found...\r\n";
     size_t	queryPos = this->_path.find('?');
 	if (queryPos != std::string::npos)
 		this->_path = this->_path.substr(0, queryPos);
@@ -69,9 +29,7 @@ void	HttpGetResponse::handleGet()
 	if (file.fail())
 	{
 		std::cerr << RED << "Error opening " << this->_path << "!\n" << RESET << std::endl;
-		std::string responseBody = "404 Not Found";
-		std::string response = "HTTP/1.1 404 Not Found\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
-		send(this->_socket, response.c_str(), response.length(), 0);
+		ft_select(this->_socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
 		close(this->_socket);
 		return ;
 	}
@@ -85,7 +43,8 @@ void	HttpGetResponse::handleGet()
 	if (file.read(&fileContents[0], file_size).fail())
 	{
 		std::cerr << RED << "Error reading " << this->_path << "!\n" << RESET << std::endl;
-		file.close();
+		ft_select(this->_socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);
+        file.close();
 		close(this->_socket);
 		return ;
 	}
@@ -95,7 +54,7 @@ void	HttpGetResponse::handleGet()
 	int	total = 0;
 	while (total < (int)httpResponse.size())
 	{
-		int sent = ft_select2(this->_socket, &httpResponse[total], httpResponse.size() - total, WRITE);
+		int sent = ft_select(this->_socket, &httpResponse[total], httpResponse.size() - total, WRITE);
 		if (sent <= 0)
 		{
 			close(this->_socket);

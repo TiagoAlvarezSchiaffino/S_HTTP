@@ -8,12 +8,11 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 05:48:22 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 09:23:18 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfigManager.hpp"
-#include <unistd.h>
 
 ConfigManager::ConfigManager(void): _configFilePath() {}
 

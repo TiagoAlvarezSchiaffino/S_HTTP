@@ -8,12 +8,12 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/04 08:30:04 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/04 09:09:05 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
 NAME		=	SERVER
-CXX			=	c++
+CXX			=	g++
 # CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
 ifeq ($(DB), 1)
     CXXFLAGS += -fsanitize=thread -g3
@@ -21,7 +21,6 @@ endif
 INCLUDES	=	-Iincs
 RM			=	rm -rf
 MKDIR		=	mkdir -p
-
 SRC_PATH	=	srcs
 OBJ_PATH	=	objs
 ANNOYING	=	*.dSYM .vscode
@@ -34,18 +33,20 @@ SRC			=	WebServer.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
 				HttpDeleteResponse.cpp \
+				HttpHeadResponse.cpp \
 				EuleeHand.cpp \
 				EuleePocket.cpp \
 				EuleeWallet.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
-all: ${NAME}
+all: 
+	${MKDIR} ${OBJ_PATH}
+	make ${NAME}
 
 ${NAME}: ${OBJ} $(MAIN)
 	${CXX} ${CXXFLAGS} ${INCLUDES} ${MAIN} ${OBJ} -o ${NAME}
 
 ${OBJ_PATH}/%.o: ${SRC_PATH}/%.cpp
-	${MKDIR} ${@D}
 	${CXX} ${CXXFLAGS} ${INCLUDES} -c $< -o $@
 
 test: fclean all
