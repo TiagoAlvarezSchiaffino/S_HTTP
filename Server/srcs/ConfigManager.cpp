@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 05:38:36 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 05:48:22 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,13 +93,13 @@ void	ConfigManager::parseConfigFile()
 void	ConfigManager::printTokens(void)
 {
 	for (size_t i = 0; i < this->_tokens.size(); i++)
-		std::cout << "Token: |" << this->_tokens[i].getToken() << "| Type: |" << this->_tokens[i].getType() << "| Line: |" << this->_tokens[i].getLineNum() << "|" << std::endl;
+		std::cout << "Token: |" << this->_tokens[i].token << "| Type: |" << this->_tokens[i].type << "| Line: |" << this->_tokens[i].lineNum << "|" << std::endl;
 }
 
 void	ConfigManager::printError(std::string str, int i)
 {
-	std::cout << str << "Line: " << this->_tokens[i].getLineNum() << std::endl;
-	std::cout << this->_tokens[i].getToken() << std::endl;
+	std::cout << str << "Line: " << this->_tokens[i].lineNum << std::endl;
+	std::cout << this->_tokens[i].token << std::endl;
 	exit(1);
 }
 
@@ -118,33 +118,32 @@ void	ConfigManager::errorHandleShit(void)
 
 	for (size_t i = 0; i < this->_tokens.size(); i++) 
 	{
-		if (this->_tokens[i].getType() == CONTEXT) // 0
+		if (this->_tokens[i].type == CONTEXT) // 0
 			printError("Random word out of blocks. ", i);
-		if (this->_tokens[i].getType() == KEY) // 1
+		if (this->_tokens[i].type == KEY) // 1
 		{
-			if (!(std::find(this->_validStr.begin(), this->_validStr.end(), this->_tokens[i].getToken()) != this->_validStr.end()))
-				printError("Not a valid string. ", i);
+			if (!(std::find(this->_validStr.begin(), this->_validStr.end(), this->_tokens[i].token) != this->_validStr.end()))				printError("Not a valid string. ", i);
 			if ((previous == 3 || previous == 4 || previous == 5) || juan == 0)
 				previous = 1;
 			else
 				printError("Key is not after braces or semicolon. ", i);
 			juan = 1;
 		}
-		if (this->_tokens[i].getType() == VALUE) // 2
+		if (this->_tokens[i].type == VALUE) // 2
 		{
 			if (previous == 1 || previous == 2)
 				previous = 2;
 			else
 				printError("Not a key/value before another value. ", i);
 		}
-		if (this->_tokens[i].getType() == SEMICOLON) // 3
+		if (this->_tokens[i].type == SEMICOLON) // 3
 		{
 			if (previous == 2)
 				previous = 3;
 			else
 				printError("Semicolon not after value. ", i);
 		}
-		if (this->_tokens[i].getType() == OPEN_BRACE) // 4
+		if (this->_tokens[i].type == OPEN_BRACE) // 4
 		{
 			if (juan > 0)
 				braces++;
@@ -155,7 +154,7 @@ void	ConfigManager::errorHandleShit(void)
 			else
 				printError("Open braces not after key or value. ", i);
 		}
-		if (this->_tokens[i].getType() == CLOSE_BRACE) // 5
+		if (this->_tokens[i].type == CLOSE_BRACE) // 5
 		{
 			if (braces > 0)
 				braces--;

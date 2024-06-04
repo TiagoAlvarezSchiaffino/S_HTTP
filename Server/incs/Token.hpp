@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:55:33 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 14:16:10 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 05:42:46 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,20 +27,14 @@ enum Type
     CLOSE_BRACE
 };
 
-class Token
+struct Token
 {
-	public:
-		Token(std::string context, Type type, int lineNum);
-		~Token(void);
+	Token(std::string context, Type type, int lineNum);
+	~Token(void);
 
-		Type		getType(void);
-		std::string	getToken(void);
-		int			getLineNum(void);
-
-	private:
-		Type		_type;
-		std::string	_token;
-		int			_lineNum;
+	Type		type;
+	std::string	token;
+	int			lineNum;
 };
 
 #endif
