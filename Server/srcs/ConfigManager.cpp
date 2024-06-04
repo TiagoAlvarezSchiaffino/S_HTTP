@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 16:08:41 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 05:38:36 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,4 +170,9 @@ void	ConfigManager::errorHandleShit(void)
 		}
 	}
 	return ;
+
+	std::vector<Token>	&ConfigManager::getToken(void)
+{
+	return (this->_tokens);
+}
 }

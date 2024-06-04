@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/03 17:26:47 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 05:35:59 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,16 @@ class ConfigManager
 		ConfigManager(std::string configFilePath);
 		~ConfigManager(void);
 
-		ConfigManager	&operator=(const ConfigManager &ref);
+		ConfigManager		&operator=(const ConfigManager &ref);
 
-		void			parseConfigFile(void);
-		void			printTokens(void);
-		void			configLibrary(void);
-		void			errorHandleShit(void);
+		void				parseConfigFile(void);
+		void				printTokens(void);
+		void				configLibrary(void);
+		void				errorHandleShit(void);
 
 		// Utils
-		void			printError(std::string str, int i);
+		void				printError(std::string str, int i);
+		std::vector<Token>	&getToken(void);
 
 	private:
 		std::string					_configFilePath;
