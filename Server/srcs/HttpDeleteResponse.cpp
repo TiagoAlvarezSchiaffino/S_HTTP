@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 08:46:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 09:31:43 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:11:30 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	HttpDeleteResponse::handleDelete()
 	if (result != 0)
 	{
 		std::cerr << RED << "Error: " << filePath << " cannot be deleted" << RESET << std::endl;
-		this->_database.sendHttp(404, 1);
+		this->_database.sendHttp(404);
 		return ;
 	}
 	std::cout << GREEN << filePath << " has been deleted!" << RESET << std::endl;

@@ -7,12 +7,20 @@ if len(sys.argv) != 2:
     print("Usage: py_post.py <url>")
     sys.exit(1)
 
+def data_generator():
+    f = open("../test.txt", "rb")
+    data = f.read()
+    # data = b"12345678901234567890\n Hello World!"
+    chunk_size = 1000000
+    for i in range(0, len(data), chunk_size):
+        yield data[i:i+chunk_size]
+
 try:
-	headers = {
-		"Transfer-Encoding": "chunked",
-		"Content-Type": "application/octet-stream"
-	}
-	response = requests.post(sys.argv[1], headers=headers, data="14\r\n12345678901234567890\r\n8\r\n, world!\r\n0\r\n\r\n")
+    headers = {
+        "Content-Type": "application/octet-stream",
+        "X-Secret-Header-For-Test": "1",
+    }
+    response = requests.post(sys.argv[1], headers=headers, data=data_generator(), stream=True)
 except:
 	print("Error: Could not connect to server")
 	sys.exit(1)

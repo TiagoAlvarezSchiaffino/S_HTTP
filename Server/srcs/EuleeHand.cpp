@@ -8,15 +8,20 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:41:50 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:23:14 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), useDirectoryListing(), method(), methodPath(), buffer(), locationPath() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), locationPath(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(envp), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), useDirectoryListing(), method(), methodPath(), buffer(), locationPath(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), locationPath(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+{
+	this->envp = new char*[100];
+	for (size_t i = 0; envp[i]; ++i)
+		this->addEnv(envp[i]);
+}
 
 EuleeHand::~EuleeHand() {}
 
@@ -58,6 +63,13 @@ void	EuleeHand::printServers()
 			std::cout << CGI << " : ";
 			for (std::map<std::string, std::string>::iterator it3 = cgi.begin(); it3 != cgi.end(); ++it3)
 				std::cout << it3->first << " ";
+			std::cout << std::endl;
+		}
+		if (this->errorpage.size())
+		{
+			std::cout << ERROR_PAGE << " : ";
+			for (std::map<int, std::string>::iterator it5 = errorpage.begin(); it5 != errorpage.end(); ++it5)
+				std::cout << it5->first << " ";
 			std::cout << std::endl;
 		}
 		std::cout << RESET << std::endl;
@@ -110,7 +122,7 @@ size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &l
 			}
 		}
 		if (tokens[j + 1].token == tokens[j + size].token)
-			this->_configManager.printError("cgi_index : no specified .cgi extension ", j);
+			this->_configManager.printError("cgi_index : invalid arguments ", j);
 		std::string	path = tokens[i + size].token;
 		while (tokens[++i].token[0] == '.')
 		{
@@ -119,6 +131,39 @@ size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &l
 			else
 				location.cgi[tokens[i].token] = path;
 		}
+	}
+	return (i);
+}
+
+bool	isNumeric(const std::string &str)
+{
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isdigit(*it)) {
+			return (false);
+		}
+	}
+    return (true);
+}
+
+size_t	EuleeHand::_parseErrorPage(std::vector<Token> &tokens, size_t i)
+{
+	if (tokens[i].token == "error_page" && tokens[i].type == KEY)
+	{
+		size_t	j = i;
+		size_t	size = 0;
+		while (tokens[++j].token != ";")
+			size++;
+		j = i;
+		while (tokens[++j].token != ";" && tokens[j].token != tokens[i + size].token)
+		{
+			if (!isNumeric(tokens[j].token))
+				this->_configManager.printError("error_page : invalid status code. ", j);
+		}
+		if (tokens[j + 1].token == tokens[j + size].token)
+			this->_configManager.printError("error_page : invalid arguments ", j);
+		std::string	path = tokens[i + size].token;
+		while (isNumeric(tokens[++i].token))
+			this->errorpage[std::atoi(tokens[i].token.c_str())] = path;
 	}
 	return (i);
 }
@@ -146,7 +191,6 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 		i = this->_parsingHelper(tokens, i, loc, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "return", RETURN);
 		i = this->_parsingHelper(tokens, i, loc, "upload", UPLOAD);
-		i = this->_parsingHelper(tokens, i, loc, "include", INCLUDE);
 		i = this->_parsingHelper(tokens, i, loc, "error_page", ERROR_PAGE);
 		i = this->_parsingHelper(tokens, i, loc, "autoindex", AUTO_INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "limit_except", LIMIT_EXCEPT);
@@ -165,13 +209,13 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 		// i = this->_parseCgi(tokens, i);
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
+		i = this->_parseErrorPage(tokens, i);
 		i = this->_parseCgi(tokens, i, serv, 1);
 		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "listen", LISTEN);
 		i = this->_parsingHelper(tokens, i, serv, "return", RETURN);
 		i = this->_parsingHelper(tokens, i, serv, "upload", UPLOAD);
-		i = this->_parsingHelper(tokens, i, serv, "include", INCLUDE);
 		i = this->_parsingHelper(tokens, i, serv, "autoindex", AUTO_INDEX);
 		i = this->_parsingHelper(tokens, i, serv, "error_page", ERROR_PAGE);
 		i = this->_parsingHelper(tokens, i, serv, "server_name", SERVER_NAME);
@@ -207,7 +251,6 @@ std::string EuleeHand::_getFileCreationTime(const std::string &path, const std::
 	{
     	std::time_t last_modified_time = result.st_mtime;   
     	std::time_t modified_time = static_cast<std::time_t>(last_modified_time);
-    	// std::cout << "Last modified time: " << std::ctime(&modified_time) << std::endl;
 		return (std::ctime(&modified_time));
     }
 	else if (rv == -1)
@@ -229,10 +272,8 @@ std::string EuleeHand::directoryListing(std::string path)
         while ((ent = readdir(dir)) != nullptr)
 		{
             std::string filename = ent->d_name;
-			// std::cerr << filename << std::endl;
 			lastMod = this->_getFileCreationTime(path, filename);
 			fileSize = this->_getFileSize(path, filename);
-			// std::cerr << "[" << filename << "]" << std::endl;
             if (filename != "." && filename != "..")
 			{
                 content << "<tr> <td><a href=\"" << filename << "\">" << filename << "</a></td>\n";
@@ -298,55 +339,6 @@ void	EuleeHand::perrorExit(std::string msg, int exitTrue)
 		exit(EXIT_FAILURE);
 }
 
-long	EuleeHand::ft_select(int fd, void *buff, size_t size, Mode mode)
-{
-	fd_set	readFds, writeFds;
-	FD_ZERO(&readFds);
-	FD_ZERO(&writeFds);
-	FD_SET(fd, (mode == READ) ? &readFds : &writeFds);
-
-	timeval	timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 500;
-
-	int	ret = select(this->socket + 1, &readFds, &writeFds, NULL, &timeout);
-	if (ret == -1)
-	{
-		this->perrorExit("Select Error", 0);
-		return (-1);
-	}
-	else if (ret == 0)
-	{
-		std::cout << RED << "Select timeout!" << RESET << std::endl;
-		return (0);
-	}
-
-	long	val = 0;
-	size_t	total = 0;
-	if (FD_ISSET(fd, &readFds) && mode == READ)
-	{
-		val = recv(fd, buff, size, 0);
-		if (val == -1)
-			this->perrorExit("Read Error", 0);
-		return (val);
-	}
-	else if (FD_ISSET(fd, &writeFds) && mode == WRITE)
-	{
-		val = send(fd, (char *)buff, size, 0);
-		if (val == (long)size)
-			return (val);
-		while (val > 0)
-		{
-			total += val;
-			std::cout << GREEN << "Sent: " << val << ((val == WS_BUFFER_SIZE) ? "" : "\t") << "\tTotal: " << total << RESET << std::endl;
-			val = this->ft_select(fd, (char *)buff + total, size - total, WRITE);
-			if (val == -1)
-				this->perrorExit("Write Error", 0);
-		}
-	}
-	return (total);
-}
-
 int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
 {
     std::ifstream   temp(path + "/");
@@ -394,52 +386,10 @@ int	EuleeHand::checkExcept()
 	}
 	if (found == 0)
 	{
-		this->sendHttp(405, 1);
+		this->sendHttp(405);
 		return (1);
 	}
 	return (0);
-}
-
-int    EuleeHand::unchunkResponse()
-{
-    std::string    output;
-    std::string    header = this->buffer.substr(0, this->buffer.find("\r\n\r\n"));
-
-    if (header.find("Transfer-Encoding: chunked") == std::string::npos)
-        return (0);
-    std::string    remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
-    std::string    newBody = "";
-
-    while (1)
-    {
-        size_t        pos = remaining.find("\r\n");
-        if (pos == std::string::npos)
-            break ;
-        std::string    chunkSize = remaining.substr(0, pos);
-		size_t	size = 0;
-		try
-		{
-			size = std::stoul(chunkSize, 0, 16);
-		}
-		catch(const std::exception& e)
-		{
-			std::cout << RED << "Chunk Error: Hex size is less than chunk size!" << RESET << '\n';
-			this->sendHttp(400, 1);
-			return (1);
-		}
-        if (size == 0)
-            break ;
-        if (size > remaining.size() - std::strlen("\r\n"))
-        {
-			std::cout << RED << "Chunk Error: Hex size is more than remaining size!" << RESET << '\n';
-            this->sendHttp(400, 1);
-            return (1);
-        }
-        newBody += remaining.substr(pos + std::strlen("\r\n"), size);
-        remaining = remaining.substr(pos + size + std::strlen("\r\n\r\n"));
-    }
-    this->buffer = header + "\r\n\r\n" + newBody;
-    return (0);
 }
 
 void	EuleeHand::convertLocation()
@@ -460,7 +410,6 @@ void	EuleeHand::convertLocation()
 	newPath = this->methodPath;
 	if (methodPathCopy.length() - this->locationPath.length() > 1) // Trailing File
 	{
-		std::cout << "Trailing File" << std::endl;
 		if (myServer.location[this->locationPath][ROOT].size() != 0)
 		{
 			locationRoot = myServer.location[this->locationPath][ROOT][0];
@@ -482,7 +431,8 @@ void	EuleeHand::convertLocation()
 	if (myServer.location[this->locationPath][INDEX].empty()) // No Trailing File -> Append back and find
 	{
 		remainingPath = this->methodPath.substr(this->locationPath.length());
-		indexFile = myServer[INDEX][0];
+		if (myServer[INDEX].empty() == false)
+			indexFile = myServer[INDEX][0];
 		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + (this->locationPath[this->locationPath.length() - 1] == '/' ? "" : "/") + (this->method == "GET" ? indexFile : ""); 
 		this->useDefaultIndex = 1;
 		this->useDirectoryListing = (this->server[this->serverIndex].location[this->locationPath][AUTO_INDEX].size() != 0);
@@ -516,7 +466,7 @@ std::string	EuleeHand::extractHTML(std::string path)
 	return (extract);
 }
 
-int		EuleeHand::sendHttp(int statusCode, int closeSocket, std::string htmlPath)
+int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
 {
 	if (this->statusList.find(statusCode) == this->statusList.end())
 	{
@@ -524,7 +474,7 @@ int		EuleeHand::sendHttp(int statusCode, int closeSocket, std::string htmlPath)
 		std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
 		return (statusCode);
 	}
-	std::string response = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
+	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
 	if (htmlPath.empty() && statusCode != 200)
 		htmlPath = WS_ERROR_PAGE_PATH;
 	else if (htmlPath.empty())
@@ -544,18 +494,16 @@ int		EuleeHand::sendHttp(int statusCode, int closeSocket, std::string htmlPath)
 		std::string code = "{{error_code}}";
 		std::string msg = "{{error_message}}";
 
-		response += htmlPage;
+		baseResponse += htmlPage;
 		if (statusCode != 200)
 		{
-			response.replace(response.find(code), code.length(), std::to_string(statusCode));	
-			response.replace(response.find(code), code.length(), std::to_string(statusCode));	
-			response.replace(response.find(msg), msg.length(), this->statusList[statusCode]);
+			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
+			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
+			baseResponse.replace(baseResponse.find(msg), msg.length(), this->statusList[statusCode]);
 		}
 	}
 	
-	ft_select(this->socket, (void *)response.c_str(), response.length(), WRITE);
-	if (closeSocket)
-		close (this->socket);
+	this->response[this->socket] = baseResponse;
 	std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
 	return (statusCode);
 }
@@ -580,12 +528,68 @@ int	EuleeHand::checkClientBodySize()
 		clientMaxBodySize = std::stoul(this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE][0]);
 	if (this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE].size() != 0)
 		clientMaxBodySize = std::min(clientMaxBodySize, std::stoul(this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE][0]));
-	size_t	startPos = this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n");
-	if (this->buffer.length() - startPos > clientMaxBodySize)
+	size_t	startPos = this->bufferTemp.find("\r\n\r\n") + std::strlen("\r\n\r\n");
+	if (this->bufferTemp.length() - startPos > clientMaxBodySize)
 	{
 		std::cout << RED << "Client Body Size Exceeded!" << RESET << std::endl;
-		this->sendHttp(413, 1);
+		this->sendHttp(413);
 		return (1);
 	}
 	return (0);
+}
+
+size_t	EuleeHand::addEnv(std::string input)
+{
+	size_t	i = 0;
+	std::string	temp = input.substr(0, input.find('='));
+	for (; i < this->_envpSize; ++i)
+	{
+		std::string	str(this->envp[i]);
+		str = str.substr(0, str.find('='));
+		if (str == temp)
+			break ;
+	}
+	if (i == this->_envpSize)
+	{
+		i = 0;
+		this->envp[this->_envpSize] = new char[10000];
+		std::memset(this->envp[this->_envpSize], 0, 10000);
+		for (; input[i]; ++i)
+			this->envp[this->_envpSize][i] = input[i];
+		this->envp[this->_envpSize][i] = '\0';
+		return (++this->_envpSize);
+	}
+	for (size_t j = 0; this->envp[i][j] != '\0'; ++j)
+		this->envp[i][j] = '\0';
+	for (size_t j = 0; input[j]; ++j)
+		this->envp[i][j] = input[j];
+	return (this->_envpSize);
+}
+
+int	EuleeHand::parseHeader()
+{
+	size_t	headerEndPos = this->buffer[this->socket].find("\r\n\r\n");
+	if (headerEndPos == std::string::npos)
+		return (0);
+	std::istringstream	request(this->buffer[this->socket]);
+	request >> this->method >> this->methodPath;
+
+	size_t	transferEncoding = this->buffer[this->socket].find("Transfer-Encoding: chunked");
+	if (transferEncoding != std::string::npos)
+	{
+		std::cout << (this->buffer[this->socket].find("\r\n0\r\n\r\n") != std::string::npos) << std::endl;
+		return (this->buffer[this->socket].find("\r\n0\r\n\r\n") != std::string::npos);
+	}
+
+	size_t	contentLenghtPos = this->buffer[this->socket].find("Content-Length: ");
+	if (contentLenghtPos != std::string::npos)
+	{
+		std::string contentLenghtStr = this->buffer[this->socket].substr(contentLenghtPos + std::strlen("Content-Length: "));
+		size_t	contentLenght = std::stoul(contentLenghtStr.substr(0, contentLenghtStr.find("\r\n")));
+		std::cout << "Content-Length: " << contentLenght << std::endl;
+		std::string	messageBody = this->buffer[this->socket].substr(headerEndPos + std::strlen("\r\n\r\n"));
+		if (messageBody.length() < (size_t)contentLenght)
+			return (0);
+	}
+	return (1);
 }

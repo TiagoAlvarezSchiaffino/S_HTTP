@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:39:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 09:31:17 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:11:06 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,5 @@ void	HttpDefaultResponse::handleDefault()
 	std::string content_length_str = "Content-Length: " + std::to_string(message.length()) + "\r\n\r\n";
 	std::string output = http + content_length_str + message;
 
-	this->_database.ft_select(this->_database.socket, (void *)output.c_str(), output.length(), WRITE);
-	close(this->_database.socket);
+	this->_database.buffer[this->_database.socket] = output;
 }
