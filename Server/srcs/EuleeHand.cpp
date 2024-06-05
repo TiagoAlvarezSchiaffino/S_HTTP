@@ -8,11 +8,12 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:45:09 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:58:53 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
+#include <cstdlib>
 
 EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath() {}
 
@@ -58,6 +59,13 @@ void	EuleeHand::printServers()
 			std::cout << CGI << " : ";
 			for (std::map<std::string, std::string>::iterator it3 = cgi.begin(); it3 != cgi.end(); ++it3)
 				std::cout << it3->first << " ";
+			std::cout << std::endl;
+		}
+		if (this->errorpage.size())
+		{
+			std::cout << ERROR_PAGE << " : ";
+			for (std::map<int, std::string>::iterator it5 = errorpage.begin(); it5 != errorpage.end(); ++it5)
+				std::cout << it5->first << " ";
 			std::cout << std::endl;
 		}
 		std::cout << RESET << std::endl;
@@ -110,7 +118,7 @@ size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &l
 			}
 		}
 		if (tokens[j + 1].token == tokens[j + size].token)
-			this->_configManager.printError("cgi_index : no specified .cgi extension ", j);
+			this->_configManager.printError("cgi_index : invalid arguments ", j);
 		std::string	path = tokens[i + size].token;
 		while (tokens[++i].token[0] == '.')
 		{
@@ -119,6 +127,39 @@ size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &l
 			else
 				location.cgi[tokens[i].token] = path;
 		}
+	}
+	return (i);
+}
+
+bool	isNumeric(const std::string &str)
+{
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isdigit(*it)) {
+			return (false);
+		}
+	}
+    return (true);
+}
+
+size_t	EuleeHand::_parseErrorPage(std::vector<Token> &tokens, size_t i)
+{
+	if (tokens[i].token == "error_page" && tokens[i].type == KEY)
+	{
+		size_t	j = i;
+		size_t	size = 0;
+		while (tokens[++j].token != ";")
+			size++;
+		j = i;
+		while (tokens[++j].token != ";" && tokens[j].token != tokens[i + size].token)
+		{
+			if (!isNumeric(tokens[j].token))
+				this->_configManager.printError("error_page : invalid status code. ", j);
+		}
+		if (tokens[j + 1].token == tokens[j + size].token)
+			this->_configManager.printError("error_page : invalid arguments ", j);
+		std::string	path = tokens[i + size].token;
+		while (isNumeric(tokens[++i].token))
+			this->errorpage[std::atoi(tokens[i].token.c_str())] = path;
 	}
 	return (i);
 }
@@ -147,7 +188,6 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 		i = this->_parsingHelper(tokens, i, loc, "return", RETURN);
 		i = this->_parsingHelper(tokens, i, loc, "upload", UPLOAD);
 		i = this->_parsingHelper(tokens, i, loc, "include", INCLUDE);
-		i = this->_parsingHelper(tokens, i, loc, "error_page", ERROR_PAGE);
 		i = this->_parsingHelper(tokens, i, loc, "auto_index", AUTO_INDEX);
 		i = this->_parsingHelper(tokens, i, loc, "limit_except", LIMIT_EXCEPT);
 		i = this->_parsingHelper(tokens, i, loc, "client_max_body_size", CLIENT_MAX_BODY_SIZE);
@@ -165,6 +205,7 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 		// i = this->_parseCgi(tokens, i);
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
+		i = this->_parseErrorPage(tokens, i);
 		i = this->_parseCgi(tokens, i, serv, 1);
 		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
@@ -173,7 +214,6 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 		i = this->_parsingHelper(tokens, i, serv, "upload", UPLOAD);
 		i = this->_parsingHelper(tokens, i, serv, "include", INCLUDE);
 		i = this->_parsingHelper(tokens, i, serv, "auto_index", AUTO_INDEX);
-		i = this->_parsingHelper(tokens, i, serv, "error_page", ERROR_PAGE);
 		i = this->_parsingHelper(tokens, i, serv, "server_name", SERVER_NAME);
 		i = this->_parsingHelper(tokens, i, serv, "limit_except", LIMIT_EXCEPT);
 		i = this->_parsingHelper(tokens, i, serv, "client_max_body_size", CLIENT_MAX_BODY_SIZE);

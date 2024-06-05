@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:38:40 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:49:44 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ class EuleeHand
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
+		std::map<int, std::string>			errorpage;
 		std::map<int, std::string>			statusList;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
@@ -58,6 +59,7 @@ class EuleeHand
 		ConfigManager	_configManager;
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
 		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);
+		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
 		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);
 };
