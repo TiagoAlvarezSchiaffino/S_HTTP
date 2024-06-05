@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 11:25:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 19:08:08 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,9 @@ int	main(int ac, char **av)
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
+	// (void)ac;
+	// (void)av;
+	// EuleeHand hand;
+
+	// hand.sendHttp(404, "./html/error.html");
 }

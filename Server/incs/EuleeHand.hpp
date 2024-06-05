@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:09:33 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:43:06 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,10 @@ class EuleeHand
 		int			checkExcept(void);
 		int			unchunkResponse(void);
 		void		convertLocation(void);
-		std::string	cgiPath(void);
+		std::string extractHTML(std::string path);
+		int		sendHttp(int statusCode, std::string path);
 
+		std::map<int, std::string>			statusList;
 		std::map<std::string, std::string>	envp, cgi;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;

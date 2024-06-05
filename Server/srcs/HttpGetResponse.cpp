@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:55:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:59:06 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 19:03:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,10 @@ void	HttpGetResponse::handleGet()
 		if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) || this->_database.useDefaultIndex)
 		{
 			std::cout << "Returned OK!" << std::endl;
-			std::cout << this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) << std::endl;
-			std::string	response = "HTTP/1.1 200 OK\r\n\r\n";
-			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
+			this->_database.sendHttp(200, this->_database.methodPath);
+			// std::cout << this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) << std::endl;
+			// std::string	response = "HTTP/1.1 200 OK\r\n\r\n";
+			// this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
 		}
 		else
 			this->_database.ft_select(this->_database.socket, (void *)failedResponse.c_str(), failedResponse.length(), WRITE);

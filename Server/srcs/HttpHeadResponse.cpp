@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 09:35:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:27:13 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 19:05:31 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ void	HttpHeadResponse::handleHead()
 	if (file.fail() && this->_database.methodPath != "/")
 	{
 		std::cerr << RED << "Error opening " << this->_database.methodPath << "!\n" << RESET << std::endl;
-		http = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n";
+		this->_database.sendHttp(404, this->_database.methodPath);
+
+        http = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n";
 	}
 	else
 	{
