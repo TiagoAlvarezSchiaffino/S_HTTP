@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:29:48 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:41:53 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <fstream>
 # include <cstring>
 # include <string>
+# include <limits>
 # include <vector>
 # include <map>
 # include <sys/socket.h>
@@ -41,7 +42,6 @@
 # include "HttpPutResponse.hpp"
 
 # define WS_BACKLOG				10
-# define WS_PORT				8081
 # define WS_BUFFER_SIZE			30000
 # define WS_TIMEOUT				3
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
@@ -55,6 +55,9 @@ class Serv
 
 	private:
 		void			_setupServer();
+		void			_acceptConnection();
+		int				_receiveRequest();
+		int				_handleFavicon();
 		void			_serverLoop();
 
 		ConfigManager	_configManager;

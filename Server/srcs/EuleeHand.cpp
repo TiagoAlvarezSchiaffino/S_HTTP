@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:15:49 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:47:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,7 @@ void	EuleeHand::parseConfigServer()
 	this->statusList[200] = "OK";
 	this->statusList[404] = "Not Found";
 	this->statusList[405] = "Not Allowed";
+	this->statusList[413] = "Request Entity Too Large";
 }
 
 void	EuleeHand::perrorExit(std::string msg, int exitTrue)
@@ -355,13 +356,14 @@ int	EuleeHand::unchunkResponse()
 		if (size > remaining.size() - std::strlen("\r\n"))
 		{
 			std::cout << RED << "Error: Chunk size is bigger than remaining size" << RESET << std::endl;
-			return (-1);
+			close(this->socket);
+			return (1);
 		}
 		newBody += remaining.substr(remaining.find("\r\n") + std::strlen("\r\n"), size);
 		remaining = remaining.substr(remaining.find("\r\n") + size + std::strlen("\r\n\r\n"));
 	}
 	this->buffer = header + "\r\n\r\n" + newBody;
-	return (1);
+	return (0);
 }
 
 void	EuleeHand::convertLocation()
@@ -402,9 +404,6 @@ void	EuleeHand::convertLocation()
 	}
 	if (myServer.location[this->locationPath][INDEX].size() == 0) // No Trailing File -> Append back and find
 	{
-		indexFile = "./html/index.html";
-		if (myServer[INDEX].size() != 0)
-			indexFile = myServer[INDEX][0];
 		this->methodPath = myServer[ROOT][0] + locationRoot + "/" + indexFile; 
 		this->useDefaultIndex = 1;
 	}
@@ -485,4 +484,21 @@ std::string	EuleeHand::cgiPath()
 			return (it->second);
 	}
 	return ("");
+}
+
+int	EuleeHand::checkClientBodySize()
+{
+	size_t	clientMaxBodySize = std::numeric_limits<std::size_t>::max();
+	if (this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE].size() != 0)
+		clientMaxBodySize = std::stoul(this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE][0]);
+	if (this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE].size() != 0)
+		clientMaxBodySize = std::min(clientMaxBodySize, std::stoul(this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE][0]));
+	std::cout << clientMaxBodySize << std::endl;
+	size_t	startPos = this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n");
+	std::cout << this->buffer << std::endl;
+	std::cout << startPos << std::endl;
+	std::cout << this->buffer.length() - startPos << std::endl;
+	if (this->buffer.length() - startPos > clientMaxBodySize)
+		return (this->sendHttp(413, 1));
+	return (0);
 }

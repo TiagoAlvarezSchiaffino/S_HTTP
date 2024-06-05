@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:34:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:38:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,12 @@ class EuleeHand
 		std::string	extractHTML(std::string path);
 		int			sendHttp(int statusCode, int closeSocket = 0, std::string htmlPath = "");
 
-
 		int			isCGI();
 		int			checkExcept();
 		int			unchunkResponse();
 		void		convertLocation();
 		std::string	cgiPath();
+		int			checkClientBodySize();
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;

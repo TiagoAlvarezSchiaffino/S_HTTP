@@ -8,13 +8,12 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:08:12 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:56:26 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/Serv.hpp"
 
-/* Class constructor that takes in configFilePath string */
 Serv::Serv(std::string configFilePath, char **envp)
 {
 	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath), envp);
@@ -22,6 +21,20 @@ Serv::Serv(std::string configFilePath, char **envp)
 }
 
 Serv::~Serv() {}
+
+void	Serv::runServer()
+{
+	this->_database.parseConfigFile();
+	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
+	this->_database.configLibrary();
+	this->_database.errorHandleShit();
+	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
+	this->_database.parseConfigServer();
+	this->_database.printServers();
+	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
+	this->_setupServer();
+	this->_serverLoop();
+}
 
 void	Serv::_setupServer()
 {
@@ -41,7 +54,7 @@ void	Serv::_setupServer()
 			this->_database.perrorExit("Socket Error");
 
 		int	optval = 1;
-		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1) //Done to keep socket alive even after Broken Pipe
+		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1)
 			this->_database.perrorExit("Setsockopt Error");
 
 		this->_database.server[i][SERVER_NAME].push_back("localhost");
@@ -68,68 +81,82 @@ void	Serv::_setupServer()
 	}
 }
 
-void	Serv::_serverLoop(void)
+void	Serv::_acceptConnection()
+{
+	std::cout << CYAN << "Port Accepted: ";
+	for (size_t i = 0; i < this->_database.server.size(); i++)
+		std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
+	std::cout << "\nWaiting for new connection..." << RESET << std::endl;
+	this->_database.socket = 0;
+	for (size_t i = 0; i < this->_database.server.size(); i++)
+		fcntl(this->_database.serverFd[i], F_SETFL, O_NONBLOCK);
+	while (this->_database.socket <= 0)
+	{
+		for (size_t i = 0; i < this->_database.server.size(); i++)
+		{
+			this->_database.socket = accept(this->_database.serverFd[i], NULL, NULL);
+			if (this->_database.socket != -1)
+			{
+				this->_database.serverIndex = i;
+				break ;
+			}
+		}
+	}
+	if (this->_database.socket < 0)
+		this->_database.perrorExit("Accept Error");
+}
+
+int	Serv::_receiveRequest()
+{
+	size_t		total = 0;
+	char		readBuffer[WS_BUFFER_SIZE];
+	this->_database.buffer.clear();
+	long		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
+	while (valread > 0)
+	{
+		total += valread;
+		std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
+		if (valread < 0)
+		{
+			std::cout << RED << "Receive Error: Connection interrupted!" << std::endl;
+			close(this->_database.socket);
+			return (1);
+		}
+		this->_database.buffer.append(readBuffer, valread);
+		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
+	}
+	return (0);
+}
+
+int	Serv::_handleFavicon()
+{
+	if (this->_database.methodPath != "/favicon.ico") // Ignore favicon
+		return (0);
+	std::string	message = "Go away favicon";
+	std::cout << RED << message << RESET << std::endl;
+	std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
+	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
+	close(this->_database.socket);
+	return (1);
+}
+
+void	Serv::_serverLoop()
 {
 	while(1)
 	{
-		std::cout << CYAN << "Port Accepted: ";
-		for (size_t i = 0; i < this->_database.server.size(); i++)
-			std::cout << this->_database.server[i][LISTEN][this->_database.server[i].portIndex] << " ";
-		std::cout << "\nWaiting for new connection..." << RESET << std::endl;
-		this->_database.socket = 0;
-		for (size_t i = 0; i < this->_database.server.size(); i++)
-			fcntl(this->_database.serverFd[i], F_SETFL, O_NONBLOCK);
-		while (this->_database.socket <= 0)
-		{
-			for (size_t i = 0; i < this->_database.server.size(); i++)
-			{
-				this->_database.socket = accept(this->_database.serverFd[i], NULL, NULL);
-				if (this->_database.socket != -1)
-				{
-					this->_database.serverIndex = i;
-					break ;
-				}
-			}
-		}
-		if (this->_database.socket < 0)
-			this->_database.perrorExit("Accept Error");
+		this->_acceptConnection();
 
-		size_t		total = 0;
-		char		readBuffer[WS_BUFFER_SIZE];
-		this->_database.buffer.clear();
-		long		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
-		while (valread > 0)
-		{
-			total += valread;
-			std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
-			if (valread < 0)
-			{
-				close(this->_database.socket);
-				return ;
-			}
-			this->_database.buffer.append(readBuffer, valread);
-			valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
-		}
-
-		if (this->_database.unchunkResponse() == -1)
-		{
-			close(this->_database.socket);
+		if (this->_receiveRequest())
 			continue ;
-		}
+		if (this->_database.unchunkResponse())
+			continue ;
 		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
 		std::istringstream	request(this->_database.buffer);
-		
 		request >> this->_database.method >> this->_database.methodPath;
-		if (this->_database.methodPath == "/favicon.ico") // Ignore favicon
-		{
-			std::string	message = "Go away favicon";
-			std::cout << RED << message << RESET << std::endl;
-			std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
-			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
-			close(this->_database.socket);
-			continue;
-		}
+		if (this->_handleFavicon())
+			continue ;
+
 		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
 		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
@@ -149,6 +176,8 @@ void	Serv::_serverLoop(void)
 		if (this->_database.checkExcept())
 			continue ;
 		this->_database.convertLocation();
+		if (this->_database.checkClientBodySize())
+			continue ;
 
 		if (this->_database.method == "HEAD")
 		{
@@ -156,8 +185,8 @@ void	Serv::_serverLoop(void)
 			HttpHeadResponse	headResponse(this->_database);
 			headResponse.handleHead();
 		}
-		// else if (this->_database.methodPath.find('.') != std::string::npos && (this->_database.method == "POST" && this->_database.methodPath == "/htdocs/tiago.bla"))
-		else if (this->_database.method == "POST" && this->_database.methodPath == "/htdocs/tiago.bla")
+		// else if (this->_database.methodPath.find('.') != std::string::npos && (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla"))
+		else if (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla")
 		{
 			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
 			HttpCgiResponse	cgiResponse(this->_database);
@@ -194,18 +223,4 @@ void	Serv::_serverLoop(void)
 			defaultResponse.handleDefault();
 		}
 	}
-}
-
-void	Serv::runServer()
-{
-	this->_database.parseConfigFile();
-	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;
-	this->_database.configLibrary();
-	this->_database.errorHandleShit();
-	std::cout << GREEN "Error Handling File Done..." RESET << std::endl;
-	this->_database.parseConfigServer();
-	this->_database.printServers();
-	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
-	this->_setupServer();
-	this->_serverLoop();
 }
