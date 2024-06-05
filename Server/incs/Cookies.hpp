@@ -1,10 +1,7 @@
 #ifndef COOKIE_HPP
 # define COOKIE_HPP
 
-#include <iostream>
-#include <string>
-#include <map>
-#include <vector>
+# include "server.hpp"
 
 class Cookie 
 {

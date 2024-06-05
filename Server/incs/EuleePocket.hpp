@@ -8,16 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 17:14:04 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:51:59 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef EULEEPOCKET_HPP
 # define EULEEPOCKET_HPP
 
-# include <unistd.h>
-# include <sys/select.h>
-# include <netinet/in.h>
 # include "EuleeWallet.hpp"
 
 # define RESET		"\033[0m"

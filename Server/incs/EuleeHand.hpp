@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:35:12 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:51:42 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,6 @@
 
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
-
-# include <iostream>
-# include <sstream>
-# include <fcntl.h>
-# include <dirent.h>
-# include <sys/stat.h>
 
 # define WS_BUFFER_SIZE			100000
 # define BUFFER_SIZE			1000

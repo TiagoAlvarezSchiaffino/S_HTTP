@@ -8,17 +8,14 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:59:56 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:59:18 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:52:23 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef EULEEWALLET_HPP
 # define EULEEWALLET_HPP
 
-# include <map>
-# include <vector>
-# include <string>
-# include <iostream>
+# include "server.hpp"
 
 enum	Key
 {

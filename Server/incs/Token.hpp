@@ -8,14 +8,14 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:55:33 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 05:42:46 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:52:30 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TOKEN_HPP
 # define TOKEN_HPP
 
-# include <string>
+# include "server.hpp"
 
 enum Type
 {

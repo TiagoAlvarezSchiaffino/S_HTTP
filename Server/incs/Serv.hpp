@@ -8,31 +8,17 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:21:37 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:52:46 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERV_HPP
 # define SERV_HPP
 
-# include <filesystem>
-# include <iostream>
-# include <sstream>
-# include <fstream>
-# include <cstring>
-# include <string>
-# include <limits>
-# include <vector>
-# include <map>
-# include <sys/socket.h>
-# include <unistd.h>
-# include <netdb.h>
-# include <fcntl.h>
-
 # include "server.hpp"
-# include "ConfigManager.hpp"
 # include "EuleeHand.hpp"
 # include "EuleeWallet.hpp"
+# include "ConfigManager.hpp"
 # include "HttpPostResponse.hpp"
 # include "HttpCgiResponse.hpp"
 # include "HttpGetResponse.hpp"

@@ -8,11 +8,11 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 09:26:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:53:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/server.hpp"
+#include "../incs/Serv.hpp"
 
 int	main(int ac, char **av, char **envp)
 {

@@ -8,17 +8,12 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:27:02 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:50:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CONFIGMANAGER_HPP
 # define CONFIGMANAGER_HPP
-
-# include <string>
-# include <fstream>
-# include <vector>
-# include <iostream>
 
 # include "Token.hpp"
 

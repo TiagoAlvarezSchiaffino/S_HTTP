@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 11:01:54 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:53:31 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,25 @@
 # define CYAN		"\033[1;36m"
 # define WHITE		"\033[1;37m"
 
-# include "Serv.hpp"
-# include "ConfigManager.hpp"
-# include "EuleeHand.hpp"
+# include <map>
+# include <vector>
+# include <string>
+# include <limits>
+# include <netdb.h>
+# include <sstream>
+# include <fstream>
+# include <cstring>
+# include <iostream>
+# include <algorithm>
+# include <filesystem>
+# include <fcntl.h>
+# include <dirent.h>
+# include <unistd.h>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <sys/socket.h>
+# include <sys/select.h>
+# include <netinet/in.h>
+
 
 #endif
