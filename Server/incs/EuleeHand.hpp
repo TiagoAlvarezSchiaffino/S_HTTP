@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:49:44 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 12:29:24 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class EuleeHand
 		void		convertLocation();
 		std::string	cgiPath();
 		int			checkClientBodySize();
+		size_t		addEnv(std::string input);
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
@@ -55,6 +56,7 @@ class EuleeHand
 		std::string							method, methodPath, buffer, locationPath;
 
 	private:
+		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);

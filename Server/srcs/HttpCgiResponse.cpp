@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 12:28:52 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 12:29:59 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,9 @@ void    HttpCgiResponse::handleCgi()
     close(outfd2);
     size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
     std::string newOutput = output.substr(startPos);
-    // if (newOutput.length() > 100000)
-    //     newOutput.resize(WS_TESTER_SIZE - 58);
     std::cout << MAGENTA << "Output length : " << newOutput.length() << RESET << std::endl;
 
     std::string response = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
-    std::ofstream   file("temp");
-    file << response;
     this->_database.ft_select(this->_database.socket, &response[0], response.size(), WRITE);
     std::cout << GREEN << "CGI ran successfully!" << std::endl;
     std::remove(WS_TEMP_FILE_IN);

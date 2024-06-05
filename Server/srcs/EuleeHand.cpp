@@ -8,16 +8,21 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 12:00:05 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 12:43:04 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 #include <cstdlib>
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(envp), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _configFilePath(configFilePath), _configManager(configManager) {}
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(), cgi(), statusList(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), buffer(), locationPath(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+{
+	this->envp = new char*[100];
+	for (size_t i = 0; envp[i]; ++i)
+		this->addEnv(envp[i]);
+}
 
 EuleeHand::~EuleeHand() {}
 
@@ -101,7 +106,7 @@ size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &l
 		size_t	j = i;
 		size_t	size = 0;
 		while (tokens[++j].token != ";")
-				size++;
+			size++;
 		j = i;
 		while (tokens[++j].token != ";" && tokens[j].token != tokens[i + size].token)
 		{
@@ -249,9 +254,11 @@ void	EuleeHand::parseConfigServer()
 			this->server[j].location[this->server[j].vectorLocation[k][LOCATION_READ_PATH][0]] = this->server[j].vectorLocation[k];
 	this->statusList[200] = "OK";
 	this->statusList[301] = "Moved Permanently";
+	this->statusList[400] = "Bad Request";
 	this->statusList[404] = "Not Found";
 	this->statusList[405] = "Not Allowed";
 	this->statusList[413] = "Request Entity Too Large";
+	this->statusList[500] = "Internal Server Error";
 }
 
 void	EuleeHand::perrorExit(std::string msg, int exitTrue)
@@ -303,7 +310,7 @@ long	EuleeHand::ft_select(int fd, void *buff, size_t size, Mode mode)
 		while (val > 0)
 		{
 			total += val;
-			std::cout << GREEN << "Sent: " << val << "\tTotal: " << total << RESET << std::endl;
+			std::cout << GREEN << "Sent: " << val << ((val == WS_BUFFER_SIZE) ? "" : "\t") << "\tTotal: " << total << RESET << std::endl;
 			val = this->ft_select(fd, (char *)buff + total, size - total, WRITE);
 			if (val == -1)
 				this->perrorExit("Write Error", 0);
@@ -342,10 +349,7 @@ int	EuleeHand::isCGI()
 	if (extensionPos == std::string::npos)
 		return (0);
 	std::string extension = this->methodPath.substr(extensionPos);
-	for (size_t i = 0; i < this->server[this->serverIndex][CGI].size(); i++)
-		if (this->server[this->serverIndex][CGI][i] == extension)
-			return (1);
-	return (0);
+	return (this->cgi.find(extension) != this->cgi.end());
 }
 
 int	EuleeHand::checkExcept()
@@ -375,23 +379,25 @@ int	EuleeHand::unchunkResponse()
 
 	if (header.find("Transfer-Encoding: chunked") == std::string::npos)
 		return (0);
-	std::string	remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + 4);
+	std::string	remaining = this->buffer.substr(this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 	std::string	newBody = "";
 
-	while (remaining.find("\r\n") != std::string::npos)
+	while (1)
 	{
-		std::string	chunkSize = remaining.substr(0, remaining.find("\r\n"));
+		size_t		pos = remaining.find("\r\n");
+		if (pos == std::string::npos)
+			break ;
+		std::string	chunkSize = remaining.substr(0, pos);
 		size_t		size = std::stoul(chunkSize, 0, 16);
 		if (size == 0)
-			return (0);
+			break ;
 		if (size > remaining.size() - std::strlen("\r\n"))
 		{
-			std::cout << RED << "Error: Chunk size is bigger than remaining size" << RESET << std::endl;
-			close(this->socket);
+			this->sendHttp(400, 1);
 			return (1);
 		}
-		newBody += remaining.substr(remaining.find("\r\n") + std::strlen("\r\n"), size);
-		remaining = remaining.substr(remaining.find("\r\n") + size + std::strlen("\r\n\r\n"));
+		newBody += remaining.substr(pos + std::strlen("\r\n"), size);
+		remaining = remaining.substr(pos + size + std::strlen("\r\n\r\n"));
 	}
 	this->buffer = header + "\r\n\r\n" + newBody;
 	return (0);
@@ -551,4 +557,15 @@ int	EuleeHand::checkClientBodySize()
 		return (1);
 	}
 	return (0);
+}
+
+size_t	EuleeHand::addEnv(std::string input)
+{
+	this->envp[this->_envpSize] = new char[input.length() + 1];
+
+	int	i = 0;
+	for (; input[i]; ++i)
+		this->envp[this->_envpSize][i] = input[i];
+	this->envp[this->_envpSize][i] = '\0';
+	return (++this->_envpSize);
 }
