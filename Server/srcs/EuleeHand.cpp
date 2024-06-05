@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:20:56 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:45:09 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,38 +92,32 @@ size_t	EuleeHand::_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &l
 	{
 		size_t	j = i;
 		size_t	size = 0;
-		std::string	path;
 		while (tokens[++j].token != ";")
+				size++;
+		j = i;
+		while (tokens[++j].token != ";" && tokens[j].token != tokens[i + size].token)
 		{
-			if (tokens[j].token.find("/") != std::string::npos || tokens[j].token.find(".") == std::string::npos)
-			{
-				if (++size > 1)
-					this->_configManager.printError("cgi_index : too many paths. ", j);
-				path = tokens[j].token;
-			}
-			else if (tokens[j].token[0] != '.')
+			if (tokens[j].token[0] != '.')
 				this->_configManager.printError("cgi_index : invalid extension. ", j);
 			else if (tokens[j].token[0] == '.')
 			{
 				std::string	temp = tokens[j].token.substr(1, tokens[j].token.length());
 				for (size_t k = 0; k < temp.length(); ++k)
 				{
-					if (!isalpha(temp[k]))
+					if (!isalpha(temp[k]) && temp[k] != '_')
 						this->_configManager.printError("cgi_index : invalid extension. ", j);
 				}
 			}
 		}
-		if (size == 0)
-			this->_configManager.printError("cgi_index : no specified path. ", j);
-		while (tokens[++i].token != ";")
+		if (tokens[j + 1].token == tokens[j + size].token)
+			this->_configManager.printError("cgi_index : no specified .cgi extension ", j);
+		std::string	path = tokens[i + size].token;
+		while (tokens[++i].token[0] == '.')
 		{
-			if (tokens[i].token[0] == '.')
-			{
-				if (blockType == 1)
-					this->cgi[tokens[i].token] = path;
-				else
-					location.cgi[tokens[i].token] = path;
-			}
+			if (blockType == 1)
+				this->cgi[tokens[i].token] = path;
+			else
+				location.cgi[tokens[i].token] = path;
 		}
 	}
 	return (i);
