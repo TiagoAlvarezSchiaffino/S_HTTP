@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:34:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:57:32 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,8 +203,7 @@ int		ConfigManager::checkLocationKey(size_t i, int previous, int *braces, int *m
 	{
 		if (*main_block == 1)
 		{
-			if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(),
-				this->_tokens[i].token) != this->_locationVar.end())) // server
+			if (!(std::find(this->_locationVar.begin(), this->_locationVar.end(), this->_tokens[i].token) != this->_locationVar.end())) // server
 				printError("Not a valid string for Location block. ", i);
 		}
 

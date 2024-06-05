@@ -8,13 +8,13 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/04 15:19:19 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/04 18:54:46 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
 NAME		=	SERVER
-CXX			=	g++
-CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
+CXX			=	clang++ #g++
+CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow #-std=c++98 -pedantic
 ifeq ($(DB), 1)
     CXXFLAGS += -fsanitize=thread -g3
 endif

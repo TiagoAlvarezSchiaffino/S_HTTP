@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:50:43 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:59:51 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,17 @@ void	Serv::_setupServer()
 
 	this->_database.serverAddr.resize(this->_database.server.size());
 	this->_database.serverFd.resize(this->_database.server.size()); 
-	
 	for (size_t i = 0; i < this->_database.server.size(); i++)
 	{
 		if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			this->_database.perrorExit("Socket Error");
 
-		int	optval = 1;
-		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1)
+		// int	optval = 1;
+		// if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval)) == -1)
+		struct timeval tv;
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+		if (setsockopt(this->_database.serverFd[i], SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) == -1)
 			this->_database.perrorExit("Setsockopt Error");
 
 		this->_database.server[i][SERVER_NAME].push_back("localhost");
