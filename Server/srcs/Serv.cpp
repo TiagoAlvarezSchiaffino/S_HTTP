@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:28:41 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 12:17:30 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,19 +111,19 @@ int	Serv::_receiveRequest()
 	size_t		total = 0;
 	char		readBuffer[WS_BUFFER_SIZE];
 	this->_database.buffer.clear();
-	long		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
-	while (valread > 0)
+	long		val = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
+	while (val > 0)
 	{
-		total += valread;
-		std::cout << GREEN << "Received: " << valread << "\tTotal: " << total << RESET << std::endl;
-		if (valread < 0)
+		total += val;
+		std::cout << GREEN << "Received: " << val << ((val == WS_BUFFER_SIZE) ? "" : "\t") << "\tTotal: " << total << RESET << std::endl;
+		if (val < 0)
 		{
 			std::cout << RED << "Receive Error: Connection interrupted!" << std::endl;
 			close(this->_database.socket);
 			return (1);
 		}
-		this->_database.buffer.append(readBuffer, valread);
-		valread = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
+		this->_database.buffer.append(readBuffer, val);
+		val = this->_database.ft_select(this->_database.socket, readBuffer, WS_BUFFER_SIZE, READ);
 	}
 	return (0);
 }
@@ -138,7 +138,7 @@ int	Serv::_handleFavicon()
 	return (1);
 }
 
-int	WebServer::_handleRedirection()
+int	Serv::_handleRedirection()
 {
 	if (this->_database.server[this->_database.serverIndex].location.find(this->_database.methodPath) == this->_database.server[this->_database.serverIndex].location.end())
 		return (0);
@@ -164,6 +164,9 @@ void	Serv::_serverLoop()
 		if (this->_database.unchunkResponse())
 			continue ;
 		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
+		// std::ofstream	uc("unchunked.txt");
+		// uc << this->_database.buffer;
+		// uc.close();
 
 		std::istringstream	request(this->_database.buffer);
 		request >> this->_database.method >> this->_database.methodPath;
@@ -175,7 +178,8 @@ void	Serv::_serverLoop()
 
 		/* FOR DEBUGGING: TO DELETE */
 		// std::cout << this->_database.method << " " << this->_database.methodPath << std::endl;
-		// if (this->_database.method == "GET" && this->_database.methodPath == "/google")		// {
+		// if (this->_database.method == "GET" && this->_database.methodPath == "/google")
+		// {
 		// 	std::cout << "Entered force output!" << std::endl;
 		// 	std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.google.com\r\n\r\n";
 		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
@@ -194,18 +198,21 @@ void	Serv::_serverLoop()
 		if (this->_database.checkClientBodySize())
 			continue ;
 
-		if (this->_database.method == "HEAD")
-		{
-			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
-			HttpHeadResponse	headResponse(this->_database);
-			headResponse.handleHead();
-		}
-		// else if (this->_database.methodPath.find('.') != std::string::npos && (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla"))
-		else if (this->_database.method == "POST" && this->_database.methodPath == "/YoupiBanane/youpi.bla")
+		// std::ofstream	uc2("unchunked2.txt");
+		// uc2 << this->_database.buffer;
+		// uc2.close();
+
+		if (this->_database.isCGI())
 		{
 			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
 			HttpCgiResponse	cgiResponse(this->_database);
 			cgiResponse.handleCgi();
+		}
+		else if (this->_database.method == "HEAD")
+		{
+			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
+			HttpHeadResponse	headResponse(this->_database);
+			headResponse.handleHead();
 		}
 		else if (this->_database.method == "POST")
 		{

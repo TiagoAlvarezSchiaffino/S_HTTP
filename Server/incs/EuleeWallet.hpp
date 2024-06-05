@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:59:56 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:14:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:59:18 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ enum	Key
 	AUTO_INDEX,
 	RETURN,
 	CGI,
-	INCLUDE,
 	UPLOAD, //USING
 	LIMIT_EXCEPT //USING
 };
