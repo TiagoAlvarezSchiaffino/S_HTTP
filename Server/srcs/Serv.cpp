@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 12:30:36 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 13:10:47 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void	Serv::runServer()
 	this->_database.parseConfigServer();
 	this->_database.printServers();
 	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
+	this->_database.addEnv("SERVER_PROTOCOL=HTTP/1.1");
 	this->_database.addEnv("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	this->_setupServer();
 	this->_serverLoop();
@@ -203,6 +204,7 @@ void	Serv::_serverLoop()
 		// uc2 << this->_database.buffer;
 		// uc2.close();
 
+		this->_database.addEnv("REQUEST_METHOD=" + this->_database.method);
 		if (this->_database.isCGI())
 		{
 			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;

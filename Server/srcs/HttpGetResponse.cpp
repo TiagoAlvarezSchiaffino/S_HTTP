@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:55:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 09:36:24 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 13:27:21 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,14 @@ void	HttpGetResponse::handleGet()
 	if (file.read(&fileContents[0], file_size).fail())
 	{
 		std::cerr << RED << "Error reading " << this->_database.methodPath << "!" << RESET << std::endl;
-		if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) || this->_database.useDefaultIndex)
+		if (this->_database.useDirectoryListing)
+		{
+			std::string	directoryListingResponse = "HTTP/1.1 200 OK\r\n\r\n" + this->_database.directoryListing(this->_database.methodPath);
+			this->_database.ft_select(this->_database.socket, &directoryListingResponse[0], directoryListingResponse.size(), WRITE);
+			std::cout << GREEN << "Autoindex is set on, directory listing sent!" << RESET << std::endl;
+			close(this->_database.socket);
+		}
+		else if (this->_database.checkPath(this->_database.methodPath.c_str() + 1, 0, 1) || this->_database.useDefaultIndex)
 			this->_database.sendHttp(200, 1);
 		else
 			this->_database.sendHttp(404, 1);

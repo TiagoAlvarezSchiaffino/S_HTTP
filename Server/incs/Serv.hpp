@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:15:23 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 13:12:09 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,10 @@
 # include "HttpPutResponse.hpp"
 
 # define WS_BACKLOG				10
-# define WS_BUFFER_SIZE			30000
-# define WS_TIMEOUT				3
+# define WS_BUFFER_SIZE			100000
+# define WS_TESTER_SIZE			100000
+# define WS_TEMP_FILE_IN		".tempIn"
+# define WS_TEMP_FILE_OUT		".tempOut"
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 class Serv
