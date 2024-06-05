@@ -13,9 +13,6 @@ if (len(sys.argv) == 3):
 
 for i in range(0, count):
 	try:
-		# f = open("../unchunk.txt", "r")
-		# print(len(f.read()))
-		# response = requests.get(sys.argv[1], data=f.read())
 		response = requests.get(sys.argv[1])
 	except:
 		print("Error: Could not connect to server")
@@ -26,3 +23,8 @@ for i in range(0, count):
 # jng 2000		18.47 real         4.90 user         0.97 sys
 # hyap 2000	    17.57 real         4.83 user         0.94 sys
 # mine 2000		14.95 real         4.56 user         0.86 sys
+
+# 20 workers 5000 times
+# jng	305.67 real       219.27 user        38.86 sys
+# hyap	269.88 real       212.56 user        36.29 sys
+# mine	233.77 real       206.90 user        33.29 sys

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:52:46 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 19:26:08 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class Server
 
 	private:
 		void			_setupServer();
-		void			_acceptConnection();
+		void			_acceptConnection(int fd);
 		void			_receiveRequest();
 		void			_writeResponse();
 		void			_serverLoop();
