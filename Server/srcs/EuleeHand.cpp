@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 19:11:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 19:18:03 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -428,7 +428,7 @@ size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infi
 int	EuleeHand::_unchunkIntofile(int fd, std::string bufferIn, int isHeader)
 {
 	if (bufferIn == "")
-		return (1);
+		return (0);
 	size_t		pos = bufferIn.find("\r\n\r\n");
 	std::string	remaining = bufferIn;
 	if (isHeader)
@@ -452,11 +452,17 @@ int	EuleeHand::_unchunkIntofile(int fd, std::string bufferIn, int isHeader)
 		catch(const std::exception& e)
 		{
 			std::cout << "Chunk Error: Hex size is less than chunk size!" << std::endl;
+			this->sendHttp(400);
+			return (1);
 		}
 		if (size == 0)
 			break ;
 		if (size > remaining.size() - strlen("\r\n"))
+		{
 			std::cout << "Chunk Error: Hex size is more than remaining size!" << std::endl;
+			this->sendHttp(400);
+			return (1);
+		}
 		std::string	tmp = remaining.substr(pos + strlen("\r\n"), size);
 		write(fd, tmp.c_str(), tmp.size());
 		remaining = remaining.substr(pos + size + strlen("\r\n\r\n"));
@@ -527,7 +533,14 @@ int	EuleeHand::unchunkResponse()
 	int	outfile = open(WS_UNCHUNK_OUTFILE, O_CREAT | O_TRUNC | O_RDWR, 0777);
 	for (size_t i = 0; i < bufferVector.size(); i++)
 	{
-		this->_unchunkIntofile(outfile, bufferVector[i], (i == 0));
+		if (this->_unchunkIntofile(outfile, bufferVector[i], (i == 0)))
+		{
+			close(outfile);
+			std::remove(WS_UNCHUNK_INFILE);
+			std::remove(WS_UNCHUNK_OUTFILE);
+			delete[] temp;
+			return (1);
+		}
 		std::cout << MAGENTA << "Unchunking: " << i + 1 / bufferVector.size() << "0%\r" << RESET;
 	}
 	close(outfile);
