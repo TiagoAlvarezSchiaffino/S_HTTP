@@ -8,12 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:39:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:13:27 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 09:31:17 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpDefaultResponse.hpp"
 
+/* MIGHT NOT NEED ANYMORE */
 HttpDefaultResponse::HttpDefaultResponse(EuleeHand database) : _database(database) {}
 
 HttpDefaultResponse::~HttpDefaultResponse() {}

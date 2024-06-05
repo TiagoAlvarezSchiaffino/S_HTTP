@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:33:13 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:49:46 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:18:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # define HTTPPOSTRESPONSE_HPP
 
 # include "Serv.hpp"
+
 class HttpPostResponse
 {
 	public:
@@ -24,9 +25,12 @@ class HttpPostResponse
 		void		handlePost();
 
 	private:
-		int			_saveFile(size_t contentLength, int contentLengthSpecified);
+		void		_normalSave();
+		void		_saveFile();
 
 		EuleeHand	_database;
+		size_t		_contentLength;
+		int 		_contentLengthSpecified;
 };
 
 #endif

@@ -8,22 +8,22 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 17:27:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:08:12 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/Serv.hpp"
 
 /* Class constructor that takes in configFilePath string */
-Serv::Serv(std::string configFilePath)
+Serv::Serv(std::string configFilePath, char **envp)
 {
-	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath));
+	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath), envp);
 	this->_configManager = ConfigManager(configFilePath);
 }
 
-Serv::~Serv(void) {}
+Serv::~Serv() {}
 
-void	Serv::_setupServer(void)
+void	Serv::_setupServer()
 {
 	addrinfo	hints, *res;
 
@@ -116,6 +116,7 @@ void	Serv::_serverLoop(void)
 			close(this->_database.socket);
 			continue ;
 		}
+		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
 		std::istringstream	request(this->_database.buffer);
 		
@@ -125,19 +126,22 @@ void	Serv::_serverLoop(void)
 			std::string	message = "Go away favicon";
 			std::cout << RED << message << RESET << std::endl;
 			std::string response = "HTTP/1.1 404 Not Found\r\n\r\n" + message;
-
 			this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
 			close(this->_database.socket);
 			continue;
 		}
-		// std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
-		std::cout << BLUE << this->_database.buffer << RESET << std::endl;
+		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
+		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
-		// std::cout << this->_database.methodPath << std::endl;
-		// if (this->_database.methodPath == "/directory/htdocs.bad_extension")
+		/* FOR DEBUGGING: TO DELETE */
+		// if (this->_database.method == "GET")
 		// {
-		// 	std::string response = "HTTP/1.1 404 Not Found\r\n\r\n";
+		// 	std::cout << "Entered force output!" << std::endl;
+		// 	std::string response = "HTTP/1.1 200 OK\r\n\r\n";
 		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
+		// 	// this->_database.methodPath = "/cgi/srcs/cgi_static.cgi";
+		// 	// HttpGetResponse	getResponse(this->_database);
+		// 	// getResponse.handleGet();
 		// 	close(this->_database.socket);
 		// 	continue ;
 		// }
@@ -151,6 +155,13 @@ void	Serv::_serverLoop(void)
 			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
 			HttpHeadResponse	headResponse(this->_database);
 			headResponse.handleHead();
+		}
+		// else if (this->_database.methodPath.find('.') != std::string::npos && (this->_database.method == "POST" && this->_database.methodPath == "/htdocs/tiago.bla"))
+		else if (this->_database.method == "POST" && this->_database.methodPath == "/htdocs/tiago.bla")
+		{
+			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
+			HttpCgiResponse	cgiResponse(this->_database);
+			cgiResponse.handleCgi();
 		}
 		else if (this->_database.method == "POST")
 		{
@@ -176,12 +187,6 @@ void	Serv::_serverLoop(void)
 			HttpGetResponse	getResponse(this->_database);
 			getResponse.handleGet();
 		}
-		else if (this->_database.methodPath.find('.') != std::string::npos)
-		{
-			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
-			HttpCgiResponse	cgiResponse(this->_database);
-			cgiResponse.handleCgi();
-		}
 		else
 		{
 			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
@@ -191,7 +196,7 @@ void	Serv::_serverLoop(void)
 	}
 }
 
-void	Serv::runServer(void)
+void	Serv::runServer()
 {
 	this->_database.parseConfigFile();
 	std::cout << GREEN "Config File Parsing Done..." RESET << std::endl;

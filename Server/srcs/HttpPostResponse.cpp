@@ -8,41 +8,84 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:38:42 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 16:59:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 09:53:27 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/HttpPostResponse.hpp"
 
-HttpPostResponse::HttpPostResponse(EuleeHand database) : _database(database) {}
+HttpPostResponse::HttpPostResponse(EuleeHand database) : _database(database), _contentLength(), _contentLengthSpecified() {}
 
 HttpPostResponse::~HttpPostResponse() {}
 
-int	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecified)
+void	HttpPostResponse::_normalSave()
 {
-	size_t		boundaryPos = this->_database.buffer.find("boundary=") + std::strlen("boundary=");
+	std::cout << GREEN << "Post to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
+	std::ofstream	originalPath(this->_database.methodPath.c_str() + 1, std::ios::binary);
+	if (originalPath.fail())
+	{
+		std::cout << RED << "Directory not found, using upload from config..." << RESET << std::endl;
+		if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].size() == 0)
+			std::cout << RED << "Upload not set in config, cannot save file..." << RESET << std::endl;
+		else
+		{
+			int	pathCanUse = 0;
+			for (size_t i = 0; this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].size() && pathCanUse == 0; i++)
+			{
+				std::ofstream	locationPath(this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD][i] + this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/")));
+				if (locationPath.fail() == false)
+				{
+					std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
+					std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+					if (this->_contentLengthSpecified)
+						locationPath.write(toWrite.c_str(), this->_contentLength);
+					else
+						locationPath.write(toWrite.c_str(), toWrite.length());
+					locationPath.close();
+					pathCanUse = 1;
+				}
+			}
+			if (pathCanUse == 0)
+				std::cout << RED << "Upload path cannot be used to save file..." << RESET << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << GREEN << "Put to: " << this->_database.methodPath.c_str() + 1 << RESET << std::endl;
+		std::string		toWrite = this->_database.buffer.substr(this->_database.buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
+		if (this->_contentLengthSpecified)
+			originalPath.write(toWrite.c_str(), this->_contentLength);
+		else
+			originalPath.write(toWrite.c_str(), toWrite.length());
+		originalPath.close();
+	}
+}
+
+void	HttpPostResponse::_saveFile()
+{
+	size_t	boundaryPos = this->_database.buffer.find("boundary=");
 	if (boundaryPos == std::string::npos)
 	{
 		std::cerr << RED << "No boundary found!" << RESET << std::endl;
-		return (0);
+		std::cerr << GREEN <<  "Saving file normally..." << RESET << std::endl;
+		this->_normalSave();
+		return ;
 	}
-	std::cout << "Moving..." << std::endl;
+	boundaryPos += std::strlen("boundary=");
 	std::string	boundary = this->_database.buffer.substr(boundaryPos, this->_database.buffer.find("\r\n", boundaryPos) - boundaryPos);
 	boundaryPos = this->_database.buffer.find(boundary, boundaryPos + boundary.length());
 	
-	if (contentLengthSpecified && this->_database.buffer.substr(boundaryPos).length() + std::strlen("\r\n") != contentLength)
+	if (this->_contentLengthSpecified && this->_database.buffer.substr(boundaryPos).length() + std::strlen("\r\n") != this->_contentLength)
 	{
 		std::cerr << RED << "Error: Content-Length does not match actual content length!" << RESET << std::endl;
-		return (0);
+		return ;
 	}
 	size_t		namePos = this->_database.buffer.find("filename=\"");
 	std::string	fileName;
 	if (namePos == std::string::npos)
 	{
 		std::cerr << RED << "No file name found in header! Extracting from path..." << RESET << std::endl;
-		std::cout << "Entered" << std::endl;
 		fileName = this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/"));
-		std::cout << "DNC" << std::endl;
 	}
 	else
 	{
@@ -55,7 +98,7 @@ int	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecified
 	if (boundaryEndPos == std::string::npos)
 	{
 		std::cerr << RED << "No end boundary found!" << RESET << std::endl;
-		return (0);
+		return ;
 	}
 	size_t		dataLength = boundaryEndPos - (boundaryPos + boundary.length());
 	std::string	fileData = this->_database.buffer.substr(boundaryPos + boundary.length(), dataLength - std::strlen("\r\n"));
@@ -64,30 +107,24 @@ int	HttpPostResponse::_saveFile(size_t contentLength, int contentLengthSpecified
 	if (newFile.is_open() == false)
 	{
 		std::cerr << RED << "Error: Failed to create new file!" << RESET << std::endl;
-		return (0);
+		return ;
 	}
 	std::string	toWrite = fileData.substr(fileData.find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 	newFile.write(toWrite.c_str(), toWrite.length());
 	newFile.close();
-	return (1);
 }
 
 void	HttpPostResponse::handlePost()
 {
-	int		contentLengthSpecified = 0;
-	size_t	contentLength = 0;
 	size_t	contentLengthPos = this->_database.buffer.find("Content-Length: ");
 	if (contentLengthPos != std::string::npos)
 	{
 		contentLengthPos += std::strlen("Content-Length: ");
-		contentLength = std::stoul(this->_database.buffer.substr(contentLengthPos));
-		contentLengthSpecified = 1;
+		this->_contentLength = std::stoul(this->_database.buffer.substr(contentLengthPos));
+		this->_contentLengthSpecified = 1;
 	}
 
-	this->_saveFile(contentLength, contentLengthSpecified);
+	this->_saveFile();
 	std::string responseBody = "Server has received your POST request!";
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(responseBody.length()) + "\r\n\r\n" + responseBody;
-	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
-
-	close(this->_database.socket);
+	this->_database.sendHttp(200, 1);
 }

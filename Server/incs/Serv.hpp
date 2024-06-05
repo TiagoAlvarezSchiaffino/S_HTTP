@@ -8,12 +8,12 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:08:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:29:48 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef SERV_HPP
+# define SERV_HPP
 
 # include <filesystem>
 # include <iostream>
@@ -28,7 +28,7 @@
 # include <netdb.h>
 # include <fcntl.h>
 
-# include "serv.hpp"
+# include "server.hpp"
 # include "ConfigManager.hpp"
 # include "EuleeHand.hpp"
 # include "EuleeWallet.hpp"
@@ -49,16 +49,12 @@
 class Serv
 {
 	public:
-		Serv(std::string configFilePath);
-		~Serv(void);
+		Serv(std::string configFilePath, char **envp);
+		~Serv();
 		void			runServer();
 
 	private:
-		int				_checkExcept();
-		int				_isCGI();
 		void			_setupServer();
-		void			_convertLocation();
-		int				_unchunkResponse();
 		void			_serverLoop();
 
 		ConfigManager	_configManager;

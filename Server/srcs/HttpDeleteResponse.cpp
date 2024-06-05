@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 08:46:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 19:43:59 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 09:31:43 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,7 @@ void	HttpDeleteResponse::handleDelete()
 	if (result != 0)
 	{
 		std::cerr << RED << "Error: " << filePath << " cannot be deleted" << RESET << std::endl;
-		this->_database.sendHttp(404, this->_database.methodPath);
-
-        std::string	response = "HTTP/1.1 404 Not Found\r\n\r\nFile to delete is not found...\r\n";
-		this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.length(), WRITE);
-		close(this->_database.socket);
+		this->_database.sendHttp(404, 1);
 		return ;
 	}
 	std::cout << GREEN << filePath << " has been deleted!" << RESET << std::endl;

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:43:06 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 10:34:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,34 +21,37 @@
 class EuleeHand
 {
 	public:
-		EuleeHand(void);
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
-		~EuleeHand(void);
+		EuleeHand();
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
+		~EuleeHand();
 
-		void		printTokens(void);
-		void		parseConfigFile(void);
-		void		configLibrary(void);
-		void		errorHandleShit(void);
-		void		printServers(void);
-		void		parseConfigServer(void);
+		void		printTokens();
+		void		parseConfigFile();
+		void		configLibrary();
+		void		errorHandleShit();
+		void		printServers();
+		void		parseConfigServer();
 		void		perrorExit(std::string msg, int exitTrue = 1);
 		long		ft_select(int fd, void *buff, size_t size, Mode mode);
 		int			checkPath(std::string path, int	isFile, int isDirectory);
+		std::string	extractHTML(std::string path);
+		int			sendHttp(int statusCode, int closeSocket = 0, std::string htmlPath = "");
 
-		int			isCGI(void);
-		int			checkExcept(void);
-		int			unchunkResponse(void);
-		void		convertLocation(void);
-		std::string extractHTML(std::string path);
-		int		sendHttp(int statusCode, std::string path);
 
+		int			isCGI();
+		int			checkExcept();
+		int			unchunkResponse();
+		void		convertLocation();
+		std::string	cgiPath();
+
+		char								**envp;
+		std::map<std::string, std::string>	cgi;
 		std::map<int, std::string>			statusList;
-		std::map<std::string, std::string>	envp, cgi;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		std::string							method, methodPath, buffer;
 		int									socket, serverIndex, useDefaultIndex;
+		std::string							method, methodPath, buffer, locationPath;
 
 	private:
 		std::string		_configFilePath;

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 09:35:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 19:44:23 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 09:41:03 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,13 @@ void	HttpHeadResponse::handleHead()
 	std::string		http = "";
 	if (file.fail() && this->_database.methodPath != "/")
 	{
-		std::cerr << RED << "Error opening " << this->_database.methodPath << "!\n" << RESET << std::endl;
-        http = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n";
+		std::cerr << RED << "Error opening " << this->_database.methodPath << "!" << RESET << std::endl;
+		this->_database.sendHttp(404, 1);
 	}
 	else
 	{
-		std::cout << GREEN << "File " << this->_database.methodPath << " found!!\n" << RESET << std::endl;
-		http = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n";
+		std::cout << GREEN << "File " << this->_database.methodPath << " found!" << RESET << std::endl;
+		this->_database.sendHttp(200, 1);
 	}
-	this->_database.ft_select(this->_database.socket, (void *)http.c_str(), http.length(), WRITE);
 	file.close();
-	close(this->_database.socket);
 }

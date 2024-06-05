@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 16:53:38 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 09:30:20 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	HttpCgiResponse::handleCgi()
         this->_database.perrorExit("Pipe Error");
     if ((pid = fork()) < 0)
         this->_database.perrorExit("Fork Error");
-
+    std::cout << &this->_database.envp << std::endl;
     if (pid == 0)	// child process
 	{
         close(cgiInput[1]);
@@ -43,8 +43,9 @@ void	HttpCgiResponse::handleCgi()
         // setenv("CONTENT_LENGTH", std::to_string(contentLength.c_str(), 1);
 		// setenv("CONTENT_LENGTH", "69", 1);
 
-		char	*cmds[2] = {(char *)(this->_database.methodPath.c_str() + 1), NULL};
-		execve(cmds[0], cmds, NULL);
+		// char	*cmds[2] = {(char *)(this->_database.methodPath.c_str() + 1), NULL};
+		char	*cmds[2] = {(char *)("/Users/Tiago/S_HTTP/Server/cgi_tester"), NULL};
+		execve(cmds[0], cmds, this->_database.envp);
 		std::cerr << RED << "Failed to execve CGI: " << strerror(errno) << RESET << std::endl;
         std::cout << "HTTP/1.1 200 OK\r\n\r\n" << std::endl;
         exit(EXIT_FAILURE);
