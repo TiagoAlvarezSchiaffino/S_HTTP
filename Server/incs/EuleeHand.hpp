@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 17:13:36 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:09:33 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,20 +25,21 @@ class EuleeHand
 		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
 		~EuleeHand(void);
 
-		void	printTokens(void);
-		void	parseConfigFile(void);
-		void	configLibrary(void);
-		void	errorHandleShit(void);
-		void	printServers(void);
-		void	parseConfigServer(void);
-		void	perrorExit(std::string msg, int exitTrue = 1);
-		long	ft_select(int fd, void *buff, size_t size, Mode mode);
-		int		checkPath(std::string path, int	isFile, int isDirectory);
+		void		printTokens(void);
+		void		parseConfigFile(void);
+		void		configLibrary(void);
+		void		errorHandleShit(void);
+		void		printServers(void);
+		void		parseConfigServer(void);
+		void		perrorExit(std::string msg, int exitTrue = 1);
+		long		ft_select(int fd, void *buff, size_t size, Mode mode);
+		int			checkPath(std::string path, int	isFile, int isDirectory);
 
-		int		isCGI(void);
-		int		checkExcept(void);
-		int		unchunkResponse(void);
-		void	convertLocation(void);
+		int			isCGI(void);
+		int			checkExcept(void);
+		int			unchunkResponse(void);
+		void		convertLocation(void);
+		std::string	cgiPath(void);
 
 		std::map<std::string, std::string>	envp, cgi;
 		std::vector<EuleePocket>			server;
@@ -50,8 +51,8 @@ class EuleeHand
 	private:
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
-		size_t			_parseCgi(std::vector<Token> &tokens, size_t i);
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
+		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
 		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);
 };

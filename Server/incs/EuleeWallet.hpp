@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:59:56 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 10:18:38 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:15:17 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,11 @@ enum	Key
 class EuleeWallet
 {
 	public:
-		typedef Key								key_type;
-		typedef std::vector<std::string>		mapped_type;
-		typedef std::map<key_type, mapped_type>	value_type;
-		typedef	value_type::iterator			iterator;
+		typedef Key									key_type;
+		typedef std::vector<std::string>			mapped_type;
+		typedef std::map<key_type, mapped_type>		value_type;
+		typedef std::map<std::string, std::string>	cgi_type;
+		typedef	value_type::iterator				iterator;
 
 		EuleeWallet(void);
 		EuleeWallet(value_type location);
@@ -54,6 +55,8 @@ class EuleeWallet
 
 		iterator	begin(void);
 		iterator	end(void);
+
+		cgi_type	cgi;
 
 	private:
 		value_type	_location;
