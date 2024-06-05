@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 12:02:45 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 09:59:02 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:14:33 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,11 @@ void	HttpPutResponse::handlePut()
 		else
 		{
 			int	pathCanUse = 0;
+			if (this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/")) == "/")
+			{
+				std::cout << RED << "File to save is a directory..." << RESET << std::endl;
+				return ;
+			}
 			for (size_t i = 0; this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].size() && pathCanUse == 0; i++)
 			{
 				std::ofstream	locationPath(this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD][i] + this->_database.methodPath.substr(this->_database.methodPath.find_last_of("/")));

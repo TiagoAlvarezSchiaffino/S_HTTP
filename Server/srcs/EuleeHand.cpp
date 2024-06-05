@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:47:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:08:24 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -372,7 +372,7 @@ void	EuleeHand::convertLocation()
 	EuleePocket	myServer = this->server[this->serverIndex];
 	std::string	methodPathCopy = this->methodPath.c_str();
 	size_t		longestPathSize = 0;
-	std::string	pathToFind, locationRoot, newPath, indexFile;
+	std::string	pathToFind, locationRoot, newPath, indexFile, remainingPath;
 	for (std::map<std::string, EuleeWallet>::iterator it = myServer.location.begin(); it != myServer.location.end(); it++)
 	{
 		if (strncmp(it->first.c_str(), methodPathCopy.c_str(), it->first.length()) == 0 && it->first.length() > longestPathSize)
@@ -381,38 +381,53 @@ void	EuleeHand::convertLocation()
 			this->locationPath = it->first;
 		}
 	}
+	std::cout << "Location Path: " << this->locationPath << std::endl;
 	newPath = this->methodPath;
 	if (methodPathCopy.length() - this->locationPath.length() > 1) // Trailing File
 	{
+		std::cout << "Trailing File" << std::endl;
 		if (myServer.location[this->locationPath][ROOT].size() != 0)
 		{
+			std::cout << "Location Root Set" << std::endl;
 			locationRoot = myServer.location[this->locationPath][ROOT][0];
 			newPath = locationRoot + methodPathCopy.substr(this->locationPath.length());
 		}
 		if (this->checkPath(newPath, 1, 1)) // Either file or directory
 		{
-			if (this->checkPath(newPath, 1, 0)) // Found file, else found directory
+			std::cout << "Either file or directory" << std::endl;
+			if (this->checkPath(newPath, 1, 0) && newPath[newPath.length() - 1] != '/') // Found file, else found directory
 			{
+				std::cout << "This is a file" << std::endl;
 				this->methodPath = "/" + newPath;
 				std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
 				std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
 				return ;
 			}
+			else
+				std::cout << "This is a directory" << std::endl;
 		}
 		else // Not Found
+		{
+			std::cout << "Invalid path" << std::endl;
 			return ;
+		}
 	}
 	if (myServer.location[this->locationPath][INDEX].size() == 0) // No Trailing File -> Append back and find
 	{
-		this->methodPath = myServer[ROOT][0] + locationRoot + "/" + indexFile; 
+		std::cout << "Server Root Used" << std::endl;
+		remainingPath = this->methodPath.erase(0, this->locationPath.length());
+		indexFile = myServer[INDEX][0];
+		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + remainingPath + (remainingPath.length() == 0 ? "/" : "") + (this->method == "GET" ? indexFile : ""); 
 		this->useDefaultIndex = 1;
 	}
 	else // Using Index
 	{
+		std::cout << "Location Root Used" << std::endl;
 		locationRoot = myServer.location[this->locationPath][ROOT][0];
-		std::string	remainingPath = methodPathCopy.erase(0, this->locationPath.length());
+		remainingPath = methodPathCopy.erase(0, this->locationPath.length());
 		indexFile = myServer.location[this->locationPath][INDEX][0];
-		this->methodPath = "/" + myServer.location[this->locationPath][ROOT][0] + remainingPath + "/" + indexFile;
+		// if (remainingPath)
+		this->methodPath = "/" + myServer.location[this->locationPath][ROOT][0] + remainingPath + ((remainingPath[remainingPath.length() - 1] == '/') ? "" : "/") + indexFile;
 	}
 	std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
 	std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
@@ -425,7 +440,7 @@ std::string	EuleeHand::extractHTML(std::string path)
 	if (!file.is_open())
 	{
 		std::cerr << "Error: Could not open file" << std::endl;
-		exit(1);
+		return ("");
 	}
 	std::string extract;
 	std::string output;
@@ -493,12 +508,12 @@ int	EuleeHand::checkClientBodySize()
 		clientMaxBodySize = std::stoul(this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE][0]);
 	if (this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE].size() != 0)
 		clientMaxBodySize = std::min(clientMaxBodySize, std::stoul(this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE][0]));
-	std::cout << clientMaxBodySize << std::endl;
 	size_t	startPos = this->buffer.find("\r\n\r\n") + std::strlen("\r\n\r\n");
-	std::cout << this->buffer << std::endl;
-	std::cout << startPos << std::endl;
-	std::cout << this->buffer.length() - startPos << std::endl;
 	if (this->buffer.length() - startPos > clientMaxBodySize)
-		return (this->sendHttp(413, 1));
+	{
+		std::cout << RED << "Client Body Size Exceeded!" << RESET << std::endl;
+		this->sendHttp(413, 1);
+		return (1);
+	}
 	return (0);
 }
