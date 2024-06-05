@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:14:50 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:27:02 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ class ConfigManager
 		void			configLibrary(void);
 
 		void			checkImportantCheck(int i);
+		bool			checkCompulsories(int i);
 
 		int				checkServerKey(size_t i, int previous, int *braces, int *main_block);
 		int				checkLocationKey(size_t i, int previous, int *braces, int *main_block);

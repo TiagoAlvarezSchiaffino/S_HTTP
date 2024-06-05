@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 13:12:09 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:36:41 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,17 +42,17 @@
 # include "HttpPutResponse.hpp"
 
 # define WS_BACKLOG				10
-# define WS_BUFFER_SIZE			100000
+# define WS_BUFFER_SIZE			10000
 # define WS_TESTER_SIZE			100000
 # define WS_TEMP_FILE_IN		".tempIn"
 # define WS_TEMP_FILE_OUT		".tempOut"
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
-class Serv
+class Server
 {
 	public:
-		Serv(std::string configFilePath, char **envp);
-		~Serv();
+		Server(std::string configFilePath, char **envp);
+		~Server();
 		void			runServer();
 
 	private:

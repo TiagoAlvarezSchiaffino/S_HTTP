@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 12:46:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:34:11 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,24 @@ void	ConfigManager::printError(std::string str, int i)
 	exit(1);
 }
 
+bool	ConfigManager::checkCompulsories(int i)
+{
+	static bool listen;
+	static bool root;
+	static bool index;
+
+	if (this->_tokens[i].token == "listen")
+		listen = true;
+	if (this->_tokens[i].token == "root")
+		root = true;
+	if (this->_tokens[i].token == "index")
+		index = true;
+
+	if (listen && root && index)
+		return (true);
+	return (false);
+}
+
 void	ConfigManager::configLibrary(void)
 {
 	const char	*serverlib[11] = {"server", "location", "listen", "root", "index", "server_name", "error_page", "client_max_body_size", "auto_index", "return", "cgi_script"};
@@ -167,11 +185,16 @@ int		ConfigManager::checkCloseBrace(int i, int previous, int *braces, int *main_
 
 void	ConfigManager::checkImportantCheck(int i)
 {
-	if (this->_tokens[i].token == "root" || this->_tokens[i].token == "auto_index" || this->_tokens[i].token == "client_max_body_size")
+	if (this->_tokens[i].token == "root" || this->_tokens[i].token == "autoindex" || this->_tokens[i].token == "client_max_body_size" || this->_tokens[i].token == "upload")
 	{
 		if (this->_tokens[i + 2].type == VALUE)
-			printError("I hardcoded these 3 to obtain this error, problem?. ", i + 2);
+			printError("Root, autoindex, client_max_body_size or upload should have one value parameter. ", i + 2);
 	}
+			if (this->_tokens[i].token == "return")
+		{
+			if (this->_tokens[i + 2].type != VALUE)
+				printError("Return should have 2 value parameters ", i + 2);
+		}
 }
 
 int		ConfigManager::checkLocationKey(size_t i, int previous, int *braces, int *main_block)
@@ -216,7 +239,7 @@ int		ConfigManager::checkServerKey(size_t i, int previous, int *braces, int *mai
 			previous = KEY;
 		else
 			printError("Key is not after braces or semicolon. ", i);
-
+		this->checkCompulsories(i);
 		this->checkImportantCheck(i);
 		if (*main_block == 1 && this->_tokens[i].token == this->_serverVar[0])
 				printError("Server cannot be non-main directive. ", i);
@@ -288,9 +311,9 @@ void	ConfigManager::errorHandleShit(void)
 	}
 	if (braces != 0)
 		printError("Invalid number of brace. ", this->_tokens.size() - 1);
-	return ;
 }
-
+	if (this->checkCompulsories(this->_tokens.size() - 1) == false)
+		printError("Server does not have all listen, root and index. ", this->_tokens.size() - 1);
 std::vector<Token>	&ConfigManager::getToken(void)
 {
 	return (this->_tokens);

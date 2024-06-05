@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 13:10:47 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:03:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,6 @@ void	Serv::runServer()
 	this->_database.parseConfigServer();
 	this->_database.printServers();
 	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
-	this->_database.addEnv("SERVER_PROTOCOL=HTTP/1.1");
-	this->_database.addEnv("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	this->_setupServer();
 	this->_serverLoop();
 }
@@ -120,8 +118,7 @@ int	Serv::_receiveRequest()
 		std::cout << GREEN << "Received: " << val << ((val == WS_BUFFER_SIZE) ? "" : "\t") << "\tTotal: " << total << RESET << std::endl;
 		if (val < 0)
 		{
-			std::cout << RED << "Receive Error: Connection interrupted!" << std::endl;
-			close(this->_database.socket);
+			this->_database.sendHttp(400, 1);
 			return (1);
 		}
 		this->_database.buffer.append(readBuffer, val);
@@ -134,8 +131,7 @@ int	Serv::_handleFavicon()
 {
 	if (this->_database.methodPath != "/favicon.ico") // Ignore favicon
 		return (0);
-	std::string	message = "Go away favicon";
-	std::cout << RED << message << RESET << std::endl;
+	std::cout << RED << "Go away favicon" << RESET << std::endl;
 	this->_database.sendHttp(404, 1);
 	return (1);
 }
@@ -157,96 +153,97 @@ int	Serv::_handleRedirection()
 
 void	Serv::_serverLoop()
 {
-	while(1)
+	while (1)
 	{
 		this->_acceptConnection();
-
 		if (this->_receiveRequest())
 			continue ;
-		if (this->_database.unchunkResponse())
-			continue ;
-		std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
-		// std::ofstream	uc("unchunked.txt");
-		// uc << this->_database.buffer;
-		// uc.close();
+		std::cout << GREEN << "Server received request!" << RESET << std::endl;
+		try
+		{
+			if (this->_database.unchunkResponse())
+				continue ;
+			std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
-		std::istringstream	request(this->_database.buffer);
-		request >> this->_database.method >> this->_database.methodPath;
-		if (this->_handleFavicon())
-			continue ;
+			std::istringstream	request(this->_database.buffer);
+			request >> this->_database.method >> this->_database.methodPath;
+			if (this->_handleFavicon())
+				continue ;
 
-		std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
-		// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
+			std::cout << BLUE << this->_database.buffer.substr(0, this->_database.buffer.find("\r\n\r\n")) << RESET << std::endl;
+			// std::cout << BLUE << this->_database.buffer << RESET << std::endl;
 
-		/* FOR DEBUGGING: TO DELETE */
-		// std::cout << this->_database.method << " " << this->_database.methodPath << std::endl;
-		// if (this->_database.method == "GET" && this->_database.methodPath == "/google")
-		// {
-		// 	std::cout << "Entered force output!" << std::endl;
-		// 	std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.google.com\r\n\r\n";
-		// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
-		// 	// this->_database.methodPath = "/cgi/srcs/cgi_static.cgi";
-		// 	// HttpGetResponse	getResponse(this->_database);
-		// 	// getResponse.handleGet();
-		// 	close(this->_database.socket);
-		// 	continue ;
-		// }
+			/* FOR DEBUGGING: TO DELETE */
+			// std::cout << this->_database.method << " " << this->_database.methodPath << std::endl;
+			// if (this->_database.method == "GET" && this->_database.methodPath == "/google")
+			// {
+			// 	std::cout << "Entered force output!" << std::endl;
+			// 	std::string response = "HTTP/1.1 301 Moved Permanently\r\nLocation: https://www.google.com\r\n\r\n";
+			// 	this->_database.ft_select(this->_database.socket, (void *)response.c_str(), response.size(), WRITE);
+			// 	// this->_database.methodPath = "/cgi/srcs/cgi_static.cgi";
+			// 	// HttpGetResponse	getResponse(this->_database);
+			// 	// getResponse.handleGet();
+			// 	close(this->_database.socket);
+			// 	continue ;
+			// }
 
-		if (this->_handleRedirection())
-			continue ;
-		if (this->_database.checkExcept())
-			continue ;
-		this->_database.convertLocation();
-		if (this->_database.checkClientBodySize())
-			continue ;
+			if (this->_handleRedirection())
+				continue ;
+			if (this->_database.checkExcept())
+				continue ;
+			this->_database.convertLocation();
+			if (this->_database.checkClientBodySize())
+				continue ;
 
-		// std::ofstream	uc2("unchunked2.txt");
-		// uc2 << this->_database.buffer;
-		// uc2.close();
-
-		this->_database.addEnv("REQUEST_METHOD=" + this->_database.method);
-		if (this->_database.isCGI())
-		{
-			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
-			HttpCgiResponse	cgiResponse(this->_database);
-			cgiResponse.handleCgi();
+			if (this->_database.isCGI())
+			{
+				std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
+				HttpCgiResponse	cgiResponse(this->_database);
+				cgiResponse.handleCgi();
+			}
+			else if (this->_database.method == "HEAD")
+			{
+				std::cout << MAGENTA << "Head method called" << RESET << std::endl;
+				HttpHeadResponse	headResponse(this->_database);
+				headResponse.handleHead();
+			}
+			else if (this->_database.method == "POST")
+			{
+				std::cout << MAGENTA << "Post method called" << RESET << std::endl;
+				HttpPostResponse	postResponse(this->_database);
+				postResponse.handlePost();
+			}
+			else if (this->_database.method == "PUT")
+			{
+				std::cout << MAGENTA << "Put method called" << RESET << std::endl;
+				HttpPutResponse	putResponse(this->_database);
+				putResponse.handlePut();
+			}
+			else if (this->_database.method == "DELETE")
+			{
+				std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
+				HttpDeleteResponse	deleteResponse(this->_database);
+				deleteResponse.handleDelete();
+			}
+			else if (this->_database.method == "GET")
+			{
+				std::cout << MAGENTA << "Get method called" << RESET << std::endl;
+				HttpGetResponse	getResponse(this->_database);
+				getResponse.handleGet();
+			}
+			else
+			{
+				std::cout << MAGENTA << "Default method called" << RESET << std::endl;
+				HttpDefaultResponse	defaultResponse(this->_database);
+				defaultResponse.handleDefault();
+			}
 		}
-		else if (this->_database.method == "HEAD")
+		catch(const std::exception& e)
 		{
-			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
-			HttpHeadResponse	headResponse(this->_database);
-			headResponse.handleHead();
+			std::cout << RED << e.what() << RESET << '\n';
+			this->_database.sendHttp(500, 1);
 		}
-		else if (this->_database.method == "POST")
-		{
-			std::cout << MAGENTA << "Post method called" << RESET << std::endl;
-			HttpPostResponse	postResponse(this->_database);
-			postResponse.handlePost();
-		}
-		else if (this->_database.method == "PUT")
-		{
-			std::cout << MAGENTA << "Put method called" << RESET << std::endl;
-			HttpPutResponse	putResponse(this->_database);
-			putResponse.handlePut();
-		}
-		else if (this->_database.method == "DELETE")
-		{
-			std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
-			HttpDeleteResponse	deleteResponse(this->_database);
-			deleteResponse.handleDelete();
-		}
-		else if (this->_database.method == "GET" && this->_database.methodPath != "/" && this->_database.isCGI() == 0) // Will be determined by the config
-		{
-			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
-			HttpGetResponse	getResponse(this->_database);
-			getResponse.handleGet();
-		}
-		else
-		{
-			std::cout << MAGENTA << "Default method called" << RESET << std::endl;
-			HttpDefaultResponse	defaultResponse(this->_database);
-			defaultResponse.handleDefault();
-		}
+		
 	}
 }
 

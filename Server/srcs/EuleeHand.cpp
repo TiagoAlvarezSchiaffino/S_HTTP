@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 13:07:28 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 13:41:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,10 +306,10 @@ long	EuleeHand::ft_select(int fd, void *buff, size_t size, Mode mode)
 	FD_SET(fd, (mode == READ) ? &readFds : &writeFds);
 
 	timeval	timeout;
-	timeout.tv_sec = WS_TIMEOUT;
-	timeout.tv_usec = 0;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 500;
 
-	int	ret = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);
+	int	ret = select(this->socket + 1, &readFds, &writeFds, NULL, &timeout);
 	if (ret == -1)
 	{
 		this->perrorExit("Select Error", 0);
@@ -457,53 +457,38 @@ void	EuleeHand::convertLocation()
 			this->locationPath = it->first;
 		}
 	}
-	std::cout << "Location Path: " << this->locationPath << std::endl;
 	newPath = this->methodPath;
 	if (methodPathCopy.length() - this->locationPath.length() > 1) // Trailing File
 	{
 		std::cout << "Trailing File" << std::endl;
 		if (myServer.location[this->locationPath][ROOT].size() != 0)
 		{
-			std::cout << "Location Root Set" << std::endl;
 			locationRoot = myServer.location[this->locationPath][ROOT][0];
 			newPath = locationRoot + methodPathCopy.substr(this->locationPath.length());
 		}
 		if (this->checkPath(newPath, 1, 1)) // Either file or directory
 		{
-			std::cout << "Either file or directory" << std::endl;
 			if (this->checkPath(newPath, 1, 0) && newPath[newPath.length() - 1] != '/') // Found file, else found directory
 			{
-				std::cout << "This is a file" << std::endl;
 				this->methodPath = "/" + newPath;
 				std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
 				std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
 				return ;
 			}
-			else
-				std::cout << "This is a directory" << std::endl;
 		}
 		else // Not Found
-		{
-			std::cout << "Invalid path" << std::endl;
 			return ;
-		}
 	}
 	if (myServer.location[this->locationPath][INDEX].empty()) // No Trailing File -> Append back and find
 	{
-		std::cout << "Server Root Used" << std::endl;
-		std::cout << "Method Path: " << this->methodPath << std::endl;
 		remainingPath = this->methodPath.substr(this->locationPath.length());
 		indexFile = myServer[INDEX][0];
-		std::cout << "ServerRoot: " << myServer[ROOT][0] << std::endl;
-		std::cout << "LocationPath: " << this->locationPath << std::endl;
-		std::cout << "RemainingPath: " << remainingPath << std::endl;
 		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + (this->locationPath[this->locationPath.length() - 1] == '/' ? "" : "/") + (this->method == "GET" ? indexFile : ""); 
 		this->useDefaultIndex = 1;
 		this->useDirectoryListing = (this->server[this->serverIndex].location[this->locationPath][AUTO_INDEX].size() != 0);
 	}
 	else // Using Index
 	{
-		std::cout << "Location Root Used" << std::endl;
 		locationRoot = myServer.location[this->locationPath][ROOT][0];
 		remainingPath = methodPathCopy.erase(0, this->locationPath.length());
 		indexFile = myServer.location[this->locationPath][INDEX][0];
