@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:58:46 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 13:40:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:57:22 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,12 @@
 class HttpCgiResponse
 {
 	public:
-		HttpCgiResponse(EuleeHand database);
+		HttpCgiResponse(EuleeHand *database);
 		~HttpCgiResponse();
 		void		handleCgi();
 
 	private:
-		EuleeHand	_database;
+		EuleeHand	*_database;
 };
 
 #endif

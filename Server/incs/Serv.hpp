@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:09:51 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 14:58:11 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class Server
 		void			_receiveRequest();
 		void			_writeResponse();
 		void			_serverLoop();
+		void			_doRequest();
 		int				_parseRequest();
 		int				_handleFavicon();
 		int				_handleRedirection();

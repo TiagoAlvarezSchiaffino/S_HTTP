@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:57:04 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:18:57 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,14 +166,66 @@ int	Serv::_parseRequest()
 	return (0);
 }
 
+void	Serv::_doRequest()
+{
+	try
+	{
+		if (this->_database.isCGI())
+		{
+			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
+			HttpCgiResponse	cgiResponse(&this->_database);
+			cgiResponse.handleCgi();
+		}
+		else if (this->_database.method == "HEAD")
+		{
+			std::cout << MAGENTA << "Head method called" << RESET << std::endl;
+			HttpHeadResponse	headResponse(this->_database);
+			headResponse.handleHead();
+		}
+		else if (this->_database.method == "POST")
+		{
+			std::cout << MAGENTA << "Post method called" << RESET << std::endl;
+			HttpPostResponse	postResponse(this->_database);
+			postResponse.handlePost();
+		}
+		else if (this->_database.method == "PUT")
+		{
+			std::cout << MAGENTA << "Put method called" << RESET << std::endl;
+			HttpPutResponse	putResponse(&this->_database);
+			putResponse.handlePut();
+		}
+		else if (this->_database.method == "DELETE")
+		{
+			std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
+			HttpDeleteResponse	deleteResponse(this->_database);
+			deleteResponse.handleDelete();
+		}
+		else if (this->_database.method == "GET")
+		{
+			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
+			HttpGetResponse	getResponse(&this->_database);
+			getResponse.handleGet();
+			std::cout << "Response: " << this->_database.response[this->_database.socket] << std::endl;
+		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cout << RED << e.what() << RESET << '\n';
+		std::remove(WS_TEMP_FILE_IN);
+		std::remove(WS_TEMP_FILE_OUT);
+		this->_database.sendHttp(500);
+	}
+}
+
 void	Serv::_writeResponse()
 {
 	std::cout << GREEN << "Writing!" << RESET << std::endl;
-	int sendVal = send(this->_database.socket, &this->_database.response[this->_database.socket][0], this->_database.response[this->_database.socket].size(), 0);
+	int sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str(), this->_database.response[this->_database.socket].size(), 0);
 	if (sendVal < 0)
 		this->_database.perrorExit("Send Error", 0);
-	std::cout << "FD: " << this->_database.socket << " Size: " << this->_database.buffer[this->_database.socket].size() << std::endl;
 	this->_database.buffer[this->_database.socket].clear();
+	this->_database.response[this->_database.socket].clear();
+	std::cout << "Sent finished!" << std::endl;
 	close(this->_database.socket);
 }
 
@@ -220,79 +272,13 @@ void	Serv::_serverLoop()
 			if (!FD_ISSET(fd, &writeFds))
 				continue ;
 			this->_parseRequest();
+			this->_doRequest();
 			this->_writeResponse();
 
 
 			this->_database.socket = fd;
 			FD_CLR(fd, &this->_database.myWriteFds);
 		}
-
-		// try
-		// {
-		// 	// if (this->_database.unchunkResponse())
-		// 		// continue ;
-		// 	// std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
-
-		// 	std::istringstream	request(this->_database.bufferTemp);
-		// 	request >> this->_database.method >> this->_database.methodPath;
-		// 	if (this->_database.method == "GET" && this->_database.methodPath == "/")
-		// 		std::cout << "Counter: " << ++counter << std::endl;
-		// 	// if (this->_handleFavicon())
-		// 	// 	continue ;
-
-		// 	// // std::cout << BLUE << this->_database.bufferTemp.substr(0, this->_database.bufferTemp.find("\r\n\r\n")) << RESET << std::endl;
-
-		// 	// if (this->_handleRedirection())
-		// 	// 	continue ;
-		// 	// if (this->_database.checkExcept())
-		// 	// 	continue ;
-		// 	// this->_database.convertLocation();
-		// 	// if (this->_database.checkClientBodySize())
-		// 	// 	continue ;
-
-		// 	// this->_database.addEnv("REQUEST_METHOD=" + this->_database.method);
-		// 	// if (this->_database.isCGI())
-		// 	// {
-		// 	// 	std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
-		// 	// 	HttpCgiResponse	cgiResponse(this->_database);
-		// 	// 	cgiResponse.handleCgi();
-		// 	// }
-		// 	// else if (this->_database.method == "HEAD")
-		// 	// {
-		// 	// 	std::cout << MAGENTA << "Head method called" << RESET << std::endl;
-		// 	// 	HttpHeadResponse	headResponse(this->_database);
-		// 	// 	headResponse.handleHead();
-		// 	// }
-		// 	// else if (this->_database.method == "POST")
-		// 	// {
-		// 	// 	std::cout << MAGENTA << "Post method called" << RESET << std::endl;
-		// 	// 	HttpPostResponse	postResponse(this->_database);
-		// 	// 	postResponse.handlePost();
-		// 	// }
-		// 	// else if (this->_database.method == "PUT")
-		// 	// {
-		// 	// 	std::cout << MAGENTA << "Put method called" << RESET << std::endl;
-		// 	// 	HttpPutResponse	putResponse(this->_database);
-		// 	// 	putResponse.handlePut();
-		// 	// }
-		// 	// else if (this->_database.method == "DELETE")
-		// 	// {
-		// 	// 	std::cout << MAGENTA << "Delete method called" << RESET << std::endl;
-		// 	// 	HttpDeleteResponse	deleteResponse(this->_database);
-		// 	// 	deleteResponse.handleDelete();
-		// 	// }
-		// 	// else if (this->_database.method == "GET")
-		// 	// {
-		// 	// 	std::cout << MAGENTA << "Get method called" << RESET << std::endl;
-		// 	// 	HttpGetResponse	getResponse(this->_database);
-		// 	// 	getResponse.handleGet();
-		// 	// }
-		// }
-		// catch(const std::exception& e)
-		// {
-		// 	std::cout << RED << e.what() << RESET << '\n';
-		// 	this->_database.sendHttp(500, 1);
-		// }
 	}
 }
 
