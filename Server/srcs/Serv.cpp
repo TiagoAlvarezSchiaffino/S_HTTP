@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:33:40 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 18:50:43 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,8 +143,8 @@ int	Serv::_handleRedirection()
 
 int	Serv::_parseRequest()
 {
-	// if (this->_database.unchunkResponse())
-		// continue ;
+	if (this->_database.unchunkResponse())
+		return (1);
 	std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
 
 	std::istringstream	request(this->_database.buffer[this->_database.socket]);
@@ -152,7 +152,7 @@ int	Serv::_parseRequest()
 	if (this->_handleFavicon())
 		return (1);
 
-	// std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
 
 	if (this->_handleRedirection())
 		return (1) ;

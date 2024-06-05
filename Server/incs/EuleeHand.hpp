@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:20:23 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:35:12 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,12 @@
 
 # include <iostream>
 # include <sstream>
+# include <fcntl.h>
 # include <dirent.h>
 # include <sys/stat.h>
 
 # define WS_BUFFER_SIZE			100000
+# define BUFFER_SIZE			1000
 # define WS_TIMEOUT				0
 # define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
 # define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
@@ -39,9 +41,9 @@ class EuleeHand
 		int			sendHttp(int statusCode, std::string htmlPath = "");
 		int			isCGI();
 		int			checkExcept();
-		// int			unchunkResponse();
 		int			checkClientBodySize();
 		int			parseHeader();
+		int			unchunkResponse();
 		void		printTokens();
 		void		parseConfigFile();
 		void		configLibrary();
@@ -49,7 +51,6 @@ class EuleeHand
 		void		printServers();
 		void		parseConfigServer();
 		void		perrorExit(std::string msg, int exitTrue = 1);
-
 		void		convertLocation();
 		size_t		addEnv(std::string input);
 		std::string	cgiPath();
@@ -68,14 +69,20 @@ class EuleeHand
 		fd_set								myReadFds, myWriteFds;
 
 	private:
+		size_t			_envpSize;
+		std::string		_configFilePath;
+		ConfigManager	_configManager;
+
+
+		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
+		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
+		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i);
 		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
 		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);
-		std::string		_configFilePath;
-		std::string 	_getFileSize(const std::string &path, const std::string &file_name);
 		std::string 	_getFileCreationTime(const std::string &path, const std::string &file_name);
-		ConfigManager	_configManager;
+		std::string 	_getFileSize(const std::string &path, const std::string &file_name);
 		
 };
 
