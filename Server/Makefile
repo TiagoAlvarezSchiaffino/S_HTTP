@@ -8,7 +8,7 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/04 17:07:25 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/04 15:19:19 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
@@ -32,7 +32,6 @@ SRC			=	WebServer.cpp \
 				EuleePocket.cpp \
 				EuleeWallet.cpp \
 				HttpPostResponse.cpp \
-				HttpDefaultResponse.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
 				HttpDeleteResponse.cpp \

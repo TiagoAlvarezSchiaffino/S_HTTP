@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:58:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:21:37 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@
 # include "EuleeHand.hpp"
 # include "EuleeWallet.hpp"
 # include "HttpPostResponse.hpp"
-# include "HttpDefaultResponse.hpp"
 # include "HttpCgiResponse.hpp"
 # include "HttpGetResponse.hpp"
 # include "HttpDeleteResponse.hpp"

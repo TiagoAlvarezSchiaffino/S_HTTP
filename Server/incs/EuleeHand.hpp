@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:07:27 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:20:23 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ class EuleeHand
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
 		int									socket, serverIndex, useDefaultIndex, useDirectoryListing;
-		std::string							method, methodPath, bufferTemp, locationPath;
+		std::string							method, methodPath, locationPath;
 		fd_set								myReadFds, myWriteFds;
 
 	private:

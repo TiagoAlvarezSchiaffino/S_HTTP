@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:33:13 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:18:50 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/04 15:21:14 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 class HttpPostResponse
 {
 	public:
-		HttpPostResponse(EuleeHand database);
+		HttpPostResponse(EuleeHand *database);
 		~HttpPostResponse();
 		void		handlePost();
 
@@ -28,7 +28,7 @@ class HttpPostResponse
 		void		_normalSave();
 		void		_saveFile();
 
-		EuleeHand	_database;
+		EuleeHand	*_database;
 		size_t		_contentLength;
 		int 		_contentLengthSpecified;
 };
