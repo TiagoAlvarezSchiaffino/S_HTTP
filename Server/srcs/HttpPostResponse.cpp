@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:38:42 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:10:56 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:21:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	HttpPostResponse::_normalSave()
 	if (originalPath.fail())
 	{
 		std::cout << RED << "Directory not found, using upload from config..." << RESET << std::endl;
-		if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].size() == 0)
+		if (this->_database.server[this->_database.serverIndex].location[this->_database.locationPath][UPLOAD].empty())
 			std::cout << RED << "Upload not set in config, cannot save file..." << RESET << std::endl;
 		else
 		{

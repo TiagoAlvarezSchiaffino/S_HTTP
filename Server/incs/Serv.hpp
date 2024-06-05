@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:41:53 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:15:23 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ class Serv
 		void			_acceptConnection();
 		int				_receiveRequest();
 		int				_handleFavicon();
+		int				_handleRedirection();
 		void			_serverLoop();
 
 		ConfigManager	_configManager;

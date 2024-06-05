@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:59:56 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 10:26:35 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/05 11:14:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ enum	Key
 	INDEX, //USING
 	SERVER_NAME, //USING
 	ERROR_PAGE,
-	CLIENT_MAX_BODY_SIZE,
+	CLIENT_MAX_BODY_SIZE, //USING
 	AUTO_INDEX,
-	RETURN, //TBR
+	RETURN,
 	CGI,
 	INCLUDE,
 	UPLOAD, //USING
