@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 07:26:01 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:36:52 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -602,14 +602,23 @@ void	EuleeHand::convertLocation()
 			}
 		}
 		else // Not Found
+		{
+			newPath = myServer[ROOT][0] + newPath;
+			if (this->checkPath(newPath, 1, 0) && newPath[newPath.length() - 1] != '/') // Found file, else found directory
+			{
+				this->methodPath[this->socket] = "/" + newPath;
+				std::cout << GREEN << "Location Path: " << this->locationPath[this->socket] << RESET << std::endl;
+				std::cout << GREEN << "New Path: " << this->methodPath[this->socket] << RESET << std::endl;
+			}
 			return ;
+		}
 	}
 	if (myServer.location[this->locationPath[this->socket]][INDEX].empty()) // No Trailing File -> Append back and find
 	{
 		remainingPath = this->methodPath[this->socket].substr(this->locationPath[this->socket].length());
 		if (myServer[INDEX].empty() == false)
 			indexFile = myServer[INDEX][0];
-		this->methodPath[this->socket] = "/" + (myServer.location[this->locationPath[this->socket]][ROOT].empty() ? myServer[ROOT][0] : myServer.location[this->locationPath[this->socket]][ROOT][0]) + this->locationPath[this->socket] + (this->locationPath[this->socket][this->locationPath[this->socket].length() - 1] == '/' ? "" : "/") + (this->method[this->socket] == "GET" ? indexFile : "");
+		this->methodPath[this->socket] = "/" + (myServer.location[this->locationPath[this->socket]][ROOT].empty() ? myServer[ROOT][0] : myServer.location[this->locationPath[this->socket]][ROOT][0]) + this->locationPath[this->socket] + (this->locationPath[this->socket][this->locationPath[this->socket].length() - 1] == '/' ? "" : "/") + (this->method[this->socket] == "GET" ? indexFile : ""); 
 		this->useDefaultIndex[this->socket] = 1;
 		this->useDirectoryListing[this->socket] = (this->server[this->serverIndex[this->socket]].location[this->locationPath[this->socket]][AUTO_INDEX].size() != 0);
 	}
@@ -664,7 +673,6 @@ int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 		if (this->checkPath(this->server[this->serverIndex[this->socket]].errorPage[statusCode], 1, 0) == 0)
 		{
 			std::cerr << RED << this->server[this->serverIndex[this->socket]].errorPage[statusCode] << " is not found! Default is used. " << RESET <<std::endl;
-
 			std::string codeHolder = "{{error_code}}";
 			std::string msgHolder = "{{error_message}}";
 			baseResponse += extractHTML(WS_ERROR_PAGE_PATH);
