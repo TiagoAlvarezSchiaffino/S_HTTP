@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 03:07:38 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:04:27 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 class Server
 {
 	public:
-		Server(std::string configFilePath, char **envp);
+		Server(std::string configFilePath);
 		~Server();
 		void			runServer();
 

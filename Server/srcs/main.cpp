@@ -8,13 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:53:50 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:05:54 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/Serv.hpp"
 
-int	main(int ac, char **av, char **envp)
+int	main(int ac, char **av)
 {
 	std::string configFile = DEFAULT_CONFIG_PATH;
 
@@ -27,7 +27,7 @@ int	main(int ac, char **av, char **envp)
 		configFile = av[1];
 	std::cout << GREEN "Reading config file : " CYAN << configFile << RESET << std::endl;
 	try {
-		Serv	server(configFile, envp);
+		Serv	server(configFile);
 		server.runServer();
 	}
 	catch (std::exception &e) {

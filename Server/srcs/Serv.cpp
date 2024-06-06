@@ -8,17 +8,15 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 03:16:41 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:28:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/Serv.hpp"
 
-fd_set	readFds_cpy, writeFds_cpy;
-
-Serv::Serv(std::string configFilePath, char **envp)
+Serv::Serv(std::string configFilePath)
 {
-	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath), envp);
+	this->_database = EuleeHand(configFilePath, ConfigManager(configFilePath));
 	this->_configManager = ConfigManager(configFilePath);
 	std::remove(WS_TEMP_FILE_IN);
 	std::remove(WS_TEMP_FILE_OUT);
@@ -38,8 +36,6 @@ void	Serv::runServer()
 	this->_database.parseConfigServer();
 	this->_database.printServers();
 	std::cout << GREEN "Config Server Parsing Done..." RESET << std::endl;
-	this->_database.addEnv("SERVER_PROTOCOL=HTTP/1.1");
-	this->_database.addEnv("HTTP_X_SECRET_HEADER_FOR_TEST=1");
 	this->_setupServer();
 	this->_serverLoop();
 }
@@ -105,19 +101,22 @@ void	Serv::_acceptConnection(int fd)
 	}
 	this->_database.bytes_sent[this->_database.socket] = 0;
 	this->_database.parsed[this->_database.socket] = false;
+	this->_database.connectionCount++;
 	FD_SET(this->_database.socket, &this->_database.myReadFds);
 }
 
 void	Serv::_receiveRequest()
 {
-	char	readBuffer[WS_BUFFER_SIZE];
+	char	readBuffer[WS_BUFFER_SIZE + 1];
 
+	std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 	long	recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
 	while (recvVal > 0)
 	{
 		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
 		std::cout << GREEN << "Receiving total: " << this->_database.buffer[this->_database.socket].size() << "\r" << RESET;
 		std::cout.flush();
+		std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
 		if (recvVal < 0)
 			break ;
@@ -127,6 +126,7 @@ void	Serv::_receiveRequest()
 		std::cout << std::endl;
 		FD_SET(this->_database.socket, &this->_database.myWriteFds);
 		FD_CLR(this->_database.socket, &this->_database.myReadFds);
+		std::cout << "RECV Socket[" << this->_database.socket << "] size: " << this->_database.buffer[this->_database.socket].size() << std::endl;
 	}
 }
 
@@ -155,9 +155,13 @@ void	Serv::_sendResponse()
 
 	std::cout << std::endl;
 	this->_database.bytes_sent[this->_database.socket] = 0;
-	this->_database.buffer[this->_database.socket].clear();
-	this->_database.response[this->_database.socket].clear();
+	this->_database.bytes_sent.erase(this->_database.socket);
+	this->_database.buffer.erase(this->_database.socket);
+	this->_database.response.erase(this->_database.socket);
 	this->_database.parsed.erase(this->_database.socket);
+	this->_database.connectionCount--;
+
+	std::cout << "Sent Socket[" << this->_database.socket << "] size: " << this->_database.buffer[this->_database.socket].size() << std::endl;
 	close(this->_database.socket);
 	FD_CLR(this->_database.socket, &this->_database.myWriteFds);
 	std::cout << YELLOW << "Replied back to " << ++countOut << " connections!" << std::endl;
@@ -212,8 +216,6 @@ int	Serv::_parseRequest()
 	this->_database.convertLocation();
 	if (this->_database.checkClientBodySize())
 		return (1) ;
-
-	this->_database.addEnv("REQUEST_METHOD=" + this->_database.method[this->_database.socket]);
 	return (0);
 }
 
@@ -304,8 +306,12 @@ void	Serv::_serverLoop()
 				isServerFd += (fd == this->_database.serverFd[i]);
 			if (isServerFd)
 			{
-				this->_acceptConnection(fd);
-				std::cout << YELLOW << "Accepted " << ++countIn << " connections!" << std::endl;
+				std::cout << this->_database.connectionCount << std::endl;
+				if (this->_database.connectionCount <= 25)
+				{
+					this->_acceptConnection(fd);
+					std::cout << YELLOW << "Accepted " << ++countIn << " connections!" << std::endl;
+				}
 			}
 			else
 			{
@@ -318,7 +324,10 @@ void	Serv::_serverLoop()
 			if (!FD_ISSET(fd, &writeFds))
 				continue ;
 			this->_database.socket = fd;
-			if (this->_database.parsed[this->_database.socket] == false)
+			int	oneIsParsed = 0;
+			for (size_t i = 0; i < FD_SETSIZE; i++)
+				oneIsParsed += this->_database.parsed[i];
+			if (this->_database.parsed[this->_database.socket] == false && oneIsParsed == 0)
 			{
 				if (this->_parseRequest() == 0)
 					this->_doRequest();

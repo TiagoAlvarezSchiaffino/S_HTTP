@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 03:07:21 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:03:03 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class EuleeHand
 {
 	public:
 		EuleeHand();
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
 		~EuleeHand();
 
 		int			checkPath(std::string path, int	isFile, int isDirectory);
@@ -53,10 +53,10 @@ class EuleeHand
 		void		perrorExit(std::string msg, int exitTrue = 1);
 		void		convertLocation();
 		size_t		addEnv(std::string input);
+		size_t		clearEnv();
 		std::string	cgiPath();
 		std::string	extractHTML(std::string path);
 		std::string directoryListing(std::string path);
-		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
@@ -66,14 +66,13 @@ class EuleeHand
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		int									socket;
+		int									socket, connectionCount;
 		fd_set								myReadFds, myWriteFds;
 
 	private:
 		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
-
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);

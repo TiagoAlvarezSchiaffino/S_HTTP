@@ -8,19 +8,23 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 03:59:00 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:16:12 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
 {
-	this->envp = new char*[100];
-	for (size_t i = 0; envp[i]; ++i)
-		this->addEnv(envp[i]);
+	this->envp = new char*[16];
+	for (size_t i = 0; i < 15; ++i)
+	{
+		this->envp[i] = new char[1000];
+		std::memset(this->envp[i], 0, 1000);
+	}
+	this->envp[16] = NULL;
 }
 
 EuleeHand::~EuleeHand() {}
@@ -391,12 +395,12 @@ int	EuleeHand::checkExcept()
 	return (0);
 }
 
-size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count)
+size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytesRead, int type, int *count)
 {
 	size_t	current_size = 0;
 
 	if (*count > type)
-		buffer2->append(temp, bytes_read);
+		buffer2->append(temp, bytesRead);
 	else
 		{
 		if (buffer1->find("\r\n") != buffer1->length() - 2)
@@ -407,8 +411,8 @@ size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infi
 			{
 				*buffer1 += str;
 				std::memset(temp, 0, WS_BUFFER_SIZE);
-				bytes_read = read(infile, temp, WS_BUFFER_SIZE);
-				current_size += bytes_read;
+				bytesRead = read(infile, temp, WS_BUFFER_SIZE);
+				current_size += bytesRead;
 				std::string	next(temp);
 				str = next;
 				pos = str.find("\r\n");
@@ -467,8 +471,8 @@ int	EuleeHand::unchunkResponse()
 	if (this->buffer[this->socket].find("Transfer-Encoding: chunked") == std::string::npos)
 		return (0);
 	std::vector<std::string>	bufferVector(10, "");
-	long		bytes_read = 0;
-	int			infile = open(WS_UNCHUNK_INFILE, O_RDWR | O_CREAT | O_TRUNC, 0777);
+	long						bytesRead = 0;
+	int							infile = open(WS_UNCHUNK_INFILE, O_RDWR | O_CREAT | O_TRUNC, 0777);
 	write(infile, this->buffer[this->socket].c_str(), this->buffer[this->socket].size());
 	close(infile);
 
@@ -485,38 +489,38 @@ int	EuleeHand::unchunkResponse()
 	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
 	if (total <= 25000000)
 	{
-		while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
+		while ((bytesRead = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 		{
-			bufferVector[0].append(temp, bytes_read);
+			bufferVector[0].append(temp, bytesRead);
 			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
 	else
 	{
 		int	count = 0;
-		while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
+		while ((bytesRead = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 		{
-			current_size += bytes_read;
+			current_size += bytesRead;
 			if (current_size <= total / 10)
-				bufferVector[0].append(temp, bytes_read);
+				bufferVector[0].append(temp, bytesRead);
 			else if (current_size > total / 10 && current_size <= total * 2 / 10)
-				current_size += this->_readFile(&bufferVector[0], &bufferVector[1], infile, temp, bytes_read, 0, &count);
+				current_size += this->_readFile(&bufferVector[0], &bufferVector[1], infile, temp, bytesRead, 0, &count);
 			else if (current_size > total * 2 / 10 && current_size <= total * 3 / 10)
-				current_size += this->_readFile(&bufferVector[1], &bufferVector[2], infile, temp, bytes_read, 1, &count);
+				current_size += this->_readFile(&bufferVector[1], &bufferVector[2], infile, temp, bytesRead, 1, &count);
 			else if (current_size > total * 3 / 10 && current_size <= total * 4 / 10)
-				current_size += this->_readFile(&bufferVector[2], &bufferVector[3], infile, temp, bytes_read, 2, &count);
+				current_size += this->_readFile(&bufferVector[2], &bufferVector[3], infile, temp, bytesRead, 2, &count);
 			else if (current_size > total * 4 / 10 && current_size <= total * 5 / 10)
-				current_size += this->_readFile(&bufferVector[3], &bufferVector[4], infile, temp, bytes_read, 3, &count);
+				current_size += this->_readFile(&bufferVector[3], &bufferVector[4], infile, temp, bytesRead, 3, &count);
 			else if (current_size > total * 5 / 10 && current_size <= total * 6 / 10)
-				current_size += this->_readFile(&bufferVector[4], &bufferVector[5], infile, temp, bytes_read, 4, &count);
+				current_size += this->_readFile(&bufferVector[4], &bufferVector[5], infile, temp, bytesRead, 4, &count);
 			else if (current_size > total * 6 / 10 && current_size <= total * 7 / 10)
-				current_size += this->_readFile(&bufferVector[5], &bufferVector[6], infile, temp, bytes_read, 5, &count);
+				current_size += this->_readFile(&bufferVector[5], &bufferVector[6], infile, temp, bytesRead, 5, &count);
 			else if (current_size > total * 7 / 10 && current_size <= total * 8 / 10)
-				current_size += this->_readFile(&bufferVector[6], &bufferVector[7], infile, temp, bytes_read, 6, &count);
+				current_size += this->_readFile(&bufferVector[6], &bufferVector[7], infile, temp, bytesRead, 6, &count);
 			else if (current_size > total * 8 / 10 && current_size <= total * 9 / 10)
-				current_size += this->_readFile(&bufferVector[7], &bufferVector[8], infile, temp, bytes_read, 7, &count);
+				current_size += this->_readFile(&bufferVector[7], &bufferVector[8], infile, temp, bytesRead, 7, &count);
 			else
-				current_size += this->_readFile(&bufferVector[8], &bufferVector[9], infile, temp, bytes_read, 8, &count);
+				current_size += this->_readFile(&bufferVector[8], &bufferVector[9], infile, temp, bytesRead, 8, &count);
 			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
@@ -534,9 +538,9 @@ int	EuleeHand::unchunkResponse()
 
 	infile = open(WS_UNCHUNK_OUTFILE, O_RDONLY, 0777);
 	this->buffer[this->socket].clear();
-	while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
+	while ((bytesRead = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 	{
-		this->buffer[this->socket].append(temp, bytes_read);
+		this->buffer[this->socket].append(temp, bytesRead);
 		std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 	}
 	close(infile);
@@ -694,29 +698,17 @@ int	EuleeHand::checkClientBodySize()
 size_t	EuleeHand::addEnv(std::string input)
 {
 	size_t	i = 0;
-	std::string	temp = input.substr(0, input.find('='));
-	for (; i < this->_envpSize; ++i)
-	{
-		std::string	str(this->envp[i]);
-		str = str.substr(0, str.find('='));
-		if (str == temp)
-			break ;
-	}
-	if (i == this->_envpSize)
-	{
-		i = 0;
-		this->envp[this->_envpSize] = new char[10000];
-		std::memset(this->envp[this->_envpSize], 0, 10000);
-		for (; input[i]; ++i)
-			this->envp[this->_envpSize][i] = input[i];
-		this->envp[this->_envpSize][i] = '\0';
-		return (++this->_envpSize);
-	}
-	for (size_t j = 0; this->envp[i][j] != '\0'; ++j)
-		this->envp[i][j] = '\0';
-	for (size_t j = 0; input[j]; ++j)
-		this->envp[i][j] = input[j];
-	return (this->_envpSize);
+	for (; input[i]; ++i)
+		this->envp[this->_envpSize][i] = input[i];
+	return (++this->_envpSize);
+}
+
+size_t	EuleeHand::clearEnv()
+{
+	for (size_t i = 0; i < 15; ++i)
+		std::memset(this->envp[i], 0, 1000);
+	this->_envpSize = 0;
+	return (0);
 }
 
 int	EuleeHand::parseHeader()
