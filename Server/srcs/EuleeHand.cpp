@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:16:12 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:33:21 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -476,16 +476,15 @@ int	EuleeHand::unchunkResponse()
 	write(infile, this->buffer[this->socket].c_str(), this->buffer[this->socket].size());
 	close(infile);
 
-	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
-	char		*temp = new char[WS_BUFFER_SIZE + 1];
-    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
-
 	std::ifstream	countSize(WS_UNCHUNK_INFILE);
 	countSize.seekg(0, std::ios::end);
 	size_t	total = countSize.tellg();
 	countSize.seekg(0, std::ios::beg);
 	countSize.close();
-	size_t	current_size = 0;
+
+	size_t		current_size = 0;
+	char		*temp = new char[WS_BUFFER_SIZE + 1];
+    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
 	if (total <= 25000000)
 	{

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:28:50 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:40:03 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,6 @@ void	Serv::_receiveRequest()
 		std::cout << std::endl;
 		FD_SET(this->_database.socket, &this->_database.myWriteFds);
 		FD_CLR(this->_database.socket, &this->_database.myReadFds);
-		std::cout << "RECV Socket[" << this->_database.socket << "] size: " << this->_database.buffer[this->_database.socket].size() << std::endl;
 	}
 }
 
@@ -154,14 +153,11 @@ void	Serv::_sendResponse()
 		return ;
 
 	std::cout << std::endl;
-	this->_database.bytes_sent[this->_database.socket] = 0;
 	this->_database.bytes_sent.erase(this->_database.socket);
 	this->_database.buffer.erase(this->_database.socket);
 	this->_database.response.erase(this->_database.socket);
 	this->_database.parsed.erase(this->_database.socket);
-	this->_database.connectionCount--;
 
-	std::cout << "Sent Socket[" << this->_database.socket << "] size: " << this->_database.buffer[this->_database.socket].size() << std::endl;
 	close(this->_database.socket);
 	FD_CLR(this->_database.socket, &this->_database.myWriteFds);
 	std::cout << YELLOW << "Replied back to " << ++countOut << " connections!" << std::endl;
@@ -201,7 +197,6 @@ int	Serv::_parseRequest()
 	if (this->_database.unchunkResponse())
 		return (1);
 	std::cout << GREEN << "Finished unchunking" << RESET << std::endl;
-
 	std::istringstream	request(this->_database.buffer[this->_database.socket]);
 	request >> this->_database.method[this->_database.socket] >> this->_database.methodPath[this->_database.socket];
 	if (this->_handleFavicon())
@@ -306,12 +301,8 @@ void	Serv::_serverLoop()
 				isServerFd += (fd == this->_database.serverFd[i]);
 			if (isServerFd)
 			{
-				std::cout << this->_database.connectionCount << std::endl;
-				if (this->_database.connectionCount <= 25)
-				{
-					this->_acceptConnection(fd);
-					std::cout << YELLOW << "Accepted " << ++countIn << " connections!" << std::endl;
-				}
+				this->_acceptConnection(fd);
+				std::cout << YELLOW << "Accepted " << ++countIn << " connections!" << std::endl;
 			}
 			else
 			{
