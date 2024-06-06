@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:46:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:16:22 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,10 @@ void	Serv::_acceptConnection(int fd)
 {
 	this->_database.socket = accept(fd, NULL, NULL);
 	if (this->_database.socket == -1)
+	{
 		this->_database.perrorExit("Accept Error", 0);
+		return ;
+	}
 	fcntl(this->_database.socket, F_SETFL, O_NONBLOCK);
 	for (size_t i = 0; i < this->_database.serverFd.size(); i++)
 	{
@@ -110,6 +113,17 @@ void	Serv::_receiveRequest()
 
 	std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 	long	recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
+	if (recvVal <= 0)
+	{
+		this->_database.perrorExit("Recv Error", 0);
+		this->_database.bytes_sent[this->_database.socket] = 0;
+		this->_database.buffer[this->_database.socket].clear();
+		this->_database.response[this->_database.socket].clear();
+		this->_database.parsed.erase(this->_database.socket);
+		close(this->_database.socket);
+		FD_CLR(this->_database.socket, &this->_database.myReadFds);
+		return ;
+	}
 	while (recvVal > 0)
 	{
 		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
@@ -117,7 +131,7 @@ void	Serv::_receiveRequest()
 		std::cout.flush();
 		std::memset(readBuffer, 0, WS_BUFFER_SIZE + 1);
 		recvVal = recv(this->_database.socket, readBuffer, WS_BUFFER_SIZE, 0);
-		if (recvVal < 0)
+		if (recvVal <= 0)
 			break ;
 	}
 	if (this->_database.parseHeader())
@@ -133,7 +147,7 @@ void	Serv::_sendResponse()
 	static int countOut = 0;
 	long	total = this->_database.bytes_sent[this->_database.socket];
 	long	sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str() + total, this->_database.response[this->_database.socket].size() - total, 0);
-	if (sendVal < 0)
+	if (sendVal <= 0)
 	{
 		this->_database.perrorExit("Send Error", 0);
 		this->_database.bytes_sent[this->_database.socket] = 0;
@@ -201,16 +215,16 @@ int	Serv::_parseRequest()
 	if (this->_handleFavicon())
 		return (1);
 
-	std::cout << BLUE << this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n")) << RESET << std::endl;
+	std::string	requestHeader = this->_database.buffer[this->_database.socket].substr(0, this->_database.buffer[this->_database.socket].find("\r\n\r\n"));
+	std::cout << BLUE << requestHeader << RESET << std::endl;
+	this->_database.cookieExist[this->_database.socket] = this->_database.cookieJar.checkCookie(requestHeader);
 
 	if (this->_handleRedirection())
 		return (1) ;
 	if (this->_database.checkExcept())
 		return (1) ;
 	this->_database.convertLocation();
-	if (this->_database.checkClientBodySize())
-		return (1) ;
-	return (0);
+	return (this->_database.checkClientBodySize());
 }
 
 void	Serv::_doRequest()

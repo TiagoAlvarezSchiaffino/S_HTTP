@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:52:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:02:47 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ class EuleeHand
 		std::map<std::string, std::string>	cgi;
 		std::map<int, std::string>			errorpage, statusList, buffer, response, method, methodPath, locationPath;
 		std::map<int, long>					bytes_sent, serverIndex, useDefaultIndex, useDirectoryListing;
-		std::map<int, bool>					parsed;
+		std::map<int, bool>					parsed, cookieExist;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;

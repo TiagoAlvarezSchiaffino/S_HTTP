@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:28:50 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:17:01 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -640,14 +640,13 @@ std::string	EuleeHand::extractHTML(std::string path)
 
 int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 {
-	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + "\r\n";
-	baseResponse += "Content-Type: text/html\r\n";
+	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + "\r\nContent-Type: text/html";
 	if (statusCode == 200 && this->cookieExist[this->socket] == false)
 	{
 		std::cout << GREEN << "Sending Cookie..." << RESET << std::endl;
 		this->cookieJar.generateCookie(this->socket);
 		Cookie	cookie = this->cookieJar[this->socket];
-		baseResponse += "Set-Cookie: " + cookie.key + "=" + cookie.value + "; Expires=" + cookie.expireDate + "\r\n";
+		baseResponse += "\r\nSet-Cookie: " + cookie.key + "=" + cookie.value + "; Expires=" + cookie.expireDate;
 	}
 	baseResponse += "\r\n\r\n";
 	if (responseBody.empty() == false)

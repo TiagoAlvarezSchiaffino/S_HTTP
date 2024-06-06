@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/06 05:40:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:52:16 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:02:33 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,9 @@ class CookieJar
 		CookieJar();
 		~CookieJar();
 
-		Cookie		generateCookie(int socket);
 		Cookie		&operator[](int socket);
+		Cookie		generateCookie(int socket);
+		bool		checkCookie(std::string cookieRequest);
 
 	private:
 		tm 			*_generateExpirationTime(int expireTimeSeconds);

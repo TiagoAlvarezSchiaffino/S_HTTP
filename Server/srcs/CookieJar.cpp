@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/06 05:54:18 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:58:31 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:13:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,4 +59,20 @@ Cookie	CookieJar::generateCookie(int socket)
 Cookie	&CookieJar::operator[](int socket)
 {
 	return (this->_jar[socket]);
+}
+
+bool	CookieJar::checkCookie(std::string requestHeader)
+{
+	size_t cookiePos = requestHeader.find("Cookie: ");
+	if (cookiePos == std::string::npos)
+		return (false);
+	std::string	cookieRequest = requestHeader.substr(cookiePos + std::strlen("Cookie: "), requestHeader.find("\r\n", cookiePos) - cookiePos - std::strlen("Cookie: "));
+	std::string	cookieKey = cookieRequest.substr(0, cookieRequest.find("="));
+	std::string cookieValue = cookieRequest.substr(cookieRequest.find("=") + 1, cookieRequest.find(";") - cookieRequest.find("=") - 1);
+	for (std::map<int, Cookie>::iterator it = this->_jar.begin(); it != this->_jar.end(); it++)
+	{
+		if (it->second.key == cookieKey && it->second.value == cookieValue)
+			return (true);
+	}
+	return (false);
 }

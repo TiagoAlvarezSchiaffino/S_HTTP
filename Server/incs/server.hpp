@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:53:52 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:02:56 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 # define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
 # define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
 # define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
+# define WS_COOKIE_PAGE_PATH	"./html/server_html/cookie.html"
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 # include <map>

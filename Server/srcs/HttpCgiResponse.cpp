@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:06:26 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:17:14 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,5 @@ void    HttpCgiResponse::handleCgi()
 	close(stdinFd);
 	dup2(stdoutFd, STDOUT_FILENO);
 	close(stdoutFd);
-	std::cerr << count << ": Socket: " << this->_database->socket << " done" << std::endl;
 	count++;
 }
