@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:03:03 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:40:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,6 @@
 # include <fcntl.h>
 # include <dirent.h>
 # include <sys/stat.h>
-
-# define WS_BUFFER_SIZE			100000
-# define WS_UNCHUNK_INFILE		".unchunkInfile"
-# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
-# define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
-# define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
 
 class EuleeHand
 {

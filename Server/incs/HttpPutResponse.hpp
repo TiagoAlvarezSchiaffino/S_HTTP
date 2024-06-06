@@ -8,14 +8,14 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 11:46:04 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 14:57:59 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:41:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPPUTRESPONSE_HPP
 # define HTTPPUTRESPONSE_HPP
 
-# include "Serv.hpp"
+# include "EuleeHand.hpp"
 
 class HttpPutResponse
 {

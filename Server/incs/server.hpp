@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:53:31 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:42:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,16 @@
 # define MAGENTA	"\033[1;35m"
 # define CYAN		"\033[1;36m"
 # define WHITE		"\033[1;37m"
+
+# define WS_BACKLOG				10
+# define WS_BUFFER_SIZE			100000
+# define WS_TEMP_FILE_IN		".tempIn"
+# define WS_TEMP_FILE_OUT		".tempOut"
+# define WS_UNCHUNK_INFILE		".unchunkInfile"
+# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
+# define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
+# define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
+# define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 # include <map>
 # include <vector>
@@ -44,6 +54,5 @@
 # include <sys/socket.h>
 # include <sys/select.h>
 # include <netinet/in.h>
-
 
 #endif

@@ -15,22 +15,7 @@
 #ifndef SERV_HPP
 # define SERV_HPP
 
-# include "server.hpp"
 # include "EuleeHand.hpp"
-# include "EuleeWallet.hpp"
-# include "ConfigManager.hpp"
-# include "HttpPostResponse.hpp"
-# include "HttpCgiResponse.hpp"
-# include "HttpGetResponse.hpp"
-# include "HttpDeleteResponse.hpp"
-# include "HttpHeadResponse.hpp"
-# include "HttpPutResponse.hpp"
-
-# define WS_BACKLOG				10
-# define WS_BUFFER_SIZE			100000
-# define WS_TEMP_FILE_IN		".tempIn"
-# define WS_TEMP_FILE_OUT		".tempOut"
-# define DEFAULT_CONFIG_PATH	"conf/default.conf"
 
 class Server
 {
@@ -50,7 +35,6 @@ class Server
 		int				_handleFavicon();
 		int				_handleRedirection();
 
-		ConfigManager	_configManager;
 		EuleeHand		_database;
 };
 

@@ -1,31 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                                            */
-/*   HttpCgiResponse.hpp                                                      */
+/*   http.hpp                                                                 */
 /*                                                                            */
 /*   By: Tiago <tiagoalvarezschiaffino@gmail.com>                             */
 /*                                                             / \__          */
 /*                                                            (    @\___      */
 /*                                                             /         O    */
-/*   Created: 2024/06/03 16:58:46 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:41:10 by Tiago                  /_____/ U         */
+/*   Created: 2024/06/06 04:42:26 by Tiago                    /   (_____/     */
+/*   Updated: 2024/06/06 04:44:41 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPCGIRESPONSE_HPP
-# define HTTPCGIRESPONSE_HPP
+#ifndef HTTP_HPP
+# define HTTP_HPP
 
-# include "EuleeHand.hpp"
-
-class HttpCgiResponse
-{
-	public:
-		HttpCgiResponse(EuleeHand *database);
-		~HttpCgiResponse();
-		void		handleCgi();
-
-	private:
-		EuleeHand	*_database;
-};
+# include "HttpPostResponse.hpp"
+# include "HttpCgiResponse.hpp"
+# include "HttpGetResponse.hpp"
+# include "HttpDeleteResponse.hpp"
+# include "HttpHeadResponse.hpp"
+# include "HttpPutResponse.hpp"
 
 #endif
