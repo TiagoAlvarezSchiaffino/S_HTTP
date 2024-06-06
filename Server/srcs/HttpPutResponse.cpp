@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 12:02:45 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:13:24 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:56:41 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,7 @@ void	HttpPutResponse::handlePut()
 	{
 		std::cout << GREEN << "Put to: " << this->_database->methodPath[this->_database->socket].c_str() + 1 << RESET << std::endl;
 		std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
-		if (contentLengthSpecified)
-			originalPath << toWrite;
-		else
-			originalPath << toWrite;
+		originalPath << toWrite;
 		originalPath.close();
 	}
 	this->_database->sendHttp(200);
