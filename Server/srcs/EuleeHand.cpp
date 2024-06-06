@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:51:13 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:26:01 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -581,8 +581,10 @@ void	EuleeHand::convertLocation()
 			this->locationPath[this->socket] = it->first;
 		}
 	}
+	if (longestPathSize == 0)
+		this->locationPath[this->socket] = "/";
 	newPath = this->methodPath[this->socket];
-	if (methodPathCopy.length() - this->locationPath[this->socket].length() > 1) // Trailing File
+	if (methodPathCopy.length() > this->locationPath[this->socket].length() + 1) // Trailing File
 	{
 		if (myServer.location[this->locationPath[this->socket]][ROOT].size() != 0)
 		{
@@ -607,7 +609,7 @@ void	EuleeHand::convertLocation()
 		remainingPath = this->methodPath[this->socket].substr(this->locationPath[this->socket].length());
 		if (myServer[INDEX].empty() == false)
 			indexFile = myServer[INDEX][0];
-		this->methodPath[this->socket] = "/" + myServer[ROOT][0] + this->locationPath[this->socket] + (this->locationPath[this->socket][this->locationPath[this->socket].length() - 1] == '/' ? "" : "/") + (this->method[this->socket] == "GET" ? indexFile : ""); 
+		this->methodPath[this->socket] = "/" + (myServer.location[this->locationPath[this->socket]][ROOT].empty() ? myServer[ROOT][0] : myServer.location[this->locationPath[this->socket]][ROOT][0]) + this->locationPath[this->socket] + (this->locationPath[this->socket][this->locationPath[this->socket].length() - 1] == '/' ? "" : "/") + (this->method[this->socket] == "GET" ? indexFile : "");
 		this->useDefaultIndex[this->socket] = 1;
 		this->useDirectoryListing[this->socket] = (this->server[this->serverIndex[this->socket]].location[this->locationPath[this->socket]][AUTO_INDEX].size() != 0);
 	}
