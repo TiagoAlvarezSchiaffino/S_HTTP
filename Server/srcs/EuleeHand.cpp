@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:17:01 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:45:11 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,11 @@ void	EuleeHand::printServers()
 				std::cout << it3->first << " ";
 			std::cout << std::endl;
 		}
-		if (this->errorpage.size())
+		if (this->server[i].errorPage.size())
 		{
 			std::cout << ERROR_PAGE << " : ";
-			for (std::map<int, std::string>::iterator it5 = errorpage.begin(); it5 != errorpage.end(); ++it5)
-				std::cout << it5->first << " ";
+			for (std::map<int, std::string>::iterator it8 = this->server[i].errorPage.begin(); it8 != this->server[i].errorPage.end(); ++it8)
+				std::cout << it8->first << " ";
 			std::cout << std::endl;
 		}
 		std::cout << RESET << std::endl;
@@ -149,7 +149,7 @@ bool	isNumeric(const std::string &str)
     return (true);
 }
 
-size_t	EuleeHand::_parseErrorPage(std::vector<Token> &tokens, size_t i)
+size_t	EuleeHand::_parseErrorPage(std::vector<Token> &tokens, size_t i, std::map<int, std::string> &err)
 {
 	if (tokens[i].token == "error_page" && tokens[i].type == KEY)
 	{
@@ -167,7 +167,7 @@ size_t	EuleeHand::_parseErrorPage(std::vector<Token> &tokens, size_t i)
 			this->_configManager.printError("error_page : invalid arguments ", j);
 		std::string	path = tokens[i + size].token;
 		while (isNumeric(tokens[++i].token))
-			this->errorpage[std::atoi(tokens[i].token.c_str())] = path;
+			err[std::atoi(tokens[i].token.c_str())] = path;
 	}
 	return (i);
 }
@@ -208,11 +208,12 @@ size_t	EuleeHand::_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWa
 size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 {
 	EuleeWallet					serv;
+	std::map<int, std::string>	err;
 	std::vector<EuleeWallet>	location;
 
 	while (i < tokens.size() && tokens[i].token != "server")
 	{
-		i = this->_parseErrorPage(tokens, i);
+		i = this->_parseErrorPage(tokens, i, err);
 		i = this->_parseCgi(tokens, i, serv, 1);
 		i = this->_parsingHelper(tokens, i, serv, "root", ROOT);
 		i = this->_parsingHelper(tokens, i, serv, "index", INDEX);
@@ -228,7 +229,7 @@ size_t	EuleeHand::_parseServer(std::vector<Token> &tokens, size_t i)
 			i = this->_parseLocation(tokens, location, ++i);
 		++i;
 	}
-	this->server.push_back(EuleePocket(serv, location));
+	this->server.push_back(EuleePocket(serv, location, err));
 	return (++i);
 }
 
@@ -655,11 +656,12 @@ int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 		return (statusCode);
 	}
 
-	if (this->errorpage.find(statusCode) != this->errorpage.end() && statusCode != 200)
+	if (this->server[this->serverIndex[this->socket]].errorPage.find(statusCode) != this->server[this->serverIndex[this->socket]].errorPage.end() && statusCode != 200)
 	{
-		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
+		std::string	errorPagePath = this->server[this->serverIndex[this->socket]].errorPage.find(statusCode)->second;
+		if (this->checkPath(this->server[this->serverIndex[this->socket]].errorPage[statusCode], 1, 0) == 0)
 		{
-			std::cerr << RED << "Error page is not found! Default is used. " << RESET <<std::endl;
+			std::cerr << RED << this->server[this->serverIndex[this->socket]].errorPage[statusCode] << " is not found! Default is used. " << RESET <<std::endl;
 
 			std::string codeHolder = "{{error_code}}";
 			std::string msgHolder = "{{error_message}}";
@@ -671,12 +673,12 @@ int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 		else
 		{
 			std::cout << GREEN << "Error HTML page is found!" << RESET << std::endl;
-			baseResponse += extractHTML(this->errorpage[statusCode]); // use client page
+			baseResponse += extractHTML(this->server[this->serverIndex[this->socket]].errorPage[statusCode]); // use client page
 		}
 	}
 	else
 	{
-		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
+		if (this->checkPath(this->server[this->serverIndex[this->socket]].errorPage[statusCode], 1, 0) == 0)
 		{
 			if (this->cookieExist[this->socket])
 			{

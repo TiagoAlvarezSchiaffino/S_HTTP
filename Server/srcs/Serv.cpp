@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:16:22 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:46:15 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,7 +299,7 @@ void	Serv::_serverLoop()
 	static int countIn = 0;
 	while (1)
 	{
-		usleep(2000);
+		// usleep(2000);
 		memcpy(&readFds, &this->_database.myReadFds, sizeof(this->_database.myReadFds));
 		memcpy(&writeFds, &this->_database.myWriteFds, sizeof(this->_database.myWriteFds));
 		int	selectVal = select(FD_SETSIZE, &readFds, &writeFds, NULL, &timeout);

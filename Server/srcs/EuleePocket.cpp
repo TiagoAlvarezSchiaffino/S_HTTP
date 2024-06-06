@@ -8,15 +8,15 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:56:40 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:58:47 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:46:07 by Tiago                   /_____/ U        */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleePocket.hpp"
 
-EuleePocket::EuleePocket() : vectorLocation(), location(), portIndex(-1), _server() {}
+EuleePocket::EuleePocket() : vectorLocation(), location(), errorPage(), portIndex(-1), _server() {}
 
-EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation) : vectorLocation(vectorLocation), location(), portIndex(-1), _server(server) {}
+EuleePocket::EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation, std::map<int, std::string> errorPage) : vectorLocation(vectorLocation), location(), errorPage(errorPage), portIndex(-1), _server(server) {}
 
 EuleePocket::~EuleePocket() {}
 

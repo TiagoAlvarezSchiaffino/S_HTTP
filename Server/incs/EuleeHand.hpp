@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:02:47 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:38:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ class EuleeHand
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
-		std::map<int, std::string>			errorpage, statusList, buffer, response, method, methodPath, locationPath;
+		std::map<int, std::string>			statusList, buffer, response, method, methodPath, locationPath;
 		std::map<int, long>					bytes_sent, serverIndex, useDefaultIndex, useDirectoryListing;
 		std::map<int, bool>					parsed, cookieExist;
 		std::vector<EuleePocket>			server;
@@ -79,7 +79,7 @@ class EuleeHand
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);
 		size_t			_parseServer(std::vector<Token> &tokens, size_t i);
-		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i);
+		size_t			_parseErrorPage(std::vector<Token> &tokens, size_t i, std::map<int, std::string> &err);
 		size_t			_parseCgi(std::vector<Token> &tokens, size_t i, EuleeWallet &location, int blockType);
 		size_t			_parseLocation(std::vector<Token> &tokens, std::vector<EuleeWallet> &location, size_t i);
 		size_t			_parsingHelper(std::vector<Token> &tokens, size_t i, EuleeWallet &location, std::string needle, Key key);

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:53:13 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:40:07 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class EuleePocket
 		typedef	value_type::iterator			iterator;
 
 		EuleePocket();
-		EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation);
+		EuleePocket(EuleeWallet server, std::vector<EuleeWallet> vectorLocation, std::map<int, std::string> errorPage);
 		~EuleePocket();
 
 		mapped_type	&operator[](key_type key);
@@ -55,6 +55,7 @@ class EuleePocket
 		// member variable
 		std::vector<EuleeWallet>			vectorLocation;
 		std::map<std::string, EuleeWallet>	location;
+		std::map<int, std::string>			errorPage;
 		int									portIndex;
 
 	private:
