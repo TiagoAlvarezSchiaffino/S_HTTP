@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 08:46:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 19:28:13 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 03:09:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ HttpDeleteResponse::~HttpDeleteResponse() {}
 
 void	HttpDeleteResponse::handleDelete()
 {
-	std::string	filePath = "." + this->_database->methodPath;
+	std::string	filePath = "." + this->_database->methodPath[this->_database->socket];
 	int	result = std::remove(filePath.c_str());
 	if (result != 0)
 	{

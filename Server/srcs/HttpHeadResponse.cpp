@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 09:35:19 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:24:33 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 03:31:28 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,16 @@ HttpHeadResponse::~HttpHeadResponse() {}
 
 void	HttpHeadResponse::handleHead()
 {
-	std::ifstream	file(this->_database->methodPath.c_str() + 1);
+	std::ifstream	file(this->_database->methodPath[this->_database->socket].c_str() + 1);
 	std::string		http = "";
-	if (file.fail() && this->_database->methodPath != "/")
+	if (file.fail() && this->_database->methodPath[this->_database->socket] != "/")
 	{
-		std::cerr << RED << "Error opening " << this->_database->methodPath << "!" << RESET << std::endl;
+		std::cerr << RED << "Error opening " << this->_database->methodPath[this->_database->socket] << "!" << RESET << std::endl;
 		this->_database->sendHttp(404);
 	}
 	else
 	{
-		std::cout << GREEN << "File " << this->_database->methodPath << " found!" << RESET << std::endl;
+		std::cout << GREEN << "File " << this->_database->methodPath[this->_database->socket] << " found!" << RESET << std::endl;
 		this->_database->sendHttp(200);
 	}
 	file.close();

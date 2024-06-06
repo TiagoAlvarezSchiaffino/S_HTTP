@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:38:42 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 15:28:31 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 03:29:10 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,33 +20,33 @@ HttpPostResponse::~HttpPostResponse() {}
 
 void	HttpPostResponse::_normalSave()
 {
-	std::cout << GREEN << "Post to: " << this->_database->methodPath.c_str() + 1 << RESET << std::endl;
-	std::ofstream	originalPath(this->_database->methodPath.c_str() + 1, std::ios::binary);
+	std::cout << GREEN << "Post to: " << this->_database->methodPath[this->_database->socket].c_str() + 1 << RESET << std::endl;
+	std::ofstream	originalPath(this->_database->methodPath[this->_database->socket].c_str() + 1, std::ios::binary);
 	if (originalPath.fail())
 	{
 		std::cout << RED << "Directory not found, using upload from config..." << RESET << std::endl;
-		if (this->_database->server[this->_database->serverIndex].location[this->_database->locationPath][UPLOAD].empty())
+		if (this->_database->server[this->_database->serverIndex[this->_database->socket]].location[this->_database->locationPath[this->_database->socket]][UPLOAD].empty())
 			std::cout << RED << "Upload not set in config, cannot save file..." << RESET << std::endl;
 		else
 		{
 			int	pathCanUse = 0;
-			if (this->_database->methodPath.substr(this->_database->methodPath.find_last_of("/")) == "/")
+			if (this->_database->methodPath[this->_database->socket].substr(this->_database->methodPath[this->_database->socket].find_last_of("/")) == "/")
 			{
 				std::cout << RED << "File to save is a directory..." << RESET << std::endl;
 				return ;
 			}
-			for (size_t i = 0; this->_database->server[this->_database->serverIndex].location[this->_database->locationPath][UPLOAD].size() && pathCanUse == 0; i++)
+			for (size_t i = 0; this->_database->server[this->_database->serverIndex[this->_database->socket]].location[this->_database->locationPath[this->_database->socket]][UPLOAD].size() && pathCanUse == 0; i++)
 			{
-				std::ofstream	locationPath(this->_database->server[this->_database->serverIndex].location[this->_database->locationPath][UPLOAD][i] + this->_database->methodPath.substr(this->_database->methodPath.find_last_of("/")));
-				if (locationPath.fail() == false)
+				std::ofstream	locationPathStream(this->_database->server[this->_database->serverIndex[this->_database->socket]].location[this->_database->locationPath[this->_database->socket]][UPLOAD][i] + this->_database->methodPath[this->_database->socket].substr(this->_database->methodPath[this->_database->socket].find_last_of("/")));
+				if (locationPathStream.fail() == false)
 				{
-					std::cout << GREEN << "Put to: " << this->_database->methodPath.c_str() + 1 << RESET << std::endl;
+					std::cout << GREEN << "Put to: " << this->_database->methodPath[this->_database->socket].c_str() + 1 << RESET << std::endl;
 					std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 					if (this->_contentLengthSpecified)
-						locationPath << toWrite;
+						locationPathStream << toWrite;
 					else
-						locationPath << toWrite;
-					locationPath.close();
+						locationPathStream << toWrite;
+					locationPathStream.close();
 					pathCanUse = 1;
 				}
 			}
@@ -56,7 +56,7 @@ void	HttpPostResponse::_normalSave()
 	}
 	else
 	{
-		std::cout << GREEN << "Put to: " << this->_database->methodPath.c_str() + 1 << RESET << std::endl;
+		std::cout << GREEN << "Put to: " << this->_database->methodPath[this->_database->socket].c_str() + 1 << RESET << std::endl;
 		std::string		toWrite = this->_database->buffer[this->_database->socket].substr(this->_database->buffer[this->_database->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n"));
 		if (this->_contentLengthSpecified)
 			originalPath << toWrite;
@@ -90,7 +90,7 @@ void	HttpPostResponse::_saveFile()
 	if (namePos == std::string::npos)
 	{
 		std::cerr << RED << "No file name found in header! Extracting from path..." << RESET << std::endl;
-		fileName = this->_database->methodPath.substr(this->_database->methodPath.find_last_of("/"));
+		fileName = this->_database->methodPath[this->_database->socket].substr(this->_database->methodPath[this->_database->socket].find_last_of("/"));
 	}
 	else
 	{

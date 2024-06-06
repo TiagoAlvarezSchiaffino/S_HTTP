@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:51:42 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 03:07:21 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,15 @@
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
 
+# include <iostream>
+# include <sstream>
+# include <fcntl.h>
+# include <dirent.h>
+# include <sys/stat.h>
+
 # define WS_BUFFER_SIZE			100000
-# define BUFFER_SIZE			1000
-# define WS_TIMEOUT				0
+# define WS_UNCHUNK_INFILE		".unchunkInfile"
+# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
 # define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
 # define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
 
@@ -54,12 +60,13 @@ class EuleeHand
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
-		std::map<int, std::string>			errorpage, statusList, buffer, response;
+		std::map<int, std::string>			errorpage, statusList, buffer, response, method, methodPath, locationPath;
+		std::map<int, long>					bytes_sent, serverIndex, useDefaultIndex, useDirectoryListing;
+		std::map<int, bool>					parsed;
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		int									socket, serverIndex, useDefaultIndex, useDirectoryListing;
-		std::string							method, methodPath, locationPath;
+		int									socket;
 		fd_set								myReadFds, myWriteFds;
 
 	private:

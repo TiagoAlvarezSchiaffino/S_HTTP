@@ -8,15 +8,15 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 19:18:03 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 03:59:00 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), locationPath(), _envpSize() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), serverIndex(), useDefaultIndex(), method(), methodPath(), locationPath(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
 {
 	this->envp = new char*[100];
 	for (size_t i = 0; envp[i]; ++i)
@@ -248,9 +248,9 @@ std::string EuleeHand::_getFileCreationTime(const std::string &path, const std::
 	int rv = stat((full_path).c_str(), &result);
 	if (rv == 0)
 	{
-    	time_t last_modified_time = result.st_mtime;   
-    	time_t modified_time = static_cast<time_t>(last_modified_time);
-		return (ctime(&modified_time));
+    	std::time_t last_modified_time = result.st_mtime;   
+    	std::time_t modified_time = static_cast<std::time_t>(last_modified_time);
+		return (std::ctime(&modified_time));
     }
 	else if (rv == -1)
     	std::cerr << "File {" <<  full_path << "} not found." << std::endl;
@@ -342,9 +342,7 @@ int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
 {
     std::ifstream   temp(path + "/");
     if (temp.good() && isFile == 1 && isDirectory == 0)
-	{
-    	return (0);
-	}
+        return (0);
 	std::ifstream	file(path);
 	if (file.good()) // is a directory and a file
 	{
@@ -366,23 +364,23 @@ int	EuleeHand::checkPath(std::string path, int isFile, int isDirectory)
 
 int	EuleeHand::isCGI()
 {
-	size_t extensionPos = this->methodPath.find_last_of('.');
+	size_t extensionPos = this->methodPath[this->socket].find_last_of('.');
 	if (extensionPos == std::string::npos)
 		return (0);
-	std::string extension = this->methodPath.substr(extensionPos);
+	std::string extension = this->methodPath[this->socket].substr(extensionPos);
 	return (this->cgi.find(extension) != this->cgi.end());
 }
 
 int	EuleeHand::checkExcept()
 {
-	if (this->server[this->serverIndex].location.find(this->methodPath) == this->server[this->serverIndex].location.end())
+	if (this->server[this->serverIndex[this->socket]].location.find(this->methodPath[this->socket]) == this->server[this->serverIndex[this->socket]].location.end())
 		return (0);
 	int	found = 0;
-	if (this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT].empty())
+	if (this->server[this->serverIndex[this->socket]].location[this->methodPath[this->socket]][LIMIT_EXCEPT].empty())
 		return (0);
-	for (size_t j = 0; j < this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT].size(); j++)
+	for (size_t j = 0; j < this->server[this->serverIndex[this->socket]].location[this->methodPath[this->socket]][LIMIT_EXCEPT].size(); j++)
 	{
-		if (this->server[this->serverIndex].location[this->methodPath][LIMIT_EXCEPT][j] == this->method)
+		if (this->server[this->serverIndex[this->socket]].location[this->methodPath[this->socket]][LIMIT_EXCEPT][j] == this->method[this->socket])
 			found++;
 	}
 	if (found == 0)
@@ -408,7 +406,7 @@ size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infi
 			while (pos == std::string::npos)
 			{
 				*buffer1 += str;
-				memset(temp, 0, WS_BUFFER_SIZE);
+				std::memset(temp, 0, WS_BUFFER_SIZE);
 				bytes_read = read(infile, temp, WS_BUFFER_SIZE);
 				current_size += bytes_read;
 				std::string	next(temp);
@@ -428,7 +426,7 @@ size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infi
 int	EuleeHand::_unchunkIntofile(int fd, std::string bufferIn, int isHeader)
 {
 	if (bufferIn == "")
-		return (0);
+		return (1);
 	size_t		pos = bufferIn.find("\r\n\r\n");
 	std::string	remaining = bufferIn;
 	if (isHeader)
@@ -452,20 +450,14 @@ int	EuleeHand::_unchunkIntofile(int fd, std::string bufferIn, int isHeader)
 		catch(const std::exception& e)
 		{
 			std::cout << "Chunk Error: Hex size is less than chunk size!" << std::endl;
-			this->sendHttp(400);
-			return (1);
 		}
 		if (size == 0)
 			break ;
-		if (size > remaining.size() - strlen("\r\n"))
-		{
+		if (size > remaining.size() - std::strlen("\r\n"))
 			std::cout << "Chunk Error: Hex size is more than remaining size!" << std::endl;
-			this->sendHttp(400);
-			return (1);
-		}
-		std::string	tmp = remaining.substr(pos + strlen("\r\n"), size);
+		std::string	tmp = remaining.substr(pos + std::strlen("\r\n"), size);
 		write(fd, tmp.c_str(), tmp.size());
-		remaining = remaining.substr(pos + size + strlen("\r\n\r\n"));
+		remaining = remaining.substr(pos + size + std::strlen("\r\n\r\n"));
 	}
 	return (0);
 }
@@ -482,7 +474,7 @@ int	EuleeHand::unchunkResponse()
 
 	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
 	char		*temp = new char[WS_BUFFER_SIZE + 1];
-    memset(temp, 0, WS_BUFFER_SIZE + 1);
+    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 
 	std::ifstream	countSize(WS_UNCHUNK_INFILE);
 	countSize.seekg(0, std::ios::end);
@@ -496,7 +488,7 @@ int	EuleeHand::unchunkResponse()
 		while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 		{
 			bufferVector[0].append(temp, bytes_read);
-			memset(temp, 0, WS_BUFFER_SIZE + 1);
+			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
 	else
@@ -525,7 +517,7 @@ int	EuleeHand::unchunkResponse()
 				current_size += this->_readFile(&bufferVector[7], &bufferVector[8], infile, temp, bytes_read, 7, &count);
 			else
 				current_size += this->_readFile(&bufferVector[8], &bufferVector[9], infile, temp, bytes_read, 8, &count);
-			memset(temp, 0, WS_BUFFER_SIZE + 1);
+			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
 	close(infile);
@@ -533,16 +525,11 @@ int	EuleeHand::unchunkResponse()
 	int	outfile = open(WS_UNCHUNK_OUTFILE, O_CREAT | O_TRUNC | O_RDWR, 0777);
 	for (size_t i = 0; i < bufferVector.size(); i++)
 	{
-		if (this->_unchunkIntofile(outfile, bufferVector[i], (i == 0)))
-		{
-			close(outfile);
-			std::remove(WS_UNCHUNK_INFILE);
-			std::remove(WS_UNCHUNK_OUTFILE);
-			delete[] temp;
-			return (1);
-		}
-		std::cout << MAGENTA << "Unchunking: " << i + 1 / bufferVector.size() << "0%\r" << RESET;
+		this->_unchunkIntofile(outfile, bufferVector[i], (i == 0));
+		std::cout << MAGENTA << "Unchunking: " << (i + 1 / bufferVector.size()) + 1 << "0%" << RESET << "\r";
+		std::cout.flush();
 	}
+	std::cout << std::endl;
 	close(outfile);
 
 	infile = open(WS_UNCHUNK_OUTFILE, O_RDONLY, 0777);
@@ -550,7 +537,7 @@ int	EuleeHand::unchunkResponse()
 	while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 	{
 		this->buffer[this->socket].append(temp, bytes_read);
-		memset(temp, 0, WS_BUFFER_SIZE + 1);
+		std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 	}
 	close(infile);
 	std::remove(WS_UNCHUNK_INFILE);
@@ -561,9 +548,9 @@ int	EuleeHand::unchunkResponse()
 
 void	EuleeHand::convertLocation()
 {
-	this->useDefaultIndex = 0;
-	EuleePocket	myServer = this->server[this->serverIndex];
-	std::string	methodPathCopy = this->methodPath.c_str();
+	this->useDefaultIndex[this->socket] = 0;
+	EuleePocket	myServer = this->server[this->serverIndex[this->socket]];
+	std::string	methodPathCopy = this->methodPath[this->socket].c_str();
 	size_t		longestPathSize = 0;
 	std::string	pathToFind, locationRoot, newPath, indexFile, remainingPath;
 	for (std::map<std::string, EuleeWallet>::iterator it = myServer.location.begin(); it != myServer.location.end(); it++)
@@ -571,48 +558,48 @@ void	EuleeHand::convertLocation()
 		if (strncmp(it->first.c_str(), methodPathCopy.c_str(), it->first.length()) == 0 && it->first.length() > longestPathSize)
 		{
 			longestPathSize = it->first.length();
-			this->locationPath = it->first;
+			this->locationPath[this->socket] = it->first;
 		}
 	}
-	newPath = this->methodPath;
-	if (methodPathCopy.length() - this->locationPath.length() > 1) // Trailing File
+	newPath = this->methodPath[this->socket];
+	if (methodPathCopy.length() - this->locationPath[this->socket].length() > 1) // Trailing File
 	{
-		if (myServer.location[this->locationPath][ROOT].size() != 0)
+		if (myServer.location[this->locationPath[this->socket]][ROOT].size() != 0)
 		{
-			locationRoot = myServer.location[this->locationPath][ROOT][0];
-			newPath = locationRoot + methodPathCopy.substr(this->locationPath.length());
+			locationRoot = myServer.location[this->locationPath[this->socket]][ROOT][0];
+			newPath = locationRoot + methodPathCopy.substr(this->locationPath[this->socket].length());
 		}
 		if (this->checkPath(newPath, 1, 1)) // Either file or directory
 		{
 			if (this->checkPath(newPath, 1, 0) && newPath[newPath.length() - 1] != '/') // Found file, else found directory
 			{
-				this->methodPath = "/" + newPath;
-				std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
-				std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
+				this->methodPath[this->socket] = "/" + newPath;
+				std::cout << GREEN << "Location Path: " << this->locationPath[this->socket] << RESET << std::endl;
+				std::cout << GREEN << "New Path: " << this->methodPath[this->socket] << RESET << std::endl;
 				return ;
 			}
 		}
 		else // Not Found
 			return ;
 	}
-	if (myServer.location[this->locationPath][INDEX].empty()) // No Trailing File -> Append back and find
+	if (myServer.location[this->locationPath[this->socket]][INDEX].empty()) // No Trailing File -> Append back and find
 	{
-		remainingPath = this->methodPath.substr(this->locationPath.length());
+		remainingPath = this->methodPath[this->socket].substr(this->locationPath[this->socket].length());
 		if (myServer[INDEX].empty() == false)
 			indexFile = myServer[INDEX][0];
-		this->methodPath = "/" + myServer[ROOT][0] + this->locationPath + (this->locationPath[this->locationPath.length() - 1] == '/' ? "" : "/") + (this->method == "GET" ? indexFile : ""); 
-		this->useDefaultIndex = 1;
-		this->useDirectoryListing = (this->server[this->serverIndex].location[this->locationPath][AUTO_INDEX].size() != 0);
+		this->methodPath[this->socket] = "/" + myServer[ROOT][0] + this->locationPath[this->socket] + (this->locationPath[this->socket][this->locationPath[this->socket].length() - 1] == '/' ? "" : "/") + (this->method[this->socket] == "GET" ? indexFile : ""); 
+		this->useDefaultIndex[this->socket] = 1;
+		this->useDirectoryListing[this->socket] = (this->server[this->serverIndex[this->socket]].location[this->locationPath[this->socket]][AUTO_INDEX].size() != 0);
 	}
 	else // Using Index
 	{
-		locationRoot = myServer.location[this->locationPath][ROOT][0];
-		remainingPath = methodPathCopy.erase(0, this->locationPath.length());
-		indexFile = myServer.location[this->locationPath][INDEX][0];
-		this->methodPath = "/" + myServer.location[this->locationPath][ROOT][0] + remainingPath + ((remainingPath[remainingPath.length() - 1] == '/') ? "" : "/") + indexFile;
+		locationRoot = myServer.location[this->locationPath[this->socket]][ROOT][0];
+		remainingPath = methodPathCopy.erase(0, this->locationPath[this->socket].length());
+		indexFile = myServer.location[this->locationPath[this->socket]][INDEX][0];
+		this->methodPath[this->socket] = "/" + myServer.location[this->locationPath[this->socket]][ROOT][0] + remainingPath + ((remainingPath[remainingPath.length() - 1] == '/') ? "" : "/") + indexFile;
 	}
-	std::cout << GREEN << "Location Path: " << this->locationPath << RESET << std::endl;
-	std::cout << GREEN << "New Path: " << this->methodPath << RESET << std::endl;
+	std::cout << GREEN << "Location Path: " << this->locationPath[this->socket] << RESET << std::endl;
+	std::cout << GREEN << "New Path: " << this->methodPath[this->socket] << RESET << std::endl;
 }
 
 std::string	EuleeHand::extractHTML(std::string path)
@@ -676,9 +663,9 @@ int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
 
 std::string	EuleeHand::cgiPath()
 {
-	if (this->methodPath.find_last_of(".") == std::string::npos)
+	if (this->methodPath[this->socket].find_last_of(".") == std::string::npos)
 		return ("");
-	std::string	temp = this->methodPath.substr(this->methodPath.find_last_of("."));
+	std::string	temp = this->methodPath[this->socket].substr(this->methodPath[this->socket].find_last_of("."));
 	for (std::map<std::string, std::string>::iterator it = cgi.begin(); it != cgi.end(); ++it)
 	{
 		if (temp == it->first)
@@ -690,11 +677,11 @@ std::string	EuleeHand::cgiPath()
 int	EuleeHand::checkClientBodySize()
 {
 	size_t	clientMaxBodySize = std::numeric_limits<std::size_t>::max();
-	if (this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE].size() != 0)
-		clientMaxBodySize = std::stoul(this->server[this->serverIndex][CLIENT_MAX_BODY_SIZE][0]);
-	if (this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE].size() != 0)
-		clientMaxBodySize = std::min(clientMaxBodySize, std::stoul(this->server[this->serverIndex].location[this->locationPath][CLIENT_MAX_BODY_SIZE][0]));
-	size_t	startPos = this->buffer[this->socket].find("\r\n\r\n") + strlen("\r\n\r\n");
+	if (this->server[this->serverIndex[this->socket]][CLIENT_MAX_BODY_SIZE].size() != 0)
+		clientMaxBodySize = std::stoul(this->server[this->serverIndex[this->socket]][CLIENT_MAX_BODY_SIZE][0]);
+	if (this->server[this->serverIndex[this->socket]].location[this->locationPath[this->socket]][CLIENT_MAX_BODY_SIZE].size() != 0)
+		clientMaxBodySize = std::min(clientMaxBodySize, std::stoul(this->server[this->serverIndex[this->socket]].location[this->locationPath[this->socket]][CLIENT_MAX_BODY_SIZE][0]));
+	size_t	startPos = this->buffer[this->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n");
 	if (this->buffer[this->socket].length() - startPos > clientMaxBodySize)
 	{
 		std::cout << RED << "Client Body Size Exceeded!" << RESET << std::endl;
@@ -719,7 +706,7 @@ size_t	EuleeHand::addEnv(std::string input)
 	{
 		i = 0;
 		this->envp[this->_envpSize] = new char[10000];
-		memset(this->envp[this->_envpSize], 0, 10000);
+		std::memset(this->envp[this->_envpSize], 0, 10000);
 		for (; input[i]; ++i)
 			this->envp[this->_envpSize][i] = input[i];
 		this->envp[this->_envpSize][i] = '\0';
@@ -738,7 +725,7 @@ int	EuleeHand::parseHeader()
 	if (headerEndPos == std::string::npos)
 		return (0);
 	std::istringstream	request(this->buffer[this->socket]);
-	request >> this->method >> this->methodPath;
+	request >> this->method[this->socket] >> this->methodPath[this->socket];
 
 	size_t	transferEncoding = this->buffer[this->socket].find("Transfer-Encoding: chunked");
 	if (transferEncoding != std::string::npos)
@@ -747,9 +734,9 @@ int	EuleeHand::parseHeader()
 	size_t	contentLenghtPos = this->buffer[this->socket].find("Content-Length: ");
 	if (contentLenghtPos != std::string::npos)
 	{
-		std::string contentLenghtStr = this->buffer[this->socket].substr(contentLenghtPos + strlen("Content-Length: "));
+		std::string contentLenghtStr = this->buffer[this->socket].substr(contentLenghtPos + std::strlen("Content-Length: "));
 		size_t	contentLenght = std::stoul(contentLenghtStr.substr(0, contentLenghtStr.find("\r\n")));
-		std::string	messageBody = this->buffer[this->socket].substr(headerEndPos + strlen("\r\n\r\n"));
+		std::string	messageBody = this->buffer[this->socket].substr(headerEndPos + std::strlen("\r\n\r\n"));
 		return (messageBody.length() >= (size_t)contentLenght);
 	}
 	return (1);

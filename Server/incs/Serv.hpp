@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 19:26:08 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 03:07:38 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 
 # define WS_BACKLOG				10
 # define WS_BUFFER_SIZE			100000
-# define WS_TESTER_SIZE			100000
 # define WS_TEMP_FILE_IN		".tempIn"
 # define WS_TEMP_FILE_OUT		".tempOut"
 # define DEFAULT_CONFIG_PATH	"conf/default.conf"
