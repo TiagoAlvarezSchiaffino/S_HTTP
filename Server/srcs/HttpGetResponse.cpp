@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:55:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 03:36:53 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:07:16 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,5 @@ void	HttpGetResponse::handleGet()
 	}
 	file.close();
 
-	this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\nContent-Type: */*\r\nContent-Length: " + std::to_string(file_size) + "\r\n\r\n" + fileContents;
+	this->_database->sendHttp(200, fileContents);
 }

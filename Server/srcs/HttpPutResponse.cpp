@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 12:02:45 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 03:22:34 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:13:24 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,15 @@ void	HttpPutResponse::handlePut()
 	std::ofstream	originalPath(this->_database->methodPath[this->_database->socket].c_str() + 1, std::ios::binary);
 	if (originalPath.fail())
 	{
-		std::cout << RED << "Directory not found, using upload from config..." << RESET << std::endl;
+		std::cerr << RED << "Directory not found, using upload from config..." << RESET << std::endl;
 		if (this->_database->server[this->_database->serverIndex[this->_database->socket]].location[this->_database->locationPath[this->_database->socket]][UPLOAD].empty())
-			std::cout << RED << "Upload not set in config, cannot save file..." << RESET << std::endl;
+			std::cerr << RED << "Upload not set in config, cannot save file..." << RESET << std::endl;
 		else
 		{
 			int	pathCanUse = 0;
 			if (this->_database->methodPath[this->_database->socket].substr(this->_database->methodPath[this->_database->socket].find_last_of("/")) == "/")
 			{
-				std::cout << RED << "File to save is a directory..." << RESET << std::endl;
+				std::cerr << RED << "File to save is a directory..." << RESET << std::endl;
 				return ;
 			}
 			for (size_t i = 0; this->_database->server[this->_database->serverIndex[this->_database->socket]].location[this->_database->locationPath[this->_database->socket]][UPLOAD].size() && pathCanUse == 0; i++)
@@ -60,7 +60,7 @@ void	HttpPutResponse::handlePut()
 				}
 			}
 			if (pathCanUse == 0)
-				std::cout << RED << "Upload path cannot be used to save file..." << RESET << std::endl;
+				std::cerr << RED << "Upload path cannot be used to save file..." << RESET << std::endl;
 		}
 	}
 	else

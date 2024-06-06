@@ -8,11 +8,10 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:46:01 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:46:20 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../incs/http.hpp"
 #include "../incs/Serv.hpp"
 
 Serv::Serv(std::string configFilePath)
@@ -173,7 +172,7 @@ int	Serv::_handleFavicon()
 {
 	if (this->_database.methodPath[this->_database.socket] != "/favicon.ico")
 		return (0);
-	std::cout << RED << "Go away favicon" << RESET << std::endl;
+	std::cerr << RED << "Go away favicon" << RESET << std::endl;
 	this->_database.sendHttp(404);
 	return (1);
 }
@@ -257,7 +256,7 @@ void	Serv::_doRequest()
 	}
 	catch(const std::exception& e)
 	{
-		std::cout << RED << e.what() << RESET << '\n';
+		std::cerr << RED << e.what() << RESET << '\n';
 		std::remove(WS_TEMP_FILE_IN);
 		std::remove(WS_TEMP_FILE_OUT);
 		this->_database.sendHttp(500);

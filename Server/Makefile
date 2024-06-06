@@ -8,7 +8,7 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/06 04:40:47 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/06 04:46:35 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
@@ -28,6 +28,7 @@ MAIN		=	srcs/main.cpp
 SRC			=	WebServer.cpp \
 				ConfigManager.cpp \
 				Token.cpp \
+				Cookies.cpp \
 				EuleeHand.cpp \
 				EuleePocket.cpp \
 				EuleeWallet.cpp \

@@ -8,23 +8,19 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:33:21 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:04:26 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "EuleeHand.hpp"
 
-EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize() {}
+EuleeHand::EuleeHand() : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize() {}
 
-EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), connectionCount(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
+EuleeHand::EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp) : envp(), cgi(), statusList(), buffer(), server(), serverFd(), serverAddr(), socket(), _envpSize(), _configFilePath(configFilePath), _configManager(configManager)
 {
-	this->envp = new char*[16];
-	for (size_t i = 0; i < 15; ++i)
-	{
-		this->envp[i] = new char[1000];
-		std::memset(this->envp[i], 0, 1000);
-	}
-	this->envp[16] = NULL;
+	this->envp = new char*[100];
+	for (size_t i = 0; envp[i]; ++i)
+		this->addEnv(envp[i]);
 }
 
 EuleeHand::~EuleeHand() {}
@@ -395,12 +391,12 @@ int	EuleeHand::checkExcept()
 	return (0);
 }
 
-size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytesRead, int type, int *count)
+size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count)
 {
 	size_t	current_size = 0;
 
 	if (*count > type)
-		buffer2->append(temp, bytesRead);
+		buffer2->append(temp, bytes_read);
 	else
 		{
 		if (buffer1->find("\r\n") != buffer1->length() - 2)
@@ -411,8 +407,8 @@ size_t	EuleeHand::_readFile(std::string *buffer1, std::string *buffer2, int infi
 			{
 				*buffer1 += str;
 				std::memset(temp, 0, WS_BUFFER_SIZE);
-				bytesRead = read(infile, temp, WS_BUFFER_SIZE);
-				current_size += bytesRead;
+				bytes_read = read(infile, temp, WS_BUFFER_SIZE);
+				current_size += bytes_read;
 				std::string	next(temp);
 				str = next;
 				pos = str.find("\r\n");
@@ -471,55 +467,56 @@ int	EuleeHand::unchunkResponse()
 	if (this->buffer[this->socket].find("Transfer-Encoding: chunked") == std::string::npos)
 		return (0);
 	std::vector<std::string>	bufferVector(10, "");
-	long						bytesRead = 0;
-	int							infile = open(WS_UNCHUNK_INFILE, O_RDWR | O_CREAT | O_TRUNC, 0777);
+	long		bytes_read = 0;
+	int			infile = open(WS_UNCHUNK_INFILE, O_RDWR | O_CREAT | O_TRUNC, 0777);
 	write(infile, this->buffer[this->socket].c_str(), this->buffer[this->socket].size());
 	close(infile);
+
+	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
+	char		*temp = new char[WS_BUFFER_SIZE + 1];
+    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 
 	std::ifstream	countSize(WS_UNCHUNK_INFILE);
 	countSize.seekg(0, std::ios::end);
 	size_t	total = countSize.tellg();
 	countSize.seekg(0, std::ios::beg);
 	countSize.close();
-
-	size_t		current_size = 0;
-	char		*temp = new char[WS_BUFFER_SIZE + 1];
-    std::memset(temp, 0, WS_BUFFER_SIZE + 1);
+	size_t	current_size = 0;
 	infile = open(WS_UNCHUNK_INFILE, O_RDONLY, 0777);
 	if (total <= 25000000)
 	{
-		while ((bytesRead = read(infile, temp, WS_BUFFER_SIZE)) > 0)
+		while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 		{
-			bufferVector[0].append(temp, bytesRead);
+			bufferVector[0].append(temp, bytes_read);
 			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
 	else
 	{
 		int	count = 0;
-		while ((bytesRead = read(infile, temp, WS_BUFFER_SIZE)) > 0)
+		while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 		{
-			current_size += bytesRead;
+			current_size += bytes_read;
 			if (current_size <= total / 10)
-				bufferVector[0].append(temp, bytesRead);
+				bufferVector[0].append(temp, bytes_read);
 			else if (current_size > total / 10 && current_size <= total * 2 / 10)
-				current_size += this->_readFile(&bufferVector[0], &bufferVector[1], infile, temp, bytesRead, 0, &count);
+				current_size += this->_readFile(&bufferVector[0], &bufferVector[1], infile, temp, bytes_read, 0, &count);
 			else if (current_size > total * 2 / 10 && current_size <= total * 3 / 10)
-				current_size += this->_readFile(&bufferVector[1], &bufferVector[2], infile, temp, bytesRead, 1, &count);
+				current_size += this->_readFile(&bufferVector[1], &bufferVector[2], infile, temp, bytes_read, 1, &count);
 			else if (current_size > total * 3 / 10 && current_size <= total * 4 / 10)
-				current_size += this->_readFile(&bufferVector[2], &bufferVector[3], infile, temp, bytesRead, 2, &count);
+				current_size += this->_readFile(&bufferVector[2], &bufferVector[3], infile, temp, bytes_read, 2, &count);
 			else if (current_size > total * 4 / 10 && current_size <= total * 5 / 10)
-				current_size += this->_readFile(&bufferVector[3], &bufferVector[4], infile, temp, bytesRead, 3, &count);
+				current_size += this->_readFile(&bufferVector[3], &bufferVector[4], infile, temp, bytes_read, 3, &count);
 			else if (current_size > total * 5 / 10 && current_size <= total * 6 / 10)
-				current_size += this->_readFile(&bufferVector[4], &bufferVector[5], infile, temp, bytesRead, 4, &count);
+				current_size += this->_readFile(&bufferVector[4], &bufferVector[5], infile, temp, bytes_read, 4, &count);
 			else if (current_size > total * 6 / 10 && current_size <= total * 7 / 10)
-				current_size += this->_readFile(&bufferVector[5], &bufferVector[6], infile, temp, bytesRead, 5, &count);
+				current_size += this->_readFile(&bufferVector[5], &bufferVector[6], infile, temp, bytes_read, 5, &count);
 			else if (current_size > total * 7 / 10 && current_size <= total * 8 / 10)
-				current_size += this->_readFile(&bufferVector[6], &bufferVector[7], infile, temp, bytesRead, 6, &count);
+				current_size += this->_readFile(&bufferVector[6], &bufferVector[7], infile, temp, bytes_read, 6, &count);
 			else if (current_size > total * 8 / 10 && current_size <= total * 9 / 10)
-				current_size += this->_readFile(&bufferVector[7], &bufferVector[8], infile, temp, bytesRead, 7, &count);
+				current_size += this->_readFile(&bufferVector[7], &bufferVector[8], infile, temp, bytes_read, 7, &count);
 			else
-				current_size += this->_readFile(&bufferVector[8], &bufferVector[9], infile, temp, bytesRead, 8, &count);
+				current_size += this->_readFile(&bufferVector[8], &bufferVector[9], infile, temp, bytes_read, 8, &count);
 			std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 		}
 	}
@@ -537,9 +534,9 @@ int	EuleeHand::unchunkResponse()
 
 	infile = open(WS_UNCHUNK_OUTFILE, O_RDONLY, 0777);
 	this->buffer[this->socket].clear();
-	while ((bytesRead = read(infile, temp, WS_BUFFER_SIZE)) > 0)
+	while ((bytes_read = read(infile, temp, WS_BUFFER_SIZE)) > 0)
 	{
-		this->buffer[this->socket].append(temp, bytesRead);
+		this->buffer[this->socket].append(temp, bytes_read);
 		std::memset(temp, 0, WS_BUFFER_SIZE + 1);
 	}
 	close(infile);
@@ -612,7 +609,6 @@ std::string	EuleeHand::extractHTML(std::string path)
 	if (!file.is_open())
 	{
 		std::cerr << RED << "Error: Could not open html" << RESET << std::endl;
-
 		return ("");
 	}
 	std::string extract;
@@ -623,41 +619,42 @@ std::string	EuleeHand::extractHTML(std::string path)
 	return (extract);
 }
 
-int		EuleeHand::sendHttp(int statusCode, std::string htmlPath)
+int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 {
-	if (this->statusList.find(statusCode) == this->statusList.end())
+	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
+	if (responseBody.empty() == false)
 	{
-		std::cerr << RED << "Cannot find status code!" << RESET << std::endl;
-		std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
+		this->response[this->socket] = baseResponse + responseBody;
 		return (statusCode);
 	}
-	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + " \r\n\r\n";
-	if (htmlPath.empty() && statusCode != 200)
-		htmlPath = WS_ERROR_PAGE_PATH;
-	else if (htmlPath.empty())
-		htmlPath = WS_DEFAULT_PAGE_PATH;
-	else
-	{
-		if (this->checkPath(htmlPath, 1, 0) == 0)
-		{
-			statusCode = 404;
-			htmlPath = WS_ERROR_PAGE_PATH;
-		}
-	}
-	
-	std::string	htmlPage = extractHTML(htmlPath);
-	if (htmlPage.empty() == false)
-	{
-		std::string code = "{{error_code}}";
-		std::string msg = "{{error_message}}";
 
-		baseResponse += htmlPage;
-		if (statusCode != 200)
+	if (this->errorpage.find(statusCode) != this->errorpage.end())
+	{
+		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
 		{
+			std::cerr << RED << "Error page is not found! Default is used. " << RESET <<std::endl;
+
+			std::string code = "{{error_code}}";
+			std::string msg = "{{error_message}}";
+			baseResponse += extractHTML(WS_ERROR_PAGE_PATH);
+		
 			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
 			baseResponse.replace(baseResponse.find(code), code.length(), std::to_string(statusCode));	
 			baseResponse.replace(baseResponse.find(msg), msg.length(), this->statusList[statusCode]);
 		}
+		else
+		{
+			std::cout << GREEN << "Error HTML page is found!" << RESET << std::endl;
+			baseResponse += extractHTML(this->errorpage[statusCode]); // use client page
+		}
+	}
+	else
+	{
+		if (this->checkPath(this->errorpage[statusCode], 1, 0) == 0)
+			baseResponse += extractHTML(WS_DEFAULT_PAGE_PATH);
+		else
+			baseResponse += extractHTML(methodPath[this->socket]);
+
 	}
 	this->response[this->socket] = baseResponse;
 	std::cout << MAGENTA << "Returned " << statusCode << "!" << RESET << std::endl;
@@ -687,7 +684,7 @@ int	EuleeHand::checkClientBodySize()
 	size_t	startPos = this->buffer[this->socket].find("\r\n\r\n") + std::strlen("\r\n\r\n");
 	if (this->buffer[this->socket].length() - startPos > clientMaxBodySize)
 	{
-		std::cout << RED << "Client Body Size Exceeded!" << RESET << std::endl;
+		std::cerr << RED << "Client Body Size Exceeded!" << RESET << std::endl;
 		this->sendHttp(413);
 		return (1);
 	}
@@ -697,17 +694,29 @@ int	EuleeHand::checkClientBodySize()
 size_t	EuleeHand::addEnv(std::string input)
 {
 	size_t	i = 0;
-	for (; input[i]; ++i)
-		this->envp[this->_envpSize][i] = input[i];
-	return (++this->_envpSize);
-}
-
-size_t	EuleeHand::clearEnv()
-{
-	for (size_t i = 0; i < 15; ++i)
-		std::memset(this->envp[i], 0, 1000);
-	this->_envpSize = 0;
-	return (0);
+	std::string	temp = input.substr(0, input.find('='));
+	for (; i < this->_envpSize; ++i)
+	{
+		std::string	str(this->envp[i]);
+		str = str.substr(0, str.find('='));
+		if (str == temp)
+			break ;
+	}
+	if (i == this->_envpSize)
+	{
+		i = 0;
+		this->envp[this->_envpSize] = new char[10000];
+		std::memset(this->envp[this->_envpSize], 0, 10000);
+		for (; input[i]; ++i)
+			this->envp[this->_envpSize][i] = input[i];
+		this->envp[this->_envpSize][i] = '\0';
+		return (++this->_envpSize);
+	}
+	for (size_t j = 0; this->envp[i][j] != '\0'; ++j)
+		this->envp[i][j] = '\0';
+	for (size_t j = 0; input[j]; ++j)
+		this->envp[i][j] = input[j];
+	return (this->_envpSize);
 }
 
 int	EuleeHand::parseHeader()

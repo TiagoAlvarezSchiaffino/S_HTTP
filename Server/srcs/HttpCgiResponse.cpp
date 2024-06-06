@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:36:48 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:06:26 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void    HttpCgiResponse::handleCgi()
 	size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
 	std::string newOutput = output.substr(startPos);
 
-	this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + newOutput;
+	this->_database->sendHttp(200, newOutput);
 	std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
 	std::remove(inFileName.c_str());
 	std::remove(outFileName.c_str());

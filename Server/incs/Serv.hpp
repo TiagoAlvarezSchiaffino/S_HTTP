@@ -8,14 +8,19 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:48:14 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:04:27 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:46:13 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERV_HPP
 # define SERV_HPP
 
-# include "EuleeHand.hpp"
+# include "HttpPostResponse.hpp"
+# include "HttpCgiResponse.hpp"
+# include "HttpGetResponse.hpp"
+# include "HttpDeleteResponse.hpp"
+# include "HttpHeadResponse.hpp"
+# include "HttpPutResponse.hpp"
 
 class Server
 {

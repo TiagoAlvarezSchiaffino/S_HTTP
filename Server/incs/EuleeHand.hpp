@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:40:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 04:57:10 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
+# include "Cookies.hpp"
 
 # include <iostream>
 # include <sstream>
@@ -24,15 +25,21 @@
 # include <dirent.h>
 # include <sys/stat.h>
 
+# define WS_BUFFER_SIZE			100000
+# define WS_UNCHUNK_INFILE		".unchunkInfile"
+# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
+# define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
+# define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
+
 class EuleeHand
 {
 	public:
 		EuleeHand();
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
 		~EuleeHand();
 
 		int			checkPath(std::string path, int	isFile, int isDirectory);
-		int			sendHttp(int statusCode, std::string htmlPath = "");
+		int			sendHttp(int statusCode, std::string responseBody = "");
 		int			isCGI();
 		int			checkExcept();
 		int			checkClientBodySize();
@@ -47,10 +54,10 @@ class EuleeHand
 		void		perrorExit(std::string msg, int exitTrue = 1);
 		void		convertLocation();
 		size_t		addEnv(std::string input);
-		size_t		clearEnv();
 		std::string	cgiPath();
 		std::string	extractHTML(std::string path);
 		std::string directoryListing(std::string path);
+		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
@@ -60,13 +67,15 @@ class EuleeHand
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		int									socket, connectionCount;
+		int									socket;
 		fd_set								myReadFds, myWriteFds;
 
 	private:
 		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
+		CookieJar		_cookiesDB;
+
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);
