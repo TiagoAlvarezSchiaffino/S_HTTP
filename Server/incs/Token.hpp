@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:55:33 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:52:30 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:53:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ enum Type
 struct Token
 {
 	Token(std::string context, Type type, int lineNum);
-	~Token(void);
+	~Token();
 
 	Type		type;
 	std::string	token;

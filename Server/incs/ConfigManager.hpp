@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:50:58 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:40:30 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,15 @@
 class ConfigManager
 {
 	public:
-		ConfigManager(void);
+		ConfigManager();
 		ConfigManager(std::string configFilePath);
-		~ConfigManager(void);
+		~ConfigManager();
 
 		ConfigManager		&operator=(const ConfigManager &ref);
 
-		void			parseConfigFile(void);
-		void			printTokens(void);
-		void			configLibrary(void);
+		void			parseConfigFile();
+		void			printTokens();
+		void			configLibrary();
 
 		void			checkImportantCheck(int i);
 		bool			checkCompulsories(int i);
@@ -41,11 +41,11 @@ class ConfigManager
 		int				checkCloseBrace(int i, int previous, int *braces, int *main_block);
 
 		int				locationBlock(size_t i);
-		void			errorHandleShit(void);
+		void			errorHandleShit();
 
 		// Utils
 		void				printError(std::string str, int i);
-		std::vector<Token>	&getToken(void);
+		std::vector<Token>	&getToken();
 
 	private:
 		void						_lexLine(std::string line, int lineNum);

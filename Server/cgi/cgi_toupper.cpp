@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/05 10:35:10 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/05 11:48:31 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:40:16 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 # define WS_BUFFER_SIZE 100000000
 
-int    main(void)
+int    main()
 {
     char	*buffer = new char[WS_BUFFER_SIZE];
 	std::cin.getline(buffer, WS_BUFFER_SIZE);

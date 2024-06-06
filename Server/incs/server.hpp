@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:42:50 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:53:52 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # define WHITE		"\033[1;37m"
 
 # define WS_BACKLOG				10
+# define WS_COOKIE_EXPIRE_TIME	30
 # define WS_BUFFER_SIZE			100000
 # define WS_TEMP_FILE_IN		".tempIn"
 # define WS_TEMP_FILE_OUT		".tempOut"

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 02:01:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 11:16:20 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:59:10 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,4 +16,4 @@
 
 Token::Token(std::string token, Type type, int lineNum): type(type), token(token), lineNum(lineNum) {}
 
-Token::~Token(void) {}
+Token::~Token() {}

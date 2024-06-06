@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 04:57:10 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:52:58 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 # include "EuleePocket.hpp"
 # include "ConfigManager.hpp"
-# include "Cookies.hpp"
+# include "CookieJar.hpp"
 
 # include <iostream>
 # include <sstream>
@@ -69,13 +69,12 @@ class EuleeHand
 		std::vector<sockaddr_in>			serverAddr;
 		int									socket;
 		fd_set								myReadFds, myWriteFds;
+		CookieJar							cookieJar;
 
 	private:
 		size_t			_envpSize;
 		std::string		_configFilePath;
 		ConfigManager	_configManager;
-		CookieJar		_cookiesDB;
-
 
 		int				_unchunkIntofile(int fd, std::string buffer, int isHeader);
 		size_t			_readFile(std::string *buffer1, std::string *buffer2, int infile, char *temp, long bytes_read, int type, int *count);

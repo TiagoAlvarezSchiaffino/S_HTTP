@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:59:56 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:52:23 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:53:27 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,14 +42,14 @@ class EuleeWallet
 		typedef std::map<key_type, mapped_type>	value_type;
 		typedef	value_type::iterator			iterator;
 
-		EuleeWallet(void);
+		EuleeWallet();
 		EuleeWallet(value_type location);
 		~EuleeWallet(void);
 
 		mapped_type	&operator[](const key_type &key);
 
-		iterator	begin(void);
-		iterator	end(void);
+		iterator	begin();
+		iterator	end();
 
 	private:
 		value_type	_location;

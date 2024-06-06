@@ -8,7 +8,7 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/06 04:46:35 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/06 05:40:02 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
@@ -25,19 +25,19 @@ SRC_PATH	=	srcs
 OBJ_PATH	=	objs
 ANNOYING	=	*.dSYM ../.vscode
 MAIN		=	srcs/main.cpp
-SRC			=	WebServer.cpp \
-				ConfigManager.cpp \
-				Token.cpp \
-				Cookies.cpp \
+SRC			=	Token.cpp \
+				CookieJar.cpp \
+				Serv.cpp \
 				EuleeHand.cpp \
-				EuleePocket.cpp \
 				EuleeWallet.cpp \
-				HttpPostResponse.cpp \
+				EuleePocket.cpp \
+				ConfigManager.cpp \
 				HttpCgiResponse.cpp \
 				HttpGetResponse.cpp \
-				HttpDeleteResponse.cpp \
+				HttpPutResponse.cpp \
+				HttpPostResponse.cpp \
 				HttpHeadResponse.cpp \
-				HttpPutResponse.cpp
+				HttpDeleteResponse.cpp
 OBJ			=	${addprefix ${OBJ_PATH}/, ${SRC:.cpp=.o}}
 
 all: 

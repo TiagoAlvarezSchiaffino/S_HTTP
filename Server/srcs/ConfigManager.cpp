@@ -8,13 +8,13 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:59:12 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/04 18:57:32 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:54:18 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../incs/ConfigManager.hpp"
 
-ConfigManager::ConfigManager(void): _configFilePath() {}
+ConfigManager::ConfigManager(): _configFilePath() {}
 
 ConfigManager::ConfigManager(std::string configFilePath): _configFilePath(configFilePath) {}
 
@@ -89,7 +89,7 @@ void	ConfigManager::parseConfigFile()
 	file.close();
 }
 
-void	ConfigManager::printTokens(void)
+void	ConfigManager::printTokens()
 {
 	for (size_t i = 0; i < this->_tokens.size(); i++)
 		std::cout << "Token: |" << this->_tokens[i].token << "| Type: |" << this->_tokens[i].type << "| Line: |" << this->_tokens[i].lineNum << "|" << std::endl;
@@ -120,7 +120,7 @@ bool	ConfigManager::checkCompulsories(int i)
 	return (false);
 }
 
-void	ConfigManager::configLibrary(void)
+void	ConfigManager::configLibrary()
 {
 	const char	*serverlib[11] = {"server", "location", "listen", "root", "index", "server_name", "error_page", "client_max_body_size", "auto_index", "return", "cgi_script"};
 	const char	*locationlib[12] = {"root", "index", "include", "cgi_script", "upload", "error_page", "client_max_body_size", "autoindex", "return", "limit_except", "allow", "deny"};
@@ -283,7 +283,7 @@ int	ConfigManager::locationBlock(size_t i)
 	}
 	return (i);
 }
-void	ConfigManager::errorHandleShit(void)
+void	ConfigManager::errorHandleShit()
 {
 	size_t	i = 0;
 	int		main_block = 0;
@@ -313,7 +313,7 @@ void	ConfigManager::errorHandleShit(void)
 }
 	if (this->checkCompulsories(this->_tokens.size() - 1) == false)
 		printError("Server does not have all listen, root and index. ", this->_tokens.size() - 1);
-std::vector<Token>	&ConfigManager::getToken(void)
+std::vector<Token>	&ConfigManager::getToken()
 {
 	return (this->_tokens);
 }
