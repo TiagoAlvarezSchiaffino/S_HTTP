@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 07:30:43 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:48:03 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ void	Serv::_setupServer()
 
 	this->_database.serverAddr.resize(this->_database.server.size());
 	this->_database.serverFd.resize(this->_database.server.size()); 
-	
 	for (size_t i = 0; i < this->_database.server.size(); i++)
 	{
 		if ((this->_database.serverFd[i] = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -124,6 +123,12 @@ void	Serv::_receiveRequest()
 		FD_CLR(this->_database.socket, &this->_database.myReadFds);
 		return ;
 	}
+	if (this->_database.parseHeader())
+	{
+		std::cout << std::endl;
+		FD_SET(this->_database.socket, &this->_database.myWriteFds);
+		FD_CLR(this->_database.socket, &this->_database.myReadFds);
+	}
 	while (recvVal > 0)
 	{
 		this->_database.buffer[this->_database.socket].append(readBuffer, recvVal);
@@ -148,24 +153,16 @@ void	Serv::_sendResponse()
 	long	total = this->_database.bytes_sent[this->_database.socket];
 	long	sendVal = send(this->_database.socket, this->_database.response[this->_database.socket].c_str() + total, this->_database.response[this->_database.socket].size() - total, 0);
 	if (sendVal <= 0)
-	{
 		this->_database.perrorExit("Send Error", 0);
-		this->_database.bytes_sent[this->_database.socket] = 0;
-		this->_database.buffer[this->_database.socket].clear();
-		this->_database.response[this->_database.socket].clear();
-		this->_database.parsed.erase(this->_database.socket);
-		close(this->_database.socket);
-		FD_CLR(this->_database.socket, &this->_database.myWriteFds);
-		return ;
+	else
+	{
+		this->_database.bytes_sent[this->_database.socket] += sendVal;
+		std::cout << GREEN << "Sending total: " << this->_database.bytes_sent[this->_database.socket] << RESET << "\r";
+		std::cout.flush();
+		if ((size_t)this->_database.bytes_sent[this->_database.socket] != this->_database.response[this->_database.socket].size())
+			return ;
+		std::cout << std::endl;
 	}
-	this->_database.bytes_sent[this->_database.socket] += sendVal;
-	std::cout << GREEN << "Sending total: " << this->_database.bytes_sent[this->_database.socket] << RESET << "\r";
-	std::cout.flush();
-
-	if ((size_t)this->_database.bytes_sent[this->_database.socket] != this->_database.response[this->_database.socket].size())
-		return ;
-
-	std::cout << std::endl;
 	this->_database.bytes_sent.erase(this->_database.socket);
 	this->_database.buffer.erase(this->_database.socket);
 	this->_database.response.erase(this->_database.socket);
@@ -233,7 +230,7 @@ void	Serv::_doRequest()
 	{
 		if (this->_database.isCGI())
 		{
-			std::cout << MAGENTA << "Invalid method called" << RESET << std::endl;
+			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
 			HttpCgiResponse	cgiResponse(&this->_database);
 			cgiResponse.handleCgi();
 		}
@@ -266,6 +263,11 @@ void	Serv::_doRequest()
 			std::cout << MAGENTA << "Get method called" << RESET << std::endl;
 			HttpGetResponse	getResponse(&this->_database);
 			getResponse.handleGet();
+		}
+		else
+		{
+			std::cout << MAGENTA << "Invalid method called" << RESET << std::endl;
+			this->_database.sendHttp(405);
 		}
 	}
 	catch(const std::exception& e)
