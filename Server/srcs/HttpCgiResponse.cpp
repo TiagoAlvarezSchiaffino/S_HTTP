@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 17:03:30 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 07:02:41 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:11:57 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,14 @@ void    HttpCgiResponse::handleCgi()
 				exit(EXIT_FAILURE);
 			}
 		}
+		rlimit	cpuLimit;
+		cpuLimit.rlim_cur = 10;
+		cpuLimit.rlim_max = 10;
+		if (setrlimit(RLIMIT_CPU, &cpuLimit) == -1)
+		{
+        	this->_database->perrorExit("setrlimit", 0);
+        	exit(EXIT_FAILURE);
+    	}
 		execve(args[0], args, this->_database->envp);
 		std::remove(inFileName.c_str());
 		std::remove(outFileName.c_str());
@@ -96,16 +104,21 @@ void    HttpCgiResponse::handleCgi()
 		total += bytesRead;
 	}
 	close(outfd2);
-	size_t  startPos = output.find("\r\n\r\n") + std::strlen("\r\n\r\n");
-	std::string newOutput = output.substr(startPos);
-
-	this->_database->sendHttp(200, newOutput);
-	std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
-	std::remove(inFileName.c_str());
-	std::remove(outFileName.c_str());
-	dup2(stdinFd, STDIN_FILENO);
-	close(stdinFd);
-	dup2(stdoutFd, STDOUT_FILENO);
-	close(stdoutFd);
+	size_t  startPos = output.find("\r\n\r\n");
+	if (startPos == std::string::npos)
+		this->_database->sendHttp(404);
+	else
+	{
+		startPos += std::strlen("\r\n\r\n");
+		std::string newOutput = output.substr(startPos);
+		this->_database->sendHttp(200, newOutput);
+		std::cout << GREEN << "CGI ran successfully!" << RESET << std::endl;
+		std::remove(inFileName.c_str());
+		std::remove(outFileName.c_str());
+		dup2(stdinFd, STDIN_FILENO);
+		close(stdinFd);
+		dup2(stdoutFd, STDOUT_FILENO);
+		close(stdoutFd);
+	}
 	count++;
 }

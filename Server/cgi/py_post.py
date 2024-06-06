@@ -23,7 +23,7 @@ for i in range (0, count):
     try:
         headers = {
             "Content-Type": "application/octet-stream",
-            "X-Secret-Header-For-Test": "1",
+            # "X-Secret-Header-For-Test": "1",
         }
         # response = requests.post(sys.argv[1], headers=headers, data="1234567890")
         response = requests.post(sys.argv[1], headers=headers, data="aBcDeFgHiJkLmNoPqRsTuVwXyZ")

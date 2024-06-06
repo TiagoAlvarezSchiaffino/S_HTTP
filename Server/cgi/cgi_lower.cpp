@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/05 10:35:10 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:55:29 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:03:16 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,9 @@ int    main(int ac, char **av, char **envp)
     char *cwd = getcwd(NULL, 0);
     std::cout << "Current working directory: " << cwd << std::endl;
     free(cwd);
+
+    // while (1)
+        // ;
 
     for (size_t i = 0; buffer[i]; i++)
         buffer[i] = toupper(buffer[i]);

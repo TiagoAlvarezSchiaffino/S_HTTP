@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:02:56 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:03:45 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,6 @@
 # include <sys/socket.h>
 # include <sys/select.h>
 # include <netinet/in.h>
+# include <sys/resource.h>
 
 #endif
