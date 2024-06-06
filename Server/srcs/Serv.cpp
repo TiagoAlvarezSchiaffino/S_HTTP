@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:54:16 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:46:15 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 07:30:43 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,7 +233,7 @@ void	Serv::_doRequest()
 	{
 		if (this->_database.isCGI())
 		{
-			std::cout << MAGENTA << "CGI method called" << RESET << std::endl;
+			std::cout << MAGENTA << "Invalid method called" << RESET << std::endl;
 			HttpCgiResponse	cgiResponse(&this->_database);
 			cgiResponse.handleCgi();
 		}
