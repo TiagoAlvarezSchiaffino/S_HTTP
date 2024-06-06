@@ -8,16 +8,14 @@
 #                                                            (    @\___      #
 #                                                             /         O    #
 #   Created: 2024/05/15 23:13:39 by Tiago                    /   (_____/     #
-#   Updated: 2024/06/06 06:37:21 by Tiago                  /_____/ U         #
+#   Updated: 2024/06/06 06:48:20 by Tiago                  /_____/ U         #
 #                                                                            #
 # ************************************************************************** #
 
 NAME		=	SERVER
 CXX			=	g++
 CXXFLAGS	=	-Wall -Wextra -Werror -Wshadow -std=c++98 -pedantic
-ifeq ($(DB), 1)
-    CXXFLAGS += -fsanitize=thread -g3
-endif
+CXXFLAGS	+=	-fsanitize=thread -g3
 INCLUDES	=	-Iincs
 RM			=	rm -rf
 MKDIR		=	mkdir -p

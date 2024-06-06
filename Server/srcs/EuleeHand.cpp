@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:45:11 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 06:51:13 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -613,10 +613,10 @@ void	EuleeHand::convertLocation()
 	}
 	else // Using Index
 	{
-		locationRoot = myServer.location[this->locationPath[this->socket]][ROOT][0];
+		locationRoot = (myServer.location[this->locationPath[this->socket]][ROOT].size() != 0) ? myServer.location[this->locationPath[this->socket]][ROOT][0] : myServer[ROOT][0] + this->locationPath[this->socket];
 		remainingPath = methodPathCopy.erase(0, this->locationPath[this->socket].length());
 		indexFile = myServer.location[this->locationPath[this->socket]][INDEX][0];
-		this->methodPath[this->socket] = "/" + myServer.location[this->locationPath[this->socket]][ROOT][0] + remainingPath + ((remainingPath[remainingPath.length() - 1] == '/') ? "" : "/") + indexFile;
+		this->methodPath[this->socket] = "/" + locationRoot + remainingPath + ((remainingPath[remainingPath.length() - 1] == '/') ? "" : "/") + indexFile;
 	}
 	std::cout << GREEN << "Location Path: " << this->locationPath[this->socket] << RESET << std::endl;
 	std::cout << GREEN << "New Path: " << this->methodPath[this->socket] << RESET << std::endl;
