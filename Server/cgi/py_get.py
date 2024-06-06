@@ -15,7 +15,7 @@ for i in range(0, count):
 	try:
 		response = requests.get(sys.argv[1])
 		print(f"{i + 1}: Status code received: {response.status_code}")
-		print(response.text)
+		print(response.text, end="")
 	except:
 		print("Error: Could not connect to server")
 		sys.exit(1)

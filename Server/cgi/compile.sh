@@ -1,8 +1,8 @@
-clean="rm -rf srcs/cgi_toupper.cgi srcs/multiple_workers"
+clean="rm -rf srcs/cgi_lower.cgi srcs/multiple_workers"
 
 function compile()
 {
-	g++ cgi_toupper.cpp -o srcs/cgi_toupper.cgi
+	g++ cgi_lower.cpp -o srcs/cgi_lower.cgi
 	g++ multiple_workers.cpp -o multiple_workers
 }
 

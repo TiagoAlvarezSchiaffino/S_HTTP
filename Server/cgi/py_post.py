@@ -25,8 +25,10 @@ for i in range (0, count):
             "Content-Type": "application/octet-stream",
             "X-Secret-Header-For-Test": "1",
         }
-        response = requests.post(sys.argv[1], headers=headers, data="1234567890")
+        # response = requests.post(sys.argv[1], headers=headers, data="1234567890")
+        response = requests.post(sys.argv[1], headers=headers, data="aBcDeFgHiJkLmNoPqRsTuVwXyZ")
         # response = requests.post(sys.argv[1], headers=headers, data=data_generator(), stream=True)
+        print(response.text)
     except:
         print("Error: Could not connect to server")
         sys.exit(1)
