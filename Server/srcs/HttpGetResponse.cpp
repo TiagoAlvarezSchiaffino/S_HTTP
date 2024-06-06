@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/04 05:55:28 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:07:16 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:32:11 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ void	HttpGetResponse::handleGet()
 		std::cerr << RED << "Error reading " << this->_database->methodPath[this->_database->socket] << "!" << RESET << std::endl;
 		if (this->_database->useDirectoryListing[this->_database->socket])
 		{
-			this->_database->buffer[this->_database->socket] = "HTTP/1.1 200 OK\r\n\r\n" + this->_database->directoryListing(this->_database->methodPath[this->_database->socket]);
+			std::string	directoryPath = this->_database->methodPath[this->_database->socket].substr(1, this->_database->methodPath[this->_database->socket].find_last_of('/'));
+			this->_database->response[this->_database->socket] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n" + this->_database->directoryListing(directoryPath);
 			std::cout << GREEN << "Autoindex is set on, directory listing sent!" << RESET << std::endl;
 		}
 		else if (this->_database->checkPath(this->_database->methodPath[this->_database->socket].c_str() + 1, 0, 1) || this->_database->useDefaultIndex[this->_database->socket])

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:20:49 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:26:35 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/06 05:28:50 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,7 +280,7 @@ std::string EuleeHand::directoryListing(std::string path)
 			fileSize = this->_getFileSize(path, filename);
             if (filename != "." && filename != "..")
 			{
-                content << "<tr> <td><a href=\"" << filename << "\">" << filename << "</a></td>\n";
+                content << "<tr> <td><a href=\"" << path + filename << "\">" << filename << "</a></td>\n";
                 content << "<td>" << lastMod << " </td>\n";
 				content << "<td>" << fileSize << " bytes </td> </tr>\n";
 			}
@@ -641,6 +641,7 @@ std::string	EuleeHand::extractHTML(std::string path)
 int		EuleeHand::sendHttp(int statusCode, std::string responseBody)
 {
 	std::string baseResponse = "HTTP/1.1 " + std::to_string(statusCode) + " " + statusList[statusCode] + "\r\n";
+	baseResponse += "Content-Type: text/html\r\n";
 	if (statusCode == 200 && this->cookieExist[this->socket] == false)
 	{
 		std::cout << GREEN << "Sending Cookie..." << RESET << std::endl;

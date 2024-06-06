@@ -27,6 +27,7 @@ for i in range (0, count):
         }
         # response = requests.post(sys.argv[1], headers=headers, data="1234567890", stream=True)
         response = requests.post(sys.argv[1], headers=headers, data=data_generator(), stream=True)
+        print(response.text)
     except:
         print("Error: Could not connect to server")
         sys.exit(1)
