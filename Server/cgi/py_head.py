@@ -9,8 +9,7 @@ if len(sys.argv) != 2:
 
 try:
 	response = requests.head(sys.argv[1])
+	print("Status code received: ", response.status_code)
 except:
 	print("Error: Could not connect to server")
 	sys.exit(1)
-
-print("Status code received: ", response.status_code)

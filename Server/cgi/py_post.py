@@ -29,10 +29,7 @@ for i in range (0, count):
         response = requests.post(sys.argv[1], headers=headers, data="aBcDeFgHiJkLmNoPqRsTuVwXyZ")
         # response = requests.post(sys.argv[1], headers=headers, data=data_generator(), stream=True)
         print(response.text)
+        print(f"{i + 1}: Status code received: ", response.status_code, "Response size: ", len(response.text))
     except:
         print("Error: Could not connect to server")
         sys.exit(1)
-
-    print(f"{i + 1}: Status code received: ", response.status_code, "Response size: ", len(response.text))
-# print(response.headers)
-# print(response.text, end="")

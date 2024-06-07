@@ -9,8 +9,7 @@ if len(sys.argv) != 2:
 
 try:
 	response = requests.put(sys.argv[1], data = "A put request sent by py_put.py!")
+	print("Status code received: ", response.status_code)
 except:
 	print("Error: Could not connect to server")
 	sys.exit(1)
-
-print("Status code received: ", response.status_code)

@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/05 10:35:10 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 07:03:16 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/07 05:39:06 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,10 @@
 
 int    main(int ac, char **av, char **envp)
 {
+    char	*buffer = new char[WS_BUFFER_SIZE];
+	std::cin.getline(buffer, WS_BUFFER_SIZE);
+
+    for (size_t i = 0; buffer[i]; i++)
         buffer[i] = tolower(buffer[i]);
     // std::cout << "Status: 200 OK\r\n\r\nCGI: " << av[0] << "\nFileInput: " << av[1] << "\n" << buffer << std::endl;
     std::cout << "Status: 200 OK\r\n\r\n";
@@ -42,10 +46,6 @@ int    main(int ac, char **av, char **envp)
     // while (1)
         // ;
 
-    for (size_t i = 0; buffer[i]; i++)
-        buffer[i] = toupper(buffer[i]);
-    std::cout << buffer;
-
-    	delete[] buffer;
+	delete[] buffer;
     return (0);
 }
