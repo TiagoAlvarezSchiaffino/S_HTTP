@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 16:53:59 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:40:07 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/07 05:59:51 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@
 # define CYAN		"\033[1;36m"
 # define BLUENORM	"\033[34m"
 # define CYANNORM	"\033[36m"
-# define WS_TIMEOUT	3
 
 enum	Mode
 {
@@ -33,7 +32,6 @@ enum	Mode
 	WRITE
 };
 
-// server block
 class EuleePocket
 {
 	public:
@@ -48,18 +46,15 @@ class EuleePocket
 
 		mapped_type	&operator[](key_type key);
 
-		// member function
 		iterator	begin();
 		iterator	end();
 
-		// member variable
 		std::vector<EuleeWallet>			vectorLocation;
 		std::map<std::string, EuleeWallet>	location;
 		std::map<int, std::string>			errorPage;
 		int									portIndex;
 
 	private:
-		std::map<std::string, std::string>	_envp;
 		EuleeWallet							_server;
 
 };

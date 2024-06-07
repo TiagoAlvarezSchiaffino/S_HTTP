@@ -8,12 +8,9 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/15 23:30:39 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 07:03:45 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/07 06:03:08 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
-
-#ifndef SERVER_HPP
-# define SERVER_HPP
 
 # define RESET		"\033[0m"
 # define BLACK		"\033[1;30m"
@@ -48,6 +45,8 @@
 # include <iostream>
 # include <algorithm>
 # include <filesystem>
+# include <random>
+# include <unordered_map>
 # include <fcntl.h>
 # include <dirent.h>
 # include <unistd.h>

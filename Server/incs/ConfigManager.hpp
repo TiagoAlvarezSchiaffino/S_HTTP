@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/05/16 01:53:07 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 05:40:30 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/07 05:55:23 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ class ConfigManager
 		int				locationBlock(size_t i);
 		void			errorHandleShit();
 
-		// Utils
 		void				printError(std::string str, int i);
 		std::vector<Token>	&getToken();
 

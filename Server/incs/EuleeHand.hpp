@@ -8,7 +8,7 @@
 /*                                                            (    @\___      */
 /*                                                             /         O    */
 /*   Created: 2024/06/03 14:12:03 by Tiago                    /   (_____/     */
-/*   Updated: 2024/06/06 06:38:40 by Tiago                  /_____/ U         */
+/*   Updated: 2024/06/07 05:58:40 by Tiago                  /_____/ U         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,23 +19,11 @@
 # include "ConfigManager.hpp"
 # include "CookieJar.hpp"
 
-# include <iostream>
-# include <sstream>
-# include <fcntl.h>
-# include <dirent.h>
-# include <sys/stat.h>
-
-# define WS_BUFFER_SIZE			100000
-# define WS_UNCHUNK_INFILE		".unchunkInfile"
-# define WS_UNCHUNK_OUTFILE		".unchunkOutfile"
-# define WS_ERROR_PAGE_PATH 	"./html/server_html/error.html"
-# define WS_DEFAULT_PAGE_PATH	"./html/server_html/default.html"
-
 class EuleeHand
 {
 	public:
 		EuleeHand();
-		EuleeHand(std::string configFilePath, const ConfigManager &configManager, char **envp);
+		EuleeHand(std::string configFilePath, const ConfigManager &configManager);
 		~EuleeHand();
 
 		int			checkPath(std::string path, int	isFile, int isDirectory);
@@ -54,10 +42,10 @@ class EuleeHand
 		void		perrorExit(std::string msg, int exitTrue = 1);
 		void		convertLocation();
 		size_t		addEnv(std::string input);
+		size_t		clearEnv();
 		std::string	cgiPath();
 		std::string	extractHTML(std::string path);
 		std::string directoryListing(std::string path);
-		
 
 		char								**envp;
 		std::map<std::string, std::string>	cgi;
@@ -67,7 +55,7 @@ class EuleeHand
 		std::vector<EuleePocket>			server;
 		std::vector<int>					serverFd;
 		std::vector<sockaddr_in>			serverAddr;
-		int									socket;
+		int									socket, connectionCount;
 		fd_set								myReadFds, myWriteFds;
 		CookieJar							cookieJar;
 
